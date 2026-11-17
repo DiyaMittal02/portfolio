@@ -168,7 +168,7 @@
          I'd value your honest read.</p>
       <p class="sig">— Diya Mittal</p>
       <p style="font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft);margin-top:2px">
-        <span class="ph">[phone]</span> ·
+        +91&nbsp;8532006740 ·
         <a class="lnk off" data-link="li" href="#">[LinkedIn]</a></p>
     </div>
     <div class="row">
@@ -187,8 +187,11 @@
 
 <script>
   "use strict";
-  var KEY = "kuku_outreach_links_v1";
-  var state = {dash:"", case:"", li:""};
+  var KEY = "kuku_outreach_links_v2";
+  var DEF = {dash:"https://diyamittal02.github.io/portfolio/dash-kuku/",
+             "case":"https://diyamittal02.github.io/portfolio/kuku/",
+             li:"https://linkedin.com/in/diya-mittal-837939251"};
+  var state = {dash:DEF.dash, "case":DEF["case"], li:DEF.li};
   var inputs = {dash:document.getElementById("f-dash"),
                 "case":document.getElementById("f-case"),
                 li:document.getElementById("f-li")};
@@ -259,7 +262,7 @@
 "If there's an opening on your analytics team I'd love to be considered — either way, I'd value your honest read.",
 "",
 "Thanks,",
-"Diya Mittal · [phone] · "+L("li")].join("\n");
+"Diya Mittal · +91 8532006740 · "+L("li")].join("\n");
   }
 
   function flash(which){
