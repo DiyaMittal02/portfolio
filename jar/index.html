@@ -1,0 +1,280 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Jar Teardown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Dark-first scroll-story teardown; brand accent on near-black. */
+:root{
+  --bg:#0f0f0c; --panel:#191915; --panel-2:#222018; --border:#302e24;
+  --ink:#f6f4ee; --second:#bdb9ab; --muted:#857f6e;
+  --brand:#e0b000; --brand-ink:#1a1500; --grid:#262419;
+  --pos:#36c98d; --neg:#fb7185;
+  --c-sub:#e0b000; --c-a:#bdb6a2; --c-b:#7c766a;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f7f6f2; --panel:#ffffff; --panel-2:#faf8f3; --border:#e8e4da;
+  --ink:#16140f; --second:#534f46; --muted:#8a8475; --grid:#eef0ea;
+  --brand:#8a6d00; --c-sub:#8a6d00; --c-a:#9a948a; --c-b:#c7c1b4;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f7f6f2; --panel:#ffffff; --panel-2:#faf8f3; --border:#e8e4da;
+  --ink:#16140f; --second:#534f46; --muted:#8a8475; --grid:#eef0ea;
+  --brand:#8a6d00; --c-sub:#8a6d00; --c-a:#9a948a; --c-b:#c7c1b4;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.wrap{max-width:1060px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+a{color:inherit}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:800;font-size:1rem}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.brand .r{color:var(--brand)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:.8rem;color:var(--second);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)}
+section{padding-block:30px;scroll-margin-top:70px}
+.eyebrow{font-family:var(--font-m);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.sec-h{font-size:clamp(1.3rem,3.4vw,1.9rem);font-weight:800;margin:.25rem 0 .2rem}
+.sec-sub{color:var(--second);max-width:68ch;margin:0 0 16px}
+.hero{padding-top:34px}
+.hero-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hero-mark{width:74px;height:74px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:2.1rem;box-shadow:0 8px 30px rgba(0,0,0,.28)}
+.hero h1{font-size:clamp(2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero h1 .r{color:var(--brand)}
+.hero .tag{color:var(--second);font-size:1.02rem;margin:.5rem 0 0;max-width:62ch}
+.disc{display:inline-block;margin-top:12px;font-size:.75rem;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 11px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:20px}
+@media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.chip b{display:block;font-family:var(--font-m);font-size:1.28rem;font-weight:500;letter-spacing:-.01em}
+.chip span{font-size:.72rem;color:var(--muted);display:block;margin-top:2px;line-height:1.3}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px}
+.card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.card p{color:var(--second);margin:.2rem 0 0;font-size:.92rem}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;margin:16px 0}
+.insight .k{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.insight p{margin:.25rem 0 0;color:var(--ink);font-size:.98rem}
+.illus{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);border:1px dashed var(--border);border-radius:6px;padding:2px 8px;margin-left:8px;font-family:var(--font-m);vertical-align:middle}
+.chart{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 16px 10px}
+.chart .ct{font-weight:700;font-size:1rem;font-family:var(--font-d)}
+.chart .cs{color:var(--muted);font-size:.8rem;margin:1px 0 10px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.78rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+.tree{display:flex;flex-direction:column;gap:12px;align-items:center}
+.tree .node{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
+.tree .node b{font-family:var(--font-m)}
+.tree .ops{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tree .ops .node{border-top:3px solid var(--brand)}
+.tree .x{color:var(--muted);align-self:center;font-family:var(--font-m)}
+.idea{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:14px;padding:16px}
+.idea h3{font-size:1rem;font-weight:700}
+.idea .lab{font-family:var(--font-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-top:9px}
+.idea p{color:var(--second);font-size:.88rem;margin:.1rem 0 0}
+.idea .pills{display:flex;gap:8px;margin-top:11px}
+.pill{display:inline-block;font-size:.66rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px}
+.pill.imp{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.pill.eff{background:color-mix(in srgb,var(--brand) 20%,transparent);color:var(--ink)}
+table.exp{width:100%;border-collapse:collapse;font-size:.88rem}
+table.exp th,table.exp td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.exp th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+table.exp td b{color:var(--ink)}
+.tpill{display:inline-block;font-size:.68rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--brand) 20%,transparent);color:var(--ink)}
+.phase{border-left:2px solid var(--border);padding-left:16px;margin-left:6px}
+.phase li{margin-bottom:10px}
+.phase li b{font-family:var(--font-d)}
+details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+footer{border-top:1px solid var(--border);margin-top:20px;padding:20px 0 40px;color:var(--muted);font-size:.82rem}
+.src-note{color:var(--muted);font-size:.8rem}
+ul.clean{margin:.3rem 0 0;padding-left:18px}
+ul.clean li{margin-bottom:5px;color:var(--second)}
+ul.clean li b{color:var(--ink)}
+</style>
+<div class="topbar"><div class="wrap">
+  <span class="brand"><span class="logo">J</span><span>Jar <span class="r">Teardown</span></span></span>
+  <nav class="nav"><a href="#product">Product</a><a href="#economics">Economics</a><a href="#growth">Growth</a><a href="#market">Market</a><a href="#voice">Voice</a><a href="#ideas">Ideas</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a><a href="#moat">Moat &amp; risk</a></nav>
+  <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
+</div></div>
+<div class="wrap">
+  <section class="hero" id="top">
+    <div class="hero-top"><div class="hero-mark">J</div><div>
+      <h1>Jar <span class="r">·</span> Product Teardown</h1>
+      <p class="tag">India’s daily micro-savings app — round-ups and ₹10-a-day nudges that quietly buy digital gold. A habit loop turned into AUM. An independent product-analyst teardown.</p></div></div>
+    <span class="disc">Independent analysis · not affiliated with Jar · company facts real &amp; sourced · as of 2026</span>
+    <div class="chips"><div class="chip"><b>₹3,155 Cr</b><span>Valuation · Sep 2026 (+23%)</span></div><div class="chip"><b>₹208 Cr</b><span>FY25 op. revenue · principal model</span></div><div class="chip"><b>~₹2,450 Cr</b><span>Gold transacted · FY25 gross</span></div><div class="chip"><b>4 Cr+</b><span>Savers · company claim</span></div><div class="chip"><b>₹29 Cr</b><span>Series B2 · Unitary (2026)</span></div><div class="chip"><b>4.47★</b><span>Play sample · 600 reviews</span></div></div>
+    <div class="insight" style="margin-top:22px"><div class="k">The one-line thesis</div><p>Jar’s insight was <b>behavioural, not financial</b>: make saving automatic and invisible (round-ups, daily nudges) and Indians will accumulate gold without thinking. The habit works (493 of 600 reviews are 5-star). The one sharp risk is at the <b>moment of truth — withdrawal</b>, where the buy-sell spread makes cashing out feel like a loss.</p></div>
+  </section>
+
+  <section id="product"><div class="eyebrow">01 · The product</div>
+    <h2 class="sec-h">Saving, made automatic</h2><p class="sec-sub">Round up every spend to the nearest rupee, or save ₹10 a day — Jar sweeps it into <b>digital gold</b>. The product is a <b>habit loop</b> (nudge → save → streak), not an investing screen.</p>
+    <div class="grid3"><div class="card"><h3>Who</h3><p>First-time savers — young, mobile-first Indians who never had an SIP and distrust the stock market.</p></div><div class="card"><h3>How it earns</h3><p>A slice of the <b>buy-sell spread</b> on gold, plus jewellery (Nek) and allied financial products.</p></div><div class="card"><h3>Why it wins</h3><p>Gold is culturally trusted and the saving is <b>effortless</b> — Jar removes the decision, not just the fee.</p></div></div></section>
+
+  <section id="economics"><div class="eyebrow">02 · Business &amp; unit economics</div>
+    <h2 class="sec-h">Thin spread, so the habit has to compound</h2><p class="sec-sub">Jar now books the <b>full value of gold</b> transacted as revenue (principal model), but its real take is a thin slice of the spread. Economics only work if savers <b>stay and keep buying</b>.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Illustrative contribution per active saver<span class="illus">illustrative</span></div><div class="cs">Shape from a thin spread less payment, custody & support; not Jar’s P&amp;L</div><div id="c-waterfall"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><h3>Revenue ≠ take</h3><p>Gross gold transacted (~₹2,450 Cr) dwarfs the <b>net take</b> — the FY25 op. revenue of ₹208 Cr is closer to the economics that matter.</p></div><div class="card"><h3>Trust drives LTV</h3><p>A thin per-user take only compounds if the saver re-saves after withdrawing. A single bad cash-out ends the habit — and the LTV.</p></div></div></div>
+    <div class="insight"><div class="k">Analyst read</div><p>The north star isn’t gold transacted — it’s <b>active savers × retention × re-save-after-withdrawal</b>. The withdrawal experience is the metric that governs whether the whole habit survives contact with reality.</p></div></section>
+
+  <section id="growth"><div class="eyebrow">03 · Growth</div>
+    <h2 class="sec-h">Revenue scaling on a habit</h2><p class="sec-sub">FY25 operating revenue reached ₹208 Cr against ~₹2,450 Cr of gold transacted — the gap is the principal-vs-agent accounting, and a reminder that <b>net take</b> is what pays the bills.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Revenue vs gold transacted (FY25)</div><div class="cs">Reported · principal model books full gold value</div><div id="c-rev"></div></div>
+      <div class="chart"><div class="ct">Savings-mode mix<span class="illus">illustrative</span></div><div class="cs">Indicative share · round-ups are the wedge</div><div id="c-mix"></div></div></div></section>
+
+  <section id="market"><div class="eyebrow">04 · Market</div>
+    <h2 class="sec-h">The savings-habit category leader</h2><p class="sec-sub">Jar competes less with gold apps and more with <b>not saving at all</b>. Its edge is behavioural design that turns intent into a daily, automatic act.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Play Store rating (recent sample)</div><div class="cs">600-review sample · count in tooltip</div><div id="c-ratings"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><h3>Love, with a sharp edge</h3><p>At <b class='mono'>4.47★</b> on the recent sample, Jar is genuinely loved — the highest of this cohort. The edge: service-quality complaints (1.64★) cluster entirely at withdrawal.</p></div>
+        <div class="insight" style="margin:0"><div class="k">So what</div><p>The moat is <b>habit + trust</b>. The single most valuable fix is making withdrawal honest and predictable, so the spread never surprises a saver into calling a loved app a “scam.”</p></div></div></div></section>
+
+  <section id="voice">
+    <div class="eyebrow">Voice of customer · real data</div>
+    <h2 class="sec-h">What users actually say</h2>
+    <p class="sec-sub">A dated sample of <b>600 public Google Play reviews</b> (Jar, 2026-11-12 to 2026-11-16). This is <b>real data</b> — the only user-level evidence in this teardown. Reviews are self-selected; user names are not stored. Themes are keyword-tagged, and the average rating per theme shows where the pain is.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0 4px"><div class="chip"><b>600</b><span>reviews analysed</span></div><div class="chip"><b>4.47★</b><span>avg rating · this sample</span></div><div class="chip"><b>10.7%</b><span>1-star share</span></div><div class="chip"><b>App / tech</b><span>top complaint theme</span></div></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>Complaint &amp; praise themes</h3><p class="src-note" style="margin:2px 0 6px">Keyword-tagged · red average = the pain</p><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>App / tech</span><span class="src-note" style="white-space:nowrap">105 · 17.5% · <b style="color:var(--second)">3.9★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Pricing &amp; fares</span><span class="src-note" style="white-space:nowrap">36 · 6.0% · <b style="color:var(--second)">2.5★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Service quality</span><span class="src-note" style="white-space:nowrap">25 · 4.2% · <b style="color:var(--neg)">1.64★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Support</span><span class="src-note" style="white-space:nowrap">10 · 1.7% · <b style="color:var(--second)">3.0★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Wait / ETA / delay</span><span class="src-note" style="white-space:nowrap">8 · 1.3% · <b style="color:var(--second)">2.5★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Payments &amp; refunds</span><span class="src-note" style="white-space:nowrap">7 · 1.2% · <b style="color:var(--neg)">1.57★</b></span></div></div>
+      <div class="card"><h3>In their words</h3><p class="src-note" style="margin:2px 0 10px">Representative reviews · verbatim</p><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Very very bad application, first it says that you can withdraw the amount only when you want and later it locks it, no one should transfer the amount to it.”</span><div class="src-note" style="margin-top:3px">1★ · 2 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“bakwas experience.....insan mehnat se apne paise isme dalta h or 20-30% ye Paisa kaat kar dete h....3rd class app. koi mat fasna isme apne paise daal kar.”</span><div class="src-note" style="margin-top:3px">1★ · 2 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“scam app i buyed gold for 740 and when I clicked on withdrawal it decreased to 672.82 inr very bad response don't use”</span><div class="src-note" style="margin-top:3px">1★ · 2 found helpful</div></div><div style="border-left:3px solid var(--pos);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Good apps I Like this jar apps.”</span><div class="src-note" style="margin-top:3px">5★ · 1 found helpful</div></div></div>
+    </div>
+    <div class="insight" style="margin-top:16px"><div class="k">The read</div><p>The habit is genuinely loved (avg 4.47★). The pain is concentrated and severe: <b>withdrawal spread shock</b> and service-quality complaints (1.64★) — “bought ₹740, withdrew ₹672” — plus “locked my money” confusion. Trust is won or lost at withdrawal.</p></div>
+  </section>
+
+  <section id="ideas">
+    <div class="eyebrow">Feature ideas · from the reviews</div>
+    <h2 class="sec-h">What I’d ship to make the app better</h2>
+    <p class="sec-sub">The habit is loved; trust is won or lost at withdrawal. Each is pulled from a real complaint theme above, with a product-analyst’s rough impact/effort call — opinion, clearly labelled.</p>
+    <div class="grid2"><div class="idea"><h3><span class="mono" style="color:var(--brand)">1. </span>Show net withdrawal value up-front</h3><span class="lab">From the reviews</span><p>The #1 “scam” trigger (service quality 1.64★) — “bought ₹740, withdrawal showed ₹672”.</p><span class="lab">Expected impact</span><p>Removes spread shock; protects the 4.47★ trust that drives the habit.</p><div class="pills"><span class="pill imp">Impact: High</span><span class="pill eff">Effort: Low</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">2. </span>Explicit withdrawal SLA &amp;amp; no hidden locks</h3><span class="lab">From the reviews</span><p>“Says withdraw anytime, later it locks it” — lock-in reads as deception.</p><span class="lab">Expected impact</span><p>Higher re-save-after-withdrawal rate (the LTV cliff).</p><div class="pills"><span class="pill imp">Impact: High</span><span class="pill eff">Effort: Med</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">3. </span>Loyalty spread tiers for consistent savers</h3><span class="lab">From the reviews</span><p>“20–30% cut” complaints cluster among frequent savers who feel penalised.</p><span class="lab">Expected impact</span><p>Better effective returns for the stickiest cohort → retention & referrals.</p><div class="pills"><span class="pill imp">Impact: Med</span><span class="pill eff">Effort: Med</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">4. </span>Buy-time disclosure of making / GST on jewellery</h3><span class="lab">From the reviews</span><p>Charge confusion at purchase feeds the “they deduct money” narrative.</p><span class="lab">Expected impact</span><p>Sets expectations before money moves; fewer disputes.</p><div class="pills"><span class="pill imp">Impact: Med</span><span class="pill eff">Effort: Low</span></div></div></div>
+  </section>
+
+  <section id="analyst"><div class="eyebrow">05 · The product-analyst lens</div>
+    <h2 class="sec-h">How I’d run analytics here</h2>
+    <p class="sec-sub">The company facts above are real. The rest is how I’d <b>instrument and grow</b> the product. Funnel and cohort figures are <b>illustrative frameworks</b>, clearly marked.</p>
+    <div class="card"><h3>North-star metric tree</h3><p>One number the org can move, decomposed into the levers a team owns.</p>
+      <div class="tree" style="margin-top:14px"><div class="node" style="border-top:3px solid var(--brand)"><b>Gold AUM retained</b><br><span class="src-note">north star</span></div>
+        <div class="x">=</div><div class="ops"><div class="node"><b>Active savers</b><br><span class="src-note">acquisition × retention</span></div><div class="x">×</div><div class="node"><b>Save / saver</b><br><span class="src-note">nudge × streak</span></div><div class="x">×</div><div class="node"><b>Re-save after withdrawal</b><br><span class="src-note">withdrawal trust</span></div></div></div>
+      <p style="margin-top:12px">The quiet killer is the third branch — <b>re-save after withdrawal</b>. If cashing out feels like a loss, the saver never comes back, and all the acquisition spend is wasted.</p></div>
+    <div class="grid2" style="margin-top:16px"><div class="chart"><div class="ct">Savings funnel<span class="illus">illustrative</span></div><div class="cs">Install → first save → streak → withdraw → re-save</div><div id="c-funnel"></div></div>
+      <div class="chart"><div class="ct">Cohort retention (monthly)<span class="illus">illustrative</span></div><div class="cs">% of a cohort still active, by month since first use</div><div id="c-cohort"></div></div></div>
+    <div class="insight"><div class="k">What good looks like</div><p>The habit forms well — the cliff is <b>after the first withdrawal</b>. Spread shock at cash-out drops the re-save rate, and re-saving is where LTV lives. Make withdrawal honest and you protect the whole flywheel.</p></div></section>
+
+  <section id="experiments"><div class="eyebrow">06 · Experiment backlog</div>
+    <h2 class="sec-h">The first A/B tests I’d ship</h2>
+    <p class="sec-sub">Each tied to a lever in the tree, with a primary metric and a guardrail so we don’t win one number by breaking another.</p>
+    <div class="card" style="padding:4px 4px"><table class="exp"><thead><tr><th>Hypothesis</th><th>Lever</th><th>Primary metric</th><th>Guardrail</th></tr></thead><tbody><tr><td><b>Net-value disclosure</b> — show realisable sell value before and during a buy</td><td><span class="tpill">trust</span></td><td>Withdrawal CSAT</td><td>Buy conversion</td></tr><tr><td><b>No-surprise withdrawal</b> — explicit SLA + remove hidden locks</td><td><span class="tpill">retention</span></td><td>Re-save-after-withdrawal</td><td>Support tickets</td></tr><tr><td><b>Streak mechanics</b> — daily nudges + streak rewards to deepen the habit</td><td><span class="tpill">frequency</span></td><td>Saves / saver / month</td><td>Churn</td></tr><tr><td><b>Spread tiers</b> — better spread for consistent savers</td><td><span class="tpill">loyalty</span></td><td>D90 retention</td><td>Contribution / saver</td></tr></tbody></table></div>
+    <h3 style="font-family:var(--font-d);margin:22px 0 10px;font-size:1.1rem">First 30 · 60 · 90 days as your analyst</h3>
+    <ul class="phase clean"><li><b>Days 0–30 —</b> one funnel of truth (install → first save → streak → withdraw → re-save) and a <b>withdrawal-experience</b> dashboard (spread, CSAT, re-save rate).</li><li><b>Days 30–60 —</b> attack the withdrawal cliff with net-value disclosure and no-surprise withdrawal; watch re-save-after-withdrawal.</li><li><b>Days 60–90 —</b> a contribution model per saver cohort, so spread, nudges and jewellery cross-sell are tuned on retention, not gross gold.</li></ul></section>
+
+  <section id="moat"><div class="eyebrow">07 · Moat &amp; risk</div>
+    <h2 class="sec-h">What protects it, what threatens it</h2>
+    <div class="grid2"><div class="card"><h3>The moat</h3><ul class="clean"><li><b>Habit design</b> — automatic saving removes the decision.</li><li><b>Trust in gold</b> — a culturally safe first asset.</li><li><b>Scale</b> — a large, sticky base of first-time savers.</li></ul></div>
+      <div class="card"><h3>The risks</h3><ul class="clean"><li><b>Withdrawal trust</b> — spread shock drives “scam” reviews.</li><li><b>Thin take</b> — economics need high retention to compound.</li><li><b>Regulation</b> — digital-gold collection has drawn scrutiny (FIR).</li></ul></div></div>
+    <p class="src-note" style="margin-top:8px"><b>Note:</b> Funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks, not reported Jar figures. Company facts are real and sourced.</p>
+    <details><summary>Sources &amp; method</summary><p class="src-note" style="margin-top:8px">DealStreetAsia / Entrackr — Series B2 ₹29 Cr (Unitary, Sep 2026) at ~₹3,155 Cr (+23%); total raised $60M+ · FY25 operating revenue ₹208 Cr, gross gold transacted ~₹2,450 Cr (principal model) · company claim 4 Cr+ savers · Bengaluru-police FIR on digital-gold collection noted as a risk · Google Play public reviews (600-review sample, Nov 2026). Figures as of 2026.</p></details></section>
+
+  <footer>Independent product-analyst teardown by Diya Mittal (ex-Pocket FM, Scout). Company facts are real and sourced; funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks. Jar and its marks belong to their owners.</footer>
+</div>
+
+<div class="tt" id="tt"></div>
+<script>
+"use strict";
+var CFG={"wf": [{"l": "Spread / saver", "v": 22, "t": "tot"}, {"l": "− Payment", "v": -3, "t": "neg"}, {"l": "− Custody", "v": -4, "t": "neg"}, {"l": "− Support/ops", "v": -6, "t": "neg"}, {"l": "Contribution", "v": 9, "t": "end"}], "rev": [{"l": "Op. revenue", "v": 208}, {"l": "Gold transacted", "v": 2450}], "rev_growth": "", "rev_unit": "", "mix": [{"l": "Round-ups", "v": 46, "c": "--c-sub"}, {"l": "Daily SIP", "v": 30, "c": "--c-a"}, {"l": "Goal-based", "v": 16, "c": "--c-b"}, {"l": "Nek (jewellery)", "v": 8, "c": "--muted"}], "rating": [{"l": "Jar (Play sample)", "v": 4.47, "n": "600 reviews", "c": "--c-sub"}], "funnel": [{"l": "Installed", "v": 100}, {"l": "First save", "v": 58}, {"l": "7-day streak", "v": 34}, {"l": "Withdrew once", "v": 19}, {"l": "Re-saved after", "v": 14}], "cohort": [100, 54, 48, 45, 42, 45]};
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+function rupee(n){return "₹"+n.toLocaleString("en-IN");}
+
+function waterfall(id,steps){var box=document.getElementById(id);if(!box)return;var W=440,H=240,pad=26,base=H-42,top=18;
+  var max=Math.max.apply(null,steps.map(function(s){return Math.abs(s.v);})),scale=(base-top)/max,n=steps.length,slot=(W-pad*2)/n,bw=slot-16,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  steps.forEach(function(s,i){var x=pad+i*slot+8,hiVal,loVal,col;
+    if(s.t==="neg"){hiVal=run;loVal=run+s.v;run=loVal;col=neg;}
+    else{hiVal=Math.max(s.v,0);loVal=Math.min(s.v,0);run=s.v;col=(s.t==="end")?(s.v<0?neg:pos):br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s.t==="end"&&s.v<0){yTop=base;h=Math.max(Math.abs(s.v)*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s.t==="neg")?0.9:(s.t==="sub"?0.55:1)});svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+(s.v<0?"−":"")+rupee(Math.abs(s.v))+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-6,"text-anchor":"middle","font-size":10,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s.v<0?"−":"")+rupee(Math.abs(s.v));svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+15,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s.l.length>14?s.l.slice(0,13)+"…":s.l;svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function barsN(id,data,growth,unit){var box=document.getElementById(id);if(!box)return;var W=440,H=220,L=20,R=14,T=24,B=34,u=unit||"₹";
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.25,iw=W-L-R,ih=H-T-B,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length,bw=Math.min(56,(iw/n)-18),gap=(iw-bw*n)/(n+1);
+  data.forEach(function(d,i){var x=L+gap+i*(bw+gap),h=ih*d.v/max,y=T+ih-h;var r=el("rect",{x:x,y:y,width:bw,height:h,rx:5,fill:br,opacity:0.5+0.5*i/(n-1)});svg.appendChild(r);
+    bind(r,"<b>"+d.l+"</b><br><span class='v'>"+u+d.v.toLocaleString("en-IN")+(unit==="k"?"k":" Cr")+"</span>");
+    var tx=el("text",{x:x+bw/2,y:y-7,"text-anchor":"middle","font-size":10.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(unit==="k"?d.v+"k":"₹"+d.v);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:H-12,"text-anchor":"middle","font-size":10,fill:mut});lb.textContent=d.l;svg.appendChild(lb);});
+  if(growth){var ar=el("text",{x:W-R,y:T-8,"text-anchor":"end","font-size":11,fill:cvar("--pos"),"font-family":cvar("--font-m")});ar.textContent=growth;svg.appendChild(ar);}
+  box.innerHTML="";box.appendChild(svg);}
+
+function donut(id,data){var box=document.getElementById(id);if(!box)return;var W=440,H=230,cx=150,cy=H/2,rO=82,rI=50;
+  var total=data.reduce(function(a,d){return a+d.v;},0),ang=-Math.PI/2,svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d){var cc=cvar(d.c),a2=ang+d.v/total*Math.PI*2,large=(a2-ang)>Math.PI?1:0;
+    var x1=cx+rO*Math.cos(ang),y1=cy+rO*Math.sin(ang),x2=cx+rO*Math.cos(a2),y2=cy+rO*Math.sin(a2);
+    var xi1=cx+rI*Math.cos(a2),yi1=cy+rI*Math.sin(a2),xi2=cx+rI*Math.cos(ang),yi2=cy+rI*Math.sin(ang);
+    var p=el("path",{d:"M"+x1+","+y1+" A"+rO+","+rO+" 0 "+large+" 1 "+x2+","+y2+" L"+xi1+","+yi1+" A"+rI+","+rI+" 0 "+large+" 0 "+xi2+","+yi2+" Z",fill:cc,stroke:cvar("--panel"),"stroke-width":2});
+    svg.appendChild(p);bind(p,"<b>"+d.l+"</b><br><span class='v'>"+d.v+"%</span>");ang=a2;});
+  data.forEach(function(d,i){var ly=cy-24+i*26;svg.appendChild(el("rect",{x:270,y:ly,width:13,height:13,rx:3,fill:cvar(d.c)}));
+    var t=el("text",{x:290,y:ly+11,"font-size":12,fill:cvar("--ink")});t.textContent=d.l+"  ·  "+d.v+"%";t.setAttribute("font-family",cvar("--font-b"));svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function hbar(id,data){var box=document.getElementById(id);if(!box)return;var W=440,rh=46,H=data.length*rh+6,lo=3.2,hi=5.0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),mut=cvar("--muted");
+  data.forEach(function(d,i){var y=i*rh+8,w=(W-190)*(d.v-lo)/(hi-lo);var r=el("rect",{x:160,y:y,width:Math.max(w,3),height:26,rx:6,fill:cvar(d.c||"--c-sub")});svg.appendChild(r);
+    bind(r,"<b>"+d.l+"</b><br><span class='v'>"+d.v.toFixed(2)+"★ · "+d.n+"</span>");
+    var lb=el("text",{x:152,y:y+17,"text-anchor":"end","font-size":11.5,fill:cvar("--ink")});lb.textContent=d.l;svg.appendChild(lb);
+    var vl=el("text",{x:160+Math.max(w,3)+8,y:y+17,"font-size":11,fill:mut,"font-family":cvar("--font-m")});vl.textContent=d.v.toFixed(2)+"★";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function funnel(id,steps){var box=document.getElementById(id);if(!box)return;var W=440,H=steps.length*38+10,max=steps[0].v,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*38+6,w=(W-200)*s.v/max;var r=el("rect",{x:200,y:y,width:Math.max(w,3),height:26,rx:5,fill:br,opacity:1-i*0.13});svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+s.v+"% of top</span>");
+    var lb=el("text",{x:192,y:y+17,"text-anchor":"end","font-size":10.5,fill:cvar("--ink")});lb.textContent=s.l;svg.appendChild(lb);
+    var vl=el("text",{x:200+Math.max(w,3)+6,y:y+17,"font-size":10.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s.v+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function cohort(id,base){var box=document.getElementById(id);if(!box)return;var cohorts=["Jun","Jul","Aug","Sep","Oct"],months=base,W=440,cell=34,x0=46,y0=22,gapc=6;
+  var H=y0+cohorts.length*(cell+gapc)+16,svg=el("svg",{viewBox:"0 0 "+W+" "+H}),br=cvar("--brand"),mut=cvar("--muted");
+  for(var m=0;m<months.length;m++){var ht=el("text",{x:x0+m*(cell+gapc)+cell/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});ht.textContent="M"+m;svg.appendChild(ht);}
+  cohorts.forEach(function(ch,r){var rt=el("text",{x:x0-8,y:y0+r*(cell+gapc)+cell/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=ch;svg.appendChild(rt);
+    for(var m=0;m<months.length;m++){var v=Math.max(0,months[m]-r*2+(r?Math.round(Math.sin(r+m)*2):0)),op=0.14+0.86*(v/100),x=x0+m*(cell+gapc),y=y0+r*(cell+gapc);
+      var rc=el("rect",{x:x,y:y,width:cell,height:cell,rx:5,fill:br,opacity:op});svg.appendChild(rc);bind(rc,"<b>"+ch+" · M"+m+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cell/2,y:y+cell/2+3.5,"text-anchor":"middle","font-size":9,fill:(op>0.55?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v;svg.appendChild(vt);}});
+  box.innerHTML="";box.appendChild(svg);}
+
+function renderAll(){
+  waterfall("c-waterfall",CFG.wf);
+  barsN("c-rev",CFG.rev,CFG.rev_growth,CFG.rev_unit);
+  donut("c-mix",CFG.mix);
+  hbar("c-ratings",CFG.rating);
+  funnel("c-funnel",CFG.funnel);
+  cohort("c-cohort",CFG.cohort);
+}
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("td_jar");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.addEventListener("click",function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("td_jar",nd?"dark":"light");}catch(e){}setLabel();renderAll();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();renderAll();}});
+setLabel();renderAll();
+</script>
