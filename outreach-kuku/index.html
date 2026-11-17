@@ -179,6 +179,28 @@
     </div>
   </section>
 
+  <!-- Nudge -->
+  <section class="sheet" id="sheet-nudge">
+    <span class="tag">Nudge · no reply yet</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>Gentle nudge in case my last note slipped by — no worries at all if the timing's off.</p>
+      <p>Quick recap: I built an independent Kuku FM teardown — the paywall (not the content) is where
+         users drop, and payments is the #1 theme across 1,200 real reviews.</p>
+      <p>Dashboard&nbsp;→ <a class="lnk off" data-link="dash" href="#">[dashboard link]</a> &nbsp;·&nbsp;
+         Write-up&nbsp;→ <a class="lnk off" data-link="case" href="#">[case study]</a></p>
+      <p>I'm exploring Product Analyst roles on your team — would value even a two-line read whenever
+         you have a minute.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="dash" href="#" target="_blank" rel="noopener">Open dashboard</a>
+      <a class="btn ghost off" data-link="case" href="#" target="_blank" rel="noopener">Case study (PDF)</a>
+      <button class="btn ghost" data-copy="nudge">Copy message</button>
+      <span class="copied" data-for="nudge">Copied</span>
+    </div>
+  </section>
+
   <footer>
     Handwritten-style, but every link is live. Product metrics in the dashboard are synthetic and
     labelled; company facts, reviews and app imagery are real public data, shown for analysis only.
@@ -264,6 +286,19 @@
 "Thanks,",
 "Diya Mittal · +91 8532006740 · "+L("li")].join("\n");
   }
+  function nudgeText(){
+    return [
+"Hi [Name],",
+"",
+"Gentle nudge in case my last note slipped by — no worries at all if the timing's off.",
+"",
+"Quick recap: I built an independent Kuku FM teardown — the paywall (not the content) is where users drop, and payments is the #1 theme across 1,200 real reviews.",
+"Dashboard -> "+L("dash")+"  ·  Write-up -> "+L("case"),
+"",
+"I'm exploring Product Analyst roles on your team — would value even a two-line read whenever you have a minute.",
+"",
+"— Diya"].join("\n");
+  }
 
   function flash(which){
     var el=document.querySelector('.copied[data-for="'+which+'"]');
@@ -282,7 +317,7 @@
   document.querySelectorAll("button[data-copy]").forEach(function(b){
     b.addEventListener("click", function(){
       var which=b.getAttribute("data-copy");
-      copyText(which==="li"?liText():emailText(), which);
+      copyText(which==="li"?liText():which==="nudge"?nudgeText():emailText(), which);
     });
   });
 </script>

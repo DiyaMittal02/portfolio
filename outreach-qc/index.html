@@ -211,6 +211,24 @@ footer{color:#9a8a70;font-size:.76rem;text-align:center;margin:10px 0 0;line-hei
     </div>
   </section>
 
+  <section class="sheet blink">
+    <span class="tag">Nudge · no reply yet</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>Gentle nudge in case my last note slipped by — no worries at all if the timing's off.</p>
+      <p>Quick recap: I built an independent Blinkit teardown — unit economics, the growth-to-margin
+         shift and an experiment backlog. Teardown → <a class="lnk off" data-link="blink" href="#">[Blinkit teardown]</a></p>
+      <p>If a Product Analyst role opens up on the Blinkit / Eternal team I'd love to be considered —
+         either way, I'd value your read.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="blink" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="blinkNudge">Copy message</button>
+      <span class="copied" data-for="blinkNudge">Copied</span>
+    </div>
+  </section>
+
   <!-- ZEPTO -->
   <div class="co zepto"><span class="dot"></span><h3>Zepto</h3></div>
 
@@ -325,6 +343,24 @@ footer{color:#9a8a70;font-size:.76rem;text-align:center;margin:10px 0 0;line-hei
     </div>
   </section>
 
+  <section class="sheet zepto">
+    <span class="tag">Nudge · no reply yet</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>Gentle nudge in case my last note slipped by — no worries at all if the timing's off.</p>
+      <p>Quick recap: I built an independent Zepto teardown — unit economics, the pre-IPO "profitable
+         frequency" problem and an experiment backlog. Teardown → <a class="lnk off" data-link="zepto" href="#">[Zepto teardown]</a></p>
+      <p>If a Product Analyst role opens up at Zepto I'd love to be considered — either way, I'd value
+         your read.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="zepto" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="zeptoNudge">Copy message</button>
+      <span class="copied" data-for="zeptoNudge">Copied</span>
+    </div>
+  </section>
+
   <footer>
     Handwritten-style, every link live. Teardowns use real sourced data with clearly-labelled illustrative
     frameworks. Blinkit, Zepto &amp; their marks belong to their owners.
@@ -415,7 +451,15 @@ var T={
   "Company figures are real & sourced; the unit-economics model is a clearly-labelled illustrative shape, not Zepto's exact P&L.","",
   "Dashboard -> https://diyamittal02.github.io/portfolio/dash-zepto/",
   "Case study -> https://diyamittal02.github.io/portfolio/zepto/","",
-  "If a Product/Business Analyst role has opened up since we last spoke, I'd love to be considered — and if not, I'd still value two minutes of your read.","","Thanks,","Diya Mittal · +91 8532006740 · "+L("li")].join("\n");}
+  "If a Product/Business Analyst role has opened up since we last spoke, I'd love to be considered — and if not, I'd still value two minutes of your read.","","Thanks,","Diya Mittal · +91 8532006740 · "+L("li")].join("\n");},
+ blinkNudge:function(){return["Hi [Name],","",
+  "Gentle nudge in case my last note slipped by — no worries at all if the timing's off.","",
+  "Quick recap: I built an independent Blinkit teardown — unit economics, the growth-to-margin shift and an experiment backlog. Teardown -> "+L("blink"),"",
+  "If a Product Analyst role opens up on the Blinkit / Eternal team I'd love to be considered — either way, I'd value your read.","","— Diya"].join("\n");},
+ zeptoNudge:function(){return["Hi [Name],","",
+  "Gentle nudge in case my last note slipped by — no worries at all if the timing's off.","",
+  "Quick recap: I built an independent Zepto teardown — unit economics, the pre-IPO 'profitable frequency' problem and an experiment backlog. Teardown -> "+L("zepto"),"",
+  "If a Product Analyst role opens up at Zepto I'd love to be considered — either way, I'd value your read.","","— Diya"].join("\n");}
 };
 function flash(w){var e=document.querySelector('.copied[data-for="'+w+'"]');if(!e)return;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1400);}
 function fallback(txt,w){var ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";
