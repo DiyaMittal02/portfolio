@@ -1,0 +1,545 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Zepto Teardown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: dark-first scroll-story with a sticky section nav; Zepto purple as the single hero accent on near-black. */
+:root{
+  --bg:#0e0b12; --panel:#191320; --panel-2:#221a2c; --border:#2e2539;
+  --ink:#f4f1f8; --second:#b6adc4; --muted:#7d748c;
+  --brand:#a855d6;          /* Zepto purple, sampled from the app icon (brightened for dark) */
+  --brand-ink:#faf5ff;
+  --grid:#241d2e;
+  --pos:#36c98d; --neg:#ff6b7d;
+  --c-sub:#a855d6; --c-a:#b9bdc7; --c-b:#767b86;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif;
+  --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f7f4fb; --panel:#ffffff; --panel-2:#faf7fe; --border:#e9e2f1;
+  --ink:#19121f; --second:#574e62; --muted:#8a8095;
+  --brand:#7a1fa2; --brand-ink:#ffffff; --grid:#efe9f6;
+  --pos:#12996a; --neg:#d23a52; --c-sub:#7a1fa2; --c-a:#9aa0ab; --c-b:#c3c7cf;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f7f4fb; --panel:#ffffff; --panel-2:#faf7fe; --border:#e9e2f1;
+  --ink:#19121f; --second:#574e62; --muted:#8a8095;
+  --brand:#7a1fa2; --brand-ink:#ffffff; --grid:#efe9f6;
+  --pos:#12996a; --neg:#d23a52; --c-sub:#7a1fa2; --c-a:#9aa0ab; --c-b:#c3c7cf;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
+  background:var(--bg);z-index:60}
+.wrap{max-width:1060px;margin:0 auto;
+  padding-left:max(18px,env(safe-area-inset-left,0px));
+  padding-right:max(18px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+a{color:inherit}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:800;font-size:1rem}
+.brand img{width:30px;height:30px;border-radius:8px}
+.brand .r{color:var(--brand)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:.8rem;color:var(--second);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);
+  border-radius:8px;padding:6px 10px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)}
+
+section{padding-block:30px;scroll-margin-top:70px}
+.eyebrow{font-family:var(--font-m);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.sec-h{font-size:clamp(1.3rem,3.4vw,1.9rem);font-weight:800;margin:.25rem 0 .2rem}
+.sec-sub{color:var(--second);max-width:68ch;margin:0 0 16px}
+
+.hero{padding-top:34px}
+.hero-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hero-top img{width:74px;height:74px;border-radius:18px;box-shadow:0 8px 30px rgba(168,85,214,.3)}
+.hero h1{font-size:clamp(2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero h1 .r{color:var(--brand)}
+.hero .tag{color:var(--second);font-size:1.02rem;margin:.5rem 0 0;max-width:60ch}
+.disc{display:inline-block;margin-top:12px;font-size:.75rem;color:var(--muted);
+  border:1px solid var(--border);border-radius:999px;padding:4px 11px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:22px}
+@media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.chip b{display:block;font-family:var(--font-m);font-size:1.32rem;font-weight:500;letter-spacing:-.01em}
+.chip span{font-size:.72rem;color:var(--muted);display:block;margin-top:2px;line-height:1.3}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px}
+.card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.card p{color:var(--second);margin:.2rem 0 0;font-size:.92rem}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);
+  border-radius:12px;padding:14px 16px;margin:16px 0}
+.insight .k{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.insight p{margin:.25rem 0 0;color:var(--ink);font-size:.98rem}
+.illus{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);
+  border:1px dashed var(--border);border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:var(--font-m)}
+
+.chart{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 16px 10px}
+.chart .ct{font-weight:700;font-size:1rem;font-family:var(--font-d)}
+.chart .cs{color:var(--muted);font-size:.8rem;margin:1px 0 10px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);
+  border-radius:8px;padding:6px 9px;font-size:.78rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);
+  opacity:0;transition:opacity .12s;font-family:var(--font-b)}
+.tt .v{font-family:var(--font-m)}
+
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:820px){.shots{grid-template-columns:repeat(2,1fr)}}
+.shots figure{margin:0}
+.shots img{width:100%;border-radius:14px;border:1px solid var(--border);background:var(--panel)}
+.shots figcaption{font-size:.74rem;color:var(--muted);margin-top:6px;text-align:center}
+
+.tree{display:flex;flex-direction:column;gap:12px;align-items:center}
+.tree .node{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
+.tree .node b{font-family:var(--font-m)}
+.tree .ops{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.tree .ops .node{border-top:3px solid var(--brand)}
+.tree .x{color:var(--muted);align-self:center;font-family:var(--font-m)}
+
+table.exp{width:100%;border-collapse:collapse;font-size:.88rem}
+table.exp th,table.exp td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.exp th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+table.exp td b{color:var(--ink)}
+.pill{display:inline-block;font-size:.68rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px;
+  background:color-mix(in srgb,var(--brand) 22%,transparent);color:var(--ink)}
+
+.phase{border-left:2px solid var(--border);padding-left:16px;margin-left:6px}
+.phase li{margin-bottom:10px}
+.phase li b{font-family:var(--font-d)}
+
+details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+details a{color:var(--brand);word-break:break-all}
+footer{border-top:1px solid var(--border);margin-top:20px;padding:20px 0 40px;color:var(--muted);font-size:.82rem}
+.src-note{color:var(--muted);font-size:.8rem}
+ul.clean{margin:.3rem 0 0;padding-left:18px}
+ul.clean li{margin-bottom:5px;color:var(--second)}
+ul.clean li b{color:var(--ink)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="brand"><img src="img/icon.png" alt="Zepto"><span>Zepto <span class="r">Teardown</span></span></span>
+  <nav class="nav">
+    <a href="#product">Product</a><a href="#economics">Economics</a><a href="#growth">Growth</a>
+    <a href="#share">Market</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a>
+    <a href="#reads">More reads</a><a href="#moat">Moat &amp; risk</a>
+  </nav>
+  <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
+</div></div>
+
+<div class="wrap">
+
+  <section class="hero" id="top">
+    <div class="hero-top">
+      <img src="img/icon.png" alt="Zepto app icon">
+      <div>
+        <h1>Zepto <span class="r">·</span> Product Teardown</h1>
+        <p class="tag">The pure-play challenger that created India's 10-minute grocery category.
+          Founder-led, VC-backed, pre-IPO. An independent product-analyst teardown.</p>
+      </div>
+    </div>
+    <span class="disc">Independent analysis · not affiliated with Zepto · figures real &amp; sourced · as of Sep 2026</span>
+
+    <div class="chips">
+      <div class="chip"><b>₹22,624 Cr</b><span>FY26 revenue · ~2&#215; YoY</span></div>
+      <div class="chip"><b>−₹5,905 Cr</b><span>FY26 net loss (+26%)</span></div>
+      <div class="chip"><b>1,139</b><span>Dark stores · end FY26</span></div>
+      <div class="chip"><b>~$3–4.5B</b><span>2026 pre-IPO valuation talks</span></div>
+      <div class="chip"><b>4.75★</b><span>iOS rating · 1.08M ratings</span></div>
+      <div class="chip"><b>DRHP</b><span>Filed Jun 2026 · IPO deferred</span></div>
+    </div>
+
+    <div class="insight" style="margin-top:22px">
+      <div class="k">The one-line thesis</div>
+      <p>Zepto <b>created</b> the 10-minute category and still has the product love — a <b>4.75★</b> rating,
+        higher than any peer. But it runs a distant second to Blinkit and carries the <b>heaviest burn</b> in
+        the sector: FY26 net loss <b>~₹5,905 Cr</b> even as revenue doubled. That burn has repriced it —
+        2026 pre-IPO talks are at <b>~$3–4.5B, down from $7B</b> in Oct 2025 — and the IPO is deferred. The
+        whole story is one question: can it turn category love into <b>profitable frequency</b> before the
+        runway runs out? That's an analytics problem.</p>
+    </div>
+  </section>
+
+  <section id="product">
+    <div class="eyebrow">01 · The product</div>
+    <h2 class="sec-h">Speed first — then a widening wedge</h2>
+    <p class="sec-sub">Core is the same 10-minute dark-store model. Zepto's edge is <b>product velocity</b>:
+      it layered on <b>Zepto Café</b> (food &amp; beverage in minutes), <b>Super Saver</b> (cheaper,
+      next-slot delivery) and <b>Zepto Pass</b> (membership) to lift frequency and basket beyond pure
+      grocery top-ups.</p>
+    <div class="shots">
+      <figure><img src="img/s1.png" alt="Zepto screenshot 1"><figcaption>Home &amp; 10-min promise</figcaption></figure>
+      <figure><img src="img/s2.png" alt="Zepto screenshot 2"><figcaption>Categories &amp; search</figcaption></figure>
+      <figure><img src="img/s3.png" alt="Zepto screenshot 3"><figcaption>Product &amp; basket</figcaption></figure>
+      <figure><img src="img/s4.png" alt="Zepto screenshot 4"><figcaption>Cart &amp; delivery</figcaption></figure>
+    </div>
+    <div class="grid3" style="margin-top:16px">
+      <div class="card"><h3>Who</h3><p>Young, urban, metro-first users — the earliest adopters of
+        instant delivery, high intent and high frequency, but also the most promotion-sensitive.</p></div>
+      <div class="card"><h3>How it earns</h3><p>Take rate on GOV + delivery/handling fees + a growing ad
+        business + Zepto Pass subscription. Café adds a higher-margin, higher-frequency basket.</p></div>
+      <div class="card"><h3>The wedge</h3><p>Café &amp; Super Saver widen the use-cases a single dense store
+        can serve — more orders per store without more real estate.</p></div>
+    </div>
+  </section>
+
+  <section id="economics">
+    <div class="eyebrow">02 · Business &amp; unit economics</div>
+    <h2 class="sec-h">Love is cheap; profit is the test</h2>
+    <p class="sec-sub">Revenue doubled again in FY26, but the net loss widened to ~₹5,905 Cr — the classic
+      growth-stage shape. With no deep-pocketed parent and a <b>deferred IPO</b>, capital discipline is
+      existential, and investors are now judging the path to contribution-positive orders.</p>
+    <div class="grid2">
+      <div class="chart">
+        <div class="ct">Illustrative order economics<span class="illus">illustrative</span></div>
+        <div class="cs">Built from a ~₹500 AOV and a ~18% blended take; shape, not Zepto's exact P&amp;L</div>
+        <div id="c-waterfall"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card"><h3>Burn is the story</h3>
+          <p>FY26 net loss <b class="mono">₹5,905 Cr</b>, up ~26% YoY. But the per-order math is improving:
+          adjusted-EBITDA loss narrowed to <b class="mono">₹78.75/order</b> (FY26) from ₹136 a year earlier
+          — the trend that has to continue.</p></div>
+        <div class="card"><h3>No parent safety net</h3>
+          <p>Unlike Blinkit (inside Eternal), Zepto funds expansion from VC and a <b>deferred</b> IPO. That
+          makes <b>contribution margin per order</b> the metric that governs survival, not just growth.</p></div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="k">Analyst read</div>
+      <p>The lever set is identical to any q-commerce player — AOV, order frequency, fulfilment cost — but
+        the <b>stakes are higher</b> because there's no balance sheet to hide behind. The first job is a
+        trustworthy <b>per-order contribution model</b> so every pricing, Pass and Café decision is made
+        on margin, not momentum.</p>
+    </div>
+  </section>
+
+  <section id="growth">
+    <div class="eyebrow">03 · Growth</div>
+    <h2 class="sec-h">Doubling sales, expanding the map</h2>
+    <p class="sec-sub">Revenue roughly doubled again to <b>~₹22,624 Cr</b> in FY26, with the store network at
+      <b>1,139</b> dark stores and fresh IPO capital earmarked to push past 1,500.</p>
+    <div class="grid2">
+      <div class="chart"><div class="ct">Operating revenue, FY25 → FY26</div>
+        <div class="cs">Reported · ~2&#215; YoY</div>
+        <div id="c-nov"></div></div>
+      <div class="chart"><div class="ct">Dark-store network<span class="illus">approx / target</span></div>
+        <div class="cs">Reported anchors &amp; stated target — trajectory</div>
+        <div id="c-stores"></div></div>
+    </div>
+  </section>
+
+  <section id="share">
+    <div class="eyebrow">04 · Market</div>
+    <h2 class="sec-h">The strong #2</h2>
+    <p class="sec-sub">India's quick-commerce order value was ~₹64,000 Cr (~$7.6B) in FY25. Zepto is the
+      clear number two behind Blinkit, ahead of Swiggy Instamart. Share estimates (analyst, mid-2025):</p>
+    <div class="grid2">
+      <div class="chart"><div class="ct">Quick-commerce share</div>
+        <div class="cs">Share of order value · mid-2025 analyst estimates (Blinkit has since pulled further ahead)</div>
+        <div id="c-share"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card"><h3>Loved, but smaller</h3>
+          <p>Zepto <b class="mono">4.75★</b> (<b class="mono">1.08M</b> iOS ratings) edges Blinkit's
+          <b class="mono">4.66★</b> — but on a rating base <b>~3.6× smaller</b>. Higher satisfaction,
+          less scale: the challenger's position.</p></div>
+        <div class="insight" style="margin:0">
+          <div class="k">So what</div>
+          <p>Zepto must convert its satisfaction edge into <b>frequency and margin</b> faster than Blinkit
+            can close the love gap — before the IPO clock runs out.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="analyst">
+    <div class="eyebrow">05 · The product-analyst lens</div>
+    <h2 class="sec-h">How I'd run analytics here</h2>
+    <p class="sec-sub">The company facts above are real. The rest of this section is how I'd
+      <b>instrument and grow</b> the product. Numbers here are <b>illustrative frameworks</b>, clearly
+      marked — the method is the point.</p>
+
+    <div class="card">
+      <h3>North-star metric tree</h3>
+      <p>One number the whole org can move, decomposed into the levers a team actually owns.</p>
+      <div class="tree" style="margin-top:14px">
+        <div class="node" style="border-top:3px solid var(--brand)"><b>Monthly GOV</b><br><span class="src-note">north star</span></div>
+        <div class="x">=</div>
+        <div class="ops">
+          <div class="node"><b>Monthly transacting users</b><br><span class="src-note">acquisition × retention</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>Orders / user / month</b><br><span class="src-note">frequency</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>AOV</b><br><span class="src-note">basket size × mix</span></div>
+        </div>
+      </div>
+      <p style="margin-top:12px">For Zepto specifically, <b>frequency</b> is the lever Café, Pass and Super
+        Saver all aim at — so the whole product strategy maps to one branch of this tree.</p>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="chart"><div class="ct">Activation → habit funnel<span class="illus">illustrative</span></div>
+        <div class="cs">The lifecycle I'd instrument, from install to power user</div>
+        <div id="c-funnel"></div></div>
+      <div class="chart"><div class="ct">Cohort retention (monthly)<span class="illus">illustrative</span></div>
+        <div class="cs">% of a signup cohort still ordering, by month since first order</div>
+        <div id="c-cohort"></div></div>
+    </div>
+    <div class="insight">
+      <div class="k">What good looks like</div>
+      <p>Healthy q-commerce retention <b>flattens into a high plateau</b> — the grocery habit, once formed,
+        recurs. The analyst's job is to shorten <b>time-to-habit</b>: push a new user to their 3rd order
+        fast, because that's where the curve stops decaying — and that's exactly what Pass and Café are for.</p>
+    </div>
+  </section>
+
+  <section id="experiments">
+    <div class="eyebrow">06 · Experiment backlog</div>
+    <h2 class="sec-h">The first A/B tests I'd ship</h2>
+    <p class="sec-sub">Each tied to one lever in the metric tree, with a primary metric and a guardrail so
+      we don't win one number by breaking another.</p>
+    <div class="card" style="padding:4px 4px">
+    <table class="exp">
+      <thead><tr><th>Hypothesis</th><th>Lever</th><th>Primary metric</th><th>Guardrail</th></tr></thead>
+      <tbody>
+        <tr><td><b>Zepto Pass pricing</b> — test membership price / benefit mix to maximise frequency
+          without eroding margin.</td><td><span class="pill">frequency</span></td>
+          <td>Orders / user / month</td><td>Contribution margin / order</td></tr>
+        <tr><td><b>Super Saver nudge</b> — steer price-sensitive baskets to the cheaper next-slot option
+          to lift AOV and margin.</td><td><span class="pill">AOV · margin</span></td>
+          <td>AOV, Super-Saver attach</td><td>10-min order cannibalisation</td></tr>
+        <tr><td><b>Café cross-sell</b> — surface Zepto Café to grocery users to add a second, higher-margin
+          daily occasion.</td><td><span class="pill">frequency</span></td><td>Orders / user / month</td>
+          <td>Delivery cost / order</td></tr>
+        <tr><td><b>Time-to-3rd-order</b> — sequence onboarding offers to reach the 3rd order faster, where
+          retention plateaus.</td><td><span class="pill">retention</span></td><td>D30 repeat rate</td>
+          <td>CAC payback</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 style="font-family:var(--font-d);margin:22px 0 10px;font-size:1.1rem">First 30 · 60 · 90 days as your analyst</h3>
+    <ul class="phase clean">
+      <li><b>Days 0–30 —</b> one source of truth: the activation→habit funnel and a cohort-retention
+        dashboard wired to events, so growth and finance read the same numbers before the IPO roadshow.</li>
+      <li><b>Days 30–60 —</b> find the biggest retention leak (likely time-to-3rd-order) and ship the Pass
+        and Super-Saver experiments with margin guardrails.</li>
+      <li><b>Days 60–90 —</b> a per-order <b>contribution-margin</b> model by store &amp; cohort — the single
+        most important number for a company that must prove profit, not just growth.</li>
+    </ul>
+  </section>
+
+  <section id="reads">
+    <div class="eyebrow">06½ · Extra analyst reads</div>
+    <h2 class="sec-h">Three more things the data says</h2>
+    <p class="sec-sub">Beyond the headlines — the second-order reads a hiring manager actually wants.</p>
+    <div class="grid3">
+      <div class="card"><h3>Growth without expansion</h3><p>FY26 revenue roughly <b>doubled</b> while the store count grew only <b>~11%</b> (1,029→1,139). Growth is <b>density- and throughput-led</b>, not store-led — efficient, but it also means the easy store-expansion runway is thinner than Blinkit's.</p></div>
+      <div class="card"><h3>The loss ratio is improving</h3><p>Net loss was <b>~42% of revenue</b> in FY25 and fell to <b>~26%</b> in FY26 — even though the absolute loss grew. The <b>trajectory</b>, not the headline ₹5,905 Cr, is the real story for an IPO.</p></div>
+      <div class="card"><h3>Per-order burn nearly halved</h3><p>Adjusted-EBITDA loss per order dropped from <b>₹136</b> (FY25) to <b>₹78.75</b> (FY26). At that slope, <b>contribution breakeven is in sight</b> — and sustaining the slope is the entire pre-IPO thesis.</p></div>
+    </div>
+  </section>
+
+  <section id="moat">
+    <div class="eyebrow">07 · Moat &amp; risk</div>
+    <h2 class="sec-h">What protects it, what threatens it</h2>
+    <div class="grid2">
+      <div class="card"><h3>The moat</h3>
+        <ul class="clean">
+          <li><b>Category-creator brand love</b> — the highest rating in the sector (4.75★).</li>
+          <li><b>Product velocity</b> — Café, Pass &amp; Super Saver widen use-cases per store.</li>
+          <li><b>Founder-led speed</b> — fast iteration and dense metro coverage.</li>
+        </ul></div>
+      <div class="card"><h3>The risks</h3>
+        <ul class="clean">
+          <li><b>Heaviest burn, no parent</b> — survival depends on capital discipline + IPO access.</li>
+          <li><b>A bigger, backed leader</b> — Blinkit's lead &amp; Eternal balance sheet; plus Instamart.</li>
+          <li><b>Regulatory / labour</b> — dark-store FDI scrutiny and gig-worker cost pressure.</li>
+        </ul></div>
+    </div>
+    <p class="src-note" style="margin-top:8px"><b>Comparability note:</b> Zepto's ₹3,367 Cr is a
+      company-level net loss; Blinkit discloses segment-level adjusted EBITDA. The two are not an
+      apples-to-apples comparison — always normalise the denominator before ranking "who burns more."</p>
+
+    <details>
+      <summary>Sources &amp; method</summary>
+      <p class="src-note" style="margin-top:8px">
+        Inc42 — FY26 (DRHP): revenue ~₹22,624 Cr (~2× FY25 ₹11,110 Cr), net loss ₹5,905 Cr (+26%), 1,139
+        dark stores, adj-EBITDA loss ₹78.75/order · Oct 2025 Series H $450M at $7B; 2026 pre-IPO investor
+        talks ~$3–4.5B (Bloomberg) · DRHP filed Jun 2026, SEBI-approved May 2026, IPO deferred Aug 2026 ·
+        Zepto Café 100k+ orders/day · Apple App Store Search API — live iOS ratings. Figures as of Sep 2026.
+        <br><br>Illustrative items (order-economics waterfall, activation funnel, cohort grid, dark-store
+        trajectory) are analyst frameworks shown to demonstrate method — they are <b>not</b> reported
+        Zepto figures.
+      </p>
+    </details>
+  </section>
+
+  <footer>
+    Independent product-analyst teardown by Diya Mittal (ex-Pocket FM, Scout). Company facts are real and
+    sourced; funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks.
+    Zepto and its marks belong to their owners; app imagery shown for analysis only.
+  </footer>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+var SVG="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVG,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function showTT(html,x,y){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(x+12)+"px";tt.style.top=(y+12)+"px";}
+function hideTT(){tt.style.opacity="0";}
+function bind(node,html){node.addEventListener("mousemove",function(e){showTT(html,e.clientX,e.clientY);});
+  node.addEventListener("mouseleave",hideTT);node.style.cursor="default";}
+function money(n){return "₹"+n.toLocaleString("en-IN");}
+
+function waterfall(id){
+  var box=document.getElementById(id);var W=440,H=240,pad=26,base=H-42,top=18;
+  var steps=[{l:"Order value",v:500,t:"tot"},{l:"− Product",v:-400,t:"neg"},
+    {l:"Gross margin",v:100,t:"sub"},{l:"− Delivery",v:-62,t:"neg"},
+    {l:"− Store+pick",v:-40,t:"neg"},{l:"Contribution",v:-2,t:"end"}];
+  var max=500,scale=(base-top)/max;var n=steps.length,slot=(W-pad*2)/n,bw=slot-16,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  steps.forEach(function(s,i){
+    var x=pad+i*slot+8,hiVal,loVal,col;
+    if(s.t==="neg"){hiVal=run;loVal=run+s.v;run=loVal;col=neg;}
+    else{hiVal=Math.max(s.v,0);loVal=Math.min(s.v,0);run=s.v;col=(s.t==="end")?(s.v<0?neg:pos):br;}
+    var yTop=base-Math.max(hiVal,0)*scale, h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s.t==="end"&&s.v<0){yTop=base;h=Math.max(Math.abs(s.v)*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s.t==="neg")?0.9:(s.t==="sub"?0.55:1)});
+    svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+(s.v<0?"−":"")+money(Math.abs(s.v))+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-6,"text-anchor":"middle","font-size":10,fill:cvar("--ink"),"font-family":cvar("--font-m")});
+    tx.textContent=(s.v<0?"−":"")+money(Math.abs(s.v));svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+15,"text-anchor":"middle","font-size":9,fill:ink});
+    lb.textContent=s.l;svg.appendChild(lb);
+  });
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function lineChart(id,data,unit){
+  var box=document.getElementById(id);var W=440,H=220,L=40,R=14,T=16,B=34;
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.1;
+  var iw=W-L-R,ih=H-T-B;var br=cvar("--brand"),g=cvar("--grid"),mut=cvar("--muted");
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=4;t++){var yy=T+ih*t/4;var val=Math.round(max*(1-t/4));
+    svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-6,y:yy+3,"text-anchor":"end","font-size":9,fill:mut,"font-family":cvar("--font-m")});
+    yl.textContent=val>=1000?(val/1000).toFixed(1)+"k":val;svg.appendChild(yl);}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d.v/max)];});
+  var dstr="M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L");
+  var area=dstr+" L"+pts[pts.length-1][0]+","+(T+ih)+" L"+pts[0][0]+","+(T+ih)+" Z";
+  svg.appendChild(el("path",{d:area,fill:br,opacity:0.12}));
+  svg.appendChild(el("path",{d:dstr,fill:"none",stroke:br,"stroke-width":2.4,"stroke-linejoin":"round","stroke-linecap":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:4.5,fill:cvar("--panel"),stroke:br,"stroke-width":2});
+    svg.appendChild(c);bind(c,"<b>"+d.l+"</b><br><span class='v'>"+d.v.toLocaleString("en-IN")+" "+unit+"</span>");
+    var xl=el("text",{x:pts[i][0],y:H-12,"text-anchor":"middle","font-size":9,fill:mut});xl.textContent=d.l;svg.appendChild(xl);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function bars2(id,data,unit){
+  var box=document.getElementById(id);var W=440,H=220,L=20,R=14,T=24,B=34;
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.2;var iw=W-L-R,ih=H-T-B;
+  var br=cvar("--brand"),mut=cvar("--muted");var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var bw=70,gap=(iw-bw*data.length)/(data.length+1);
+  data.forEach(function(d,i){var x=L+gap+i*(bw+gap),h=ih*d.v/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:h,rx:5,fill:br,opacity:i===0?0.55:1});
+    svg.appendChild(r);bind(r,"<b>"+d.l+"</b><br><span class='v'>"+money(d.v)+" Cr</span>");
+    var tx=el("text",{x:x+bw/2,y:y-7,"text-anchor":"middle","font-size":12,fill:cvar("--ink"),"font-family":cvar("--font-m")});
+    tx.textContent="₹"+(d.v/1000).toFixed(1)+"k Cr";svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:H-12,"text-anchor":"middle","font-size":10,fill:mut});lb.textContent=d.l;svg.appendChild(lb);});
+  var ar=el("text",{x:L+gap+bw+gap/2,y:T-6,"text-anchor":"middle","font-size":11,fill:cvar("--pos"),"font-family":cvar("--font-m")});
+  ar.textContent="~2×";svg.appendChild(ar);
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function donut(id,data){
+  var box=document.getElementById(id);var W=440,H=230,cx=150,cy=H/2,rO=82,rI=50;
+  var total=data.reduce(function(a,d){return a+d.v;},0),ang=-Math.PI/2;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d){var a2=ang+d.v/total*Math.PI*2;var large=(a2-ang)>Math.PI?1:0;
+    var x1=cx+rO*Math.cos(ang),y1=cy+rO*Math.sin(ang),x2=cx+rO*Math.cos(a2),y2=cy+rO*Math.sin(a2);
+    var xi1=cx+rI*Math.cos(a2),yi1=cy+rI*Math.sin(a2),xi2=cx+rI*Math.cos(ang),yi2=cy+rI*Math.sin(ang);
+    var p=el("path",{d:"M"+x1+","+y1+" A"+rO+","+rO+" 0 "+large+" 1 "+x2+","+y2+" L"+xi1+","+yi1+" A"+rI+","+rI+" 0 "+large+" 0 "+xi2+","+yi2+" Z",fill:d.c,stroke:cvar("--panel"),"stroke-width":2});
+    svg.appendChild(p);bind(p,"<b>"+d.l+"</b><br><span class='v'>"+d.v+"%</span>");ang=a2;});
+  data.forEach(function(d,i){var ly=cy-34+i*26;
+    svg.appendChild(el("rect",{x:270,y:ly,width:13,height:13,rx:3,fill:d.c}));
+    var t=el("text",{x:290,y:ly+11,"font-size":12,fill:cvar("--ink")});t.textContent=d.l+"  ·  "+d.v+"%";
+    t.setAttribute("font-family",cvar("--font-b"));svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function funnel(id,steps){
+  var box=document.getElementById(id);var W=440;var H=steps.length*38+10;
+  var max=steps[0].v;var br=cvar("--brand"),mut=cvar("--muted");
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*38+6,w=(W-150)*s.v/max;
+    var r=el("rect",{x:150,y:y,width:Math.max(w,3),height:26,rx:5,fill:br,opacity:1-i*0.14});
+    svg.appendChild(r);bind(r,"<b>"+s.l+"</b><br><span class='v'>"+s.v+"% of installs</span>");
+    var lb=el("text",{x:142,y:y+17,"text-anchor":"end","font-size":11,fill:cvar("--ink")});lb.textContent=s.l;svg.appendChild(lb);
+    var vl=el("text",{x:150+Math.max(w,3)+6,y:y+17,"font-size":10.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s.v+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function cohort(id){
+  var box=document.getElementById(id);var cohorts=["Jan","Feb","Mar","Apr","May"];
+  var months=[100,64,50,43,40,38],W=440,cell=34,x0=46,y0=22,gapc=6;
+  var H=y0+cohorts.length*(cell+gapc)+16;var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var br=cvar("--brand"),mut=cvar("--muted");
+  for(var m=0;m<months.length;m++){var hx=x0+m*(cell+gapc);
+    var ht=el("text",{x:hx+cell/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});
+    ht.textContent="M"+m;svg.appendChild(ht);}
+  cohorts.forEach(function(ch,r){
+    var rt=el("text",{x:x0-8,y:y0+r*(cell+gapc)+cell/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=ch;svg.appendChild(rt);
+    for(var m=0;m<months.length;m++){var v=Math.max(0,months[m]-r*2+(r?Math.round(Math.sin(r+m)*2):0));
+      var op=0.14+0.86*(v/100);var x=x0+m*(cell+gapc),y=y0+r*(cell+gapc);
+      var rc=el("rect",{x:x,y:y,width:cell,height:cell,rx:5,fill:br,opacity:op});
+      svg.appendChild(rc);bind(rc,"<b>"+ch+" cohort · M"+m+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cell/2,y:y+cell/2+3.5,"text-anchor":"middle","font-size":9,
+        fill:(op>0.55?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v;svg.appendChild(vt);}
+  });
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function renderAll(){
+  waterfall("c-waterfall");
+  lineChart("c-stores",[{l:"Mar25",v:1029},{l:"Jun25",v:1060},{l:"Sep25",v:1090},
+    {l:"Dec25",v:1110},{l:"Mar26",v:1139},{l:"Target",v:1500}],"stores");
+  bars2("c-nov",[{l:"FY25",v:11110},{l:"FY26",v:22624}],"Cr");
+  donut("c-share",[{l:"Blinkit",v:48,c:cvar("--c-a")},{l:"Zepto",v:29,c:cvar("--c-sub")},{l:"Instamart",v:23,c:cvar("--c-b")}]);
+  funnel("c-funnel",[{l:"Install",v:100},{l:"First order",v:36},{l:"2nd order ≤30d",v:21},
+    {l:"Habit (4+/mo)",v:12},{l:"Power user",v:7}]);
+  cohort("c-cohort");
+}
+
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");
+  if(t)return t==="dark";return window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("zp_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.addEventListener("click",function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");
+  try{localStorage.setItem("zp_theme",nd?"dark":"light");}catch(e){}setLabel();renderAll();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();renderAll();}});
+setLabel();renderAll();
+</script>

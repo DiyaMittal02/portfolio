@@ -1,0 +1,556 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Blinkit Teardown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: dark-first scroll-story with a sticky section nav; Blinkit yellow as the single hero accent on near-black. */
+:root{
+  --bg:#0f0f0e; --panel:#1a1a18; --panel-2:#222220; --border:#2d2d2a;
+  --ink:#f6f5f1; --second:#b4b2a8; --muted:#7c7a70;
+  --brand:#FCD246;          /* Blinkit yellow, sampled from the app icon */
+  --brand-ink:#1a1700;      /* text on yellow */
+  --grid:#242422;
+  --pos:#36c98d; --neg:#ff6b5e;
+  --c-sub:#FCD246; --c-a:#b9bdc7; --c-b:#767b86;   /* share: subject + two neutral competitors */
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif;
+  --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f6f5f0; --panel:#ffffff; --panel-2:#faf8f1; --border:#e7e4da;
+  --ink:#171611; --second:#56544c; --muted:#8c8a80;
+  --brand:#f0b400; --brand-ink:#1a1700; --grid:#eceadf;
+  --pos:#12996a; --neg:#d8392b; --c-sub:#f0b400; --c-a:#9aa0ab; --c-b:#c3c7cf;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f6f5f0; --panel:#ffffff; --panel-2:#faf8f1; --border:#e7e4da;
+  --ink:#171611; --second:#56544c; --muted:#8c8a80;
+  --brand:#f0b400; --brand-ink:#1a1700; --grid:#eceadf;
+  --pos:#12996a; --neg:#d8392b; --c-sub:#f0b400; --c-a:#9aa0ab; --c-b:#c3c7cf;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
+  background:var(--bg);z-index:60}
+.wrap{max-width:1060px;margin:0 auto;
+  padding-left:max(18px,env(safe-area-inset-left,0px));
+  padding-right:max(18px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+a{color:inherit}
+
+/* sticky nav */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:800;font-size:1rem}
+.brand img{width:30px;height:30px;border-radius:8px}
+.brand .r{color:var(--brand)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:.8rem;color:var(--second);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);
+  border-radius:8px;padding:6px 10px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)}
+
+section{padding-block:30px;scroll-margin-top:70px}
+.eyebrow{font-family:var(--font-m);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.sec-h{font-size:clamp(1.3rem,3.4vw,1.9rem);font-weight:800;margin:.25rem 0 .2rem}
+.sec-sub{color:var(--second);max-width:68ch;margin:0 0 16px}
+
+/* hero */
+.hero{padding-top:34px}
+.hero-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hero-top img{width:74px;height:74px;border-radius:18px;box-shadow:0 8px 30px rgba(252,210,70,.22)}
+.hero h1{font-size:clamp(2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero h1 .r{color:var(--brand)}
+.hero .tag{color:var(--second);font-size:1.02rem;margin:.5rem 0 0;max-width:60ch}
+.disc{display:inline-block;margin-top:12px;font-size:.75rem;color:var(--muted);
+  border:1px solid var(--border);border-radius:999px;padding:4px 11px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:22px}
+@media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.chip b{display:block;font-family:var(--font-m);font-size:1.32rem;font-weight:500;letter-spacing:-.01em}
+.chip span{font-size:.72rem;color:var(--muted);display:block;margin-top:2px;line-height:1.3}
+
+/* cards + insight */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px}
+.card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.card p{color:var(--second);margin:.2rem 0 0;font-size:.92rem}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);
+  border-radius:12px;padding:14px 16px;margin:16px 0}
+.insight .k{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.insight p{margin:.25rem 0 0;color:var(--ink);font-size:.98rem}
+.illus{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);
+  border:1px dashed var(--border);border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;font-family:var(--font-m)}
+
+/* chart shell */
+.chart{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 16px 10px}
+.chart .ct{font-weight:700;font-size:1rem;font-family:var(--font-d)}
+.chart .cs{color:var(--muted);font-size:.8rem;margin:1px 0 10px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);
+  border-radius:8px;padding:6px 9px;font-size:.78rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);
+  opacity:0;transition:opacity .12s;font-family:var(--font-b)}
+.tt .v{font-family:var(--font-m)}
+
+/* screenshots */
+.shots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:820px){.shots{grid-template-columns:repeat(2,1fr)}}
+.shots figure{margin:0}
+.shots img{width:100%;border-radius:14px;border:1px solid var(--border);background:var(--panel)}
+.shots figcaption{font-size:.74rem;color:var(--muted);margin-top:6px;text-align:center}
+
+/* metric tree */
+.tree{display:flex;flex-direction:column;gap:12px;align-items:center}
+.tree .node{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
+.tree .node b{font-family:var(--font-m)}
+.tree .ops{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.tree .ops .node{border-top:3px solid var(--brand)}
+.tree .x{color:var(--muted);align-self:center;font-family:var(--font-m)}
+
+/* funnel + experiment list reuse .card */
+table.exp{width:100%;border-collapse:collapse;font-size:.88rem}
+table.exp th,table.exp td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.exp th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+table.exp td b{color:var(--ink)}
+.pill{display:inline-block;font-size:.68rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px;
+  background:color-mix(in srgb,var(--brand) 18%,transparent);color:var(--ink)}
+
+.phase{border-left:2px solid var(--border);padding-left:16px;margin-left:6px}
+.phase li{margin-bottom:10px}
+.phase li b{font-family:var(--font-d)}
+
+details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+details a{color:var(--brand);word-break:break-all}
+footer{border-top:1px solid var(--border);margin-top:20px;padding:20px 0 40px;color:var(--muted);font-size:.82rem}
+.src-note{color:var(--muted);font-size:.8rem}
+ul.clean{margin:.3rem 0 0;padding-left:18px}
+ul.clean li{margin-bottom:5px;color:var(--second)}
+ul.clean li b{color:var(--ink)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="brand"><img src="img/icon.png" alt="Blinkit"><span>Blinkit <span class="r">Teardown</span></span></span>
+  <nav class="nav">
+    <a href="#product">Product</a><a href="#economics">Economics</a><a href="#growth">Growth</a>
+    <a href="#share">Market</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a>
+    <a href="#reads">More reads</a><a href="#moat">Moat &amp; risk</a>
+  </nav>
+  <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
+</div></div>
+
+<div class="wrap">
+
+  <section class="hero" id="top">
+    <div class="hero-top">
+      <img src="img/icon.png" alt="Blinkit app icon">
+      <div>
+        <h1>Blinkit <span class="r">·</span> Product Teardown</h1>
+        <p class="tag">India's largest quick-commerce app — 10-minute grocery delivery from a dense
+          network of dark stores. Owned by Eternal (Zomato). An independent product-analyst teardown.</p>
+      </div>
+    </div>
+    <span class="disc">Independent analysis · not affiliated with Blinkit or Eternal · figures real &amp; sourced · as of Sep 2026</span>
+
+    <div class="chips">
+      <div class="chip"><b>Eternal</b><span>Parent (NSE: ETERNAL)</span></div>
+      <div class="chip"><b>₹20,940 Cr</b><span>Net order value · Q2 FY27 (+79% YoY)</span></div>
+      <div class="chip"><b>2,751</b><span>Dark stores · Sep 2026</span></div>
+      <div class="chip"><b>399M</b><span>Orders · Q2 FY27 quarter</span></div>
+      <div class="chip"><b>4.66★</b><span>iOS rating · 3.9M ratings</span></div>
+      <div class="chip"><b>3,500</b><span>Store target · by Mar 2027</span></div>
+    </div>
+
+    <div class="insight" style="margin-top:22px">
+      <div class="k">The one-line thesis</div>
+      <p>Blinkit has won the <b>land grab</b> — it's now Eternal's <b>biggest business</b>, bigger than
+        Zomato food delivery, and has <b>turned the margin corner</b>: adjusted EBITDA swung positive to
+        <b>+₹184 Cr</b> (0.9% of order value) in the Sep-2026 quarter, from a loss a year earlier. The job
+        now is <b>holding margin while scaling</b> to 3,500+ stores — an analytics problem of AOV, order
+        frequency, and per-order fulfilment cost.</p>
+    </div>
+  </section>
+
+  <section id="product">
+    <div class="eyebrow">01 · The product</div>
+    <h2 class="sec-h">A convenience engine, not a grocery store</h2>
+    <p class="sec-sub">Open app → items in ~10 minutes. The magic isn't the app; it's the <b>dark-store
+      network</b> — ~2,000–4,000 SKUs per store, placed so 90%+ of a city's demand sits within a
+      ~2 km delivery radius. Speed is the product; density is the moat.</p>
+    <div class="shots">
+      <figure><img src="img/s1.png" alt="Blinkit screenshot 1"><figcaption>Home &amp; categories</figcaption></figure>
+      <figure><img src="img/s2.png" alt="Blinkit screenshot 2"><figcaption>10-minute promise</figcaption></figure>
+      <figure><img src="img/s3.png" alt="Blinkit screenshot 3"><figcaption>Product &amp; basket</figcaption></figure>
+      <figure><img src="img/s4.png" alt="Blinkit screenshot 4"><figcaption>Checkout &amp; delivery</figcaption></figure>
+    </div>
+    <div class="grid3" style="margin-top:16px">
+      <div class="card"><h3>Who</h3><p>Urban, time-poor households in metros &amp; tier-1 — repeat
+        top-up missions (snacks, staples, last-minute needs), not monthly stock-ups.</p></div>
+      <div class="card"><h3>How it earns</h3><p>Marketplace take rate on GOV + a fast-growing
+        <b>ad / brand-funded</b> layer + delivery &amp; handling fees. Ads are the margin lever.</p></div>
+      <div class="card"><h3>Why it wins</h3><p>Density → faster delivery &amp; lower cost-per-order →
+        more orders → more density. A classic local-network flywheel.</p></div>
+    </div>
+  </section>
+
+  <section id="economics">
+    <div class="eyebrow">02 · Business &amp; unit economics</div>
+    <h2 class="sec-h">Margins just turned positive</h2>
+    <p class="sec-sub">Blinkit books order value as revenue under an inventory-led model, which inflates the
+      headline "revenue" line — so <b>net order value (NOV)</b> is the cleaner top-line. On that, Blinkit is
+      now <b>contribution-positive</b>: adjusted EBITDA reached <b>+0.9% of NOV</b> in the Sep-2026 quarter.</p>
+    <div class="grid2">
+      <div class="chart">
+        <div class="ct">Illustrative order economics<span class="illus">illustrative</span></div>
+        <div class="cs">Built from a ~₹650 AOV and a ~19% blended take; shape, not Blinkit's exact P&amp;L</div>
+        <div id="c-waterfall"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card"><h3>AOV, the margin lever</h3>
+          <p>Net average order value sits around <b class="mono">~₹518</b> (Q1 FY27). At ~400M orders a
+          quarter, every ₹10 of AOV is pure leverage on contribution — the single biggest margin dial.</p></div>
+        <div class="card"><h3>EBITDA turned positive</h3>
+          <p>Adjusted EBITDA swung to <b class="mono">+₹184 Cr</b> (0.9% of NOV) in the Sep-2026 quarter,
+          from <b class="mono">−₹156 Cr</b> a year earlier — and up from +₹102 Cr the prior quarter.</p></div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="k">Analyst read</div>
+      <p>Now that the network is just contribution-positive, the game is <b>widening</b> margin — moving
+        blended contribution another 1–2 points via AOV, ad-load and fulfilment cost. That's where a
+        product analyst earns their seat: finding margin without killing order frequency.</p>
+    </div>
+  </section>
+
+  <section id="growth">
+    <div class="eyebrow">03 · Growth</div>
+    <h2 class="sec-h">Stores are the growth pedal</h2>
+    <p class="sec-sub">Order value scales almost linearly with dark-store count — more stores mean more
+      covered demand and faster delivery. Blinkit added <b>308 net stores in the Sep-2026 quarter</b>,
+      reaching 2,751, and raised its target to 3,500 by March 2027.</p>
+    <div class="grid2">
+      <div class="chart"><div class="ct">Dark-store network</div>
+        <div class="cs">Store count by quarter (reported figures)</div>
+        <div id="c-stores"></div></div>
+      <div class="chart"><div class="ct">Net order value, Q2 YoY</div>
+        <div class="cs">Q2 FY26 → Q2 FY27 · +79%</div>
+        <div id="c-nov"></div></div>
+    </div>
+  </section>
+
+  <section id="share">
+    <div class="eyebrow">04 · Market</div>
+    <h2 class="sec-h">The category leader</h2>
+    <p class="sec-sub">India's quick-commerce order value was ~₹64,000 Cr (~$7.6B) in FY25. Blinkit sits
+      at the front, with Zepto and Swiggy Instamart chasing. Share estimates (analyst/BofA, mid-2025):</p>
+    <div class="grid2">
+      <div class="chart"><div class="ct">Quick-commerce share</div>
+        <div class="cs">Share of order value · mid-2025 analyst estimates (Blinkit's lead has since widened)</div>
+        <div id="c-share"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card"><h3>Ratings &amp; scale</h3>
+          <p>Blinkit <b class="mono">4.66★</b> across <b class="mono">3.9M</b> iOS ratings vs Zepto
+          <b class="mono">4.75★</b> / <b class="mono">1.08M</b>. Zepto rates a touch higher; Blinkit's
+          rating base is <b>~3.6× larger</b> — a proxy for a much bigger installed base.</p></div>
+        <div class="insight" style="margin:0">
+          <div class="k">So what</div>
+          <p>Leadership in a flywheel market compounds: more orders → denser stores → faster, cheaper
+            delivery. Blinkit's job is to <b>defend frequency</b> while competitors buy growth.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="analyst">
+    <div class="eyebrow">05 · The product-analyst lens</div>
+    <h2 class="sec-h">How I'd run analytics here</h2>
+    <p class="sec-sub">The company facts above are real. The rest of this section is how I'd
+      <b>instrument and grow</b> the product — the metric tree, the funnel I'd watch, and what retention
+      has to look like. Numbers here are <b>illustrative frameworks</b>, clearly marked.</p>
+
+    <div class="card">
+      <h3>North-star metric tree</h3>
+      <p>One number the whole org can move, decomposed into the levers a team actually owns.</p>
+      <div class="tree" style="margin-top:14px">
+        <div class="node" style="border-top:3px solid var(--brand)"><b>Monthly GOV</b><br><span class="src-note">north star</span></div>
+        <div class="x">=</div>
+        <div class="ops">
+          <div class="node"><b>Monthly transacting users</b><br><span class="src-note">acquisition × retention</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>Orders / user / month</b><br><span class="src-note">frequency</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>AOV</b><br><span class="src-note">basket size × mix</span></div>
+        </div>
+      </div>
+      <p style="margin-top:12px">Frequency is the q-commerce flywheel: a habitual user ordering 8×/month is
+        worth far more than two casual users — and is far cheaper to keep than to acquire.</p>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="chart"><div class="ct">Activation → habit funnel<span class="illus">illustrative</span></div>
+        <div class="cs">The lifecycle I'd instrument, from install to power user</div>
+        <div id="c-funnel"></div></div>
+      <div class="chart"><div class="ct">Cohort retention (monthly)<span class="illus">illustrative</span></div>
+        <div class="cs">% of a signup cohort still ordering, by month since first order</div>
+        <div id="c-cohort"></div></div>
+    </div>
+    <div class="insight">
+      <div class="k">What good looks like</div>
+      <p>q-commerce retention should <b>flatten into a high plateau</b> — the habit, once formed, is
+        sticky (groceries recur). The analyst's job is to shorten <b>time-to-habit</b>: get a new user to
+        their 3rd order fast, because the 3rd-order cohort is where the retention curve stops decaying.</p>
+    </div>
+  </section>
+
+  <section id="experiments">
+    <div class="eyebrow">06 · Experiment backlog</div>
+    <h2 class="sec-h">The first A/B tests I'd ship</h2>
+    <p class="sec-sub">Each tied to one lever in the metric tree, with a primary metric and a guardrail so
+      we don't win one number by breaking another.</p>
+    <div class="card" style="padding:4px 4px">
+    <table class="exp">
+      <thead><tr><th>Hypothesis</th><th>Lever</th><th>Primary metric</th><th>Guardrail</th></tr></thead>
+      <tbody>
+        <tr><td><b>Basket-builder</b> — "add ₹60 for free delivery" nudge + complementary suggestions
+          raises basket size.</td><td><span class="pill">AOV</span></td><td>AOV, free-delivery attach</td>
+          <td>Order frequency, cancellations</td></tr>
+        <tr><td><b>Membership pass</b> — a low monthly fee for free delivery lifts order frequency and
+          lock-in.</td><td><span class="pill">frequency</span></td><td>Orders / user / month</td>
+          <td>Contribution margin / order</td></tr>
+        <tr><td><b>Honest ETA</b> — show a realistic, accurate delivery time instead of a flat "10 min";
+          accuracy builds trust &amp; repeat.</td><td><span class="pill">retention</span></td>
+          <td>D30 repeat rate</td><td>Conversion, delivery cost</td></tr>
+        <tr><td><b>Store-aware assortment</b> — personalise the storefront to each dark store's live
+          in-stock SKUs to cut out-of-stock drop-off.</td><td><span class="pill">conversion</span></td>
+          <td>Session → order rate</td><td>Out-of-stock %, refunds</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 style="font-family:var(--font-d);margin:22px 0 10px;font-size:1.1rem">First 30 · 60 · 90 days as your analyst</h3>
+    <ul class="phase clean">
+      <li><b>Days 0–30 —</b> build the single source of truth: the activation→habit funnel and a cohort
+        retention dashboard, wired to events, so every team reads the same numbers.</li>
+      <li><b>Days 30–60 —</b> find the biggest leak (likely time-to-3rd-order) and the top AOV &amp; frequency
+        levers; ship the first two experiments above with clean guardrails.</li>
+      <li><b>Days 60–90 —</b> stand up a per-order contribution-margin model by store cohort, so pricing,
+        ad-load and delivery-fee decisions are made on margin, not gut.</li>
+    </ul>
+  </section>
+
+  <section id="reads">
+    <div class="eyebrow">06½ · Extra analyst reads</div>
+    <h2 class="sec-h">Three more things the data says</h2>
+    <p class="sec-sub">Beyond the headlines — the second-order reads a hiring manager actually wants.</p>
+    <div class="grid3">
+      <div class="card"><h3>Operating leverage is real</h3><p>NOV grew <b>+79% YoY</b> on roughly <b>+51%</b> more stores (1,816→2,751). Orders are outgrowing the network, so <b>throughput per store is rising</b> — spreading fixed cost across more orders is what tipped EBITDA positive.</p></div>
+      <div class="card"><h3>AOV is the untapped lever</h3><p>Net AOV is <b>flat</b> — ₹518 (Q1 FY27) vs ₹521 a year earlier. Growth is <b>frequency-led, not basket-led</b>, so AOV (basket-builders, bundles, ad-funded placements) is a margin dial Blinkit has barely pulled.</p></div>
+      <div class="card"><h3>Spoilage is the battleground</h3><p>Inventory losses run <b>~1.8% of NOV</b> (~₹308 Cr a quarter) — the single biggest controllable cost. On razor-thin per-order economics, this is exactly what a DOI &amp; markdown engine defends.</p></div>
+    </div>
+  </section>
+
+  <section id="moat">
+    <div class="eyebrow">07 · Moat &amp; risk</div>
+    <h2 class="sec-h">What protects it, what threatens it</h2>
+    <div class="grid2">
+      <div class="card"><h3>The moat</h3>
+        <ul class="clean">
+          <li><b>Density flywheel</b> — hardest thing for a new entrant to copy city-by-city.</li>
+          <li><b>Eternal backing</b> — capital, logistics and the Zomato user base.</li>
+          <li><b>Ad engine</b> — brand-funded revenue that drops almost fully to margin.</li>
+        </ul></div>
+      <div class="card"><h3>The risks</h3>
+        <ul class="clean">
+          <li><b>Margin thinness</b> — still loss-making; discipline must hold as stores scale.</li>
+          <li><b>Well-funded rivals</b> — Zepto, Instamart, plus Amazon &amp; Flipkart "Minutes".</li>
+          <li><b>Regulatory / labour</b> — dark-store FDI scrutiny and gig-worker cost pressure.</li>
+        </ul></div>
+    </div>
+    <p class="src-note" style="margin-top:8px"><b>Comparability note:</b> Blinkit's loss figures are
+      segment-level adjusted EBITDA; a private peer's company-level net loss is not an apples-to-apples
+      comparison. Always normalise the denominator before ranking "who burns more."</p>
+
+    <details>
+      <summary>Sources &amp; method</summary>
+      <p class="src-note" style="margin-top:8px">
+        Eternal Q2 FY27 results (Entrackr, MediaNama, YourStory, Oct 2026) — Blinkit NOV ₹20,940 Cr
+        (+79% YoY), 2,751 dark stores, adj-EBITDA +₹184 Cr (0.9% of NOV), 398.9M orders · net AOV ~₹518
+        (Q1 FY27) · BofA / industry aggregators — mid-2025 share estimates · Apple App Store Search API —
+        live iOS ratings. Figures as of Sep 2026.
+        <br><br>Illustrative items (order-economics waterfall, activation funnel, cohort grid) are
+        analyst frameworks shown to demonstrate method — they are <b>not</b> reported Blinkit figures.
+      </p>
+    </details>
+  </section>
+
+  <footer>
+    Independent product-analyst teardown by Diya Mittal (ex-Pocket FM, Scout). Company facts are real and
+    sourced; funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks.
+    Blinkit, Eternal and their marks belong to their owners; app imagery shown for analysis only.
+  </footer>
+</div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+var SVG="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVG,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function showTT(html,x,y){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(x+12)+"px";tt.style.top=(y+12)+"px";}
+function hideTT(){tt.style.opacity="0";}
+function bind(node,html){node.addEventListener("mousemove",function(e){showTT(html,e.clientX,e.clientY);});
+  node.addEventListener("mouseleave",hideTT);node.style.cursor="default";}
+function money(n){return "₹"+n.toLocaleString("en-IN");}
+
+// ---- waterfall: illustrative order economics ----
+function waterfall(id){
+  var box=document.getElementById(id);var W=440,H=240,pad=26,base=H-42,top=18;
+  // t: tot/sub/end = bar from 0; neg = floating delta bar
+  var steps=[{l:"Order value",v:650,t:"tot"},{l:"− Product",v:-515,t:"neg"},
+    {l:"Gross margin",v:135,t:"sub"},{l:"− Delivery",v:-70,t:"neg"},
+    {l:"− Store+pick",v:-45,t:"neg"},{l:"Contribution",v:20,t:"end"}];
+  var max=650,scale=(base-top)/max;var n=steps.length,slot=(W-pad*2)/n,bw=slot-16,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  steps.forEach(function(s,i){
+    var x=pad+i*slot+8,hiVal,loVal,col;
+    if(s.t==="neg"){hiVal=run;loVal=run+s.v;run=loVal;col=neg;}       // floating delta
+    else{hiVal=s.v;loVal=0;run=s.v;col=(s.t==="end")?pos:(s.t==="sub"?br:br);}
+    var yTop=base-hiVal*scale, h=Math.max((hiVal-loVal)*scale,2);
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s.t==="neg")?0.9:(s.t==="sub"?0.55:1)});
+    svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+(s.v<0?"−":"")+money(Math.abs(s.v))+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-6,"text-anchor":"middle","font-size":10,fill:cvar("--ink"),"font-family":cvar("--font-m")});
+    tx.textContent=(s.v<0?"−":"")+money(Math.abs(s.v));svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+15,"text-anchor":"middle","font-size":9,fill:ink});
+    lb.textContent=s.l;svg.appendChild(lb);
+  });
+  box.innerHTML="";box.appendChild(svg);
+}
+
+// ---- line: dark store growth ----
+function lineChart(id,data,unit){
+  var box=document.getElementById(id);var W=440,H=220,L=40,R=14,T=16,B=34;
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.1;
+  var iw=W-L-R,ih=H-T-B;var br=cvar("--brand"),g=cvar("--grid"),mut=cvar("--muted");
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=4;t++){var yy=T+ih*t/4;var val=Math.round(max*(1-t/4));
+    svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-6,y:yy+3,"text-anchor":"end","font-size":9,fill:mut,"font-family":cvar("--font-m")});
+    yl.textContent=val>=1000?(val/1000).toFixed(1)+"k":val;svg.appendChild(yl);}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d.v/max)];});
+  var dstr="M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L");
+  var area=dstr+" L"+pts[pts.length-1][0]+","+(T+ih)+" L"+pts[0][0]+","+(T+ih)+" Z";
+  svg.appendChild(el("path",{d:area,fill:br,opacity:0.12}));
+  svg.appendChild(el("path",{d:dstr,fill:"none",stroke:br,"stroke-width":2.4,"stroke-linejoin":"round","stroke-linecap":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:4.5,fill:cvar("--panel"),stroke:br,"stroke-width":2});
+    svg.appendChild(c);bind(c,"<b>"+d.l+"</b><br><span class='v'>"+d.v.toLocaleString("en-IN")+" "+unit+"</span>");
+    var xl=el("text",{x:pts[i][0],y:H-12,"text-anchor":"middle","font-size":9,fill:mut});xl.textContent=d.l;svg.appendChild(xl);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+// ---- simple 2-bar YoY ----
+function bars2(id,data,unit){
+  var box=document.getElementById(id);var W=440,H=220,L=20,R=14,T=24,B=34;
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.2;var iw=W-L-R,ih=H-T-B;
+  var br=cvar("--brand"),mut=cvar("--muted");var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var bw=70,gap=(iw-bw*data.length)/(data.length+1);
+  data.forEach(function(d,i){var x=L+gap+i*(bw+gap),h=ih*d.v/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:h,rx:5,fill:br,opacity:i===0?0.55:1});
+    svg.appendChild(r);bind(r,"<b>"+d.l+"</b><br><span class='v'>"+money(d.v)+" Cr</span>");
+    var tx=el("text",{x:x+bw/2,y:y-7,"text-anchor":"middle","font-size":12,fill:cvar("--ink"),"font-family":cvar("--font-m")});
+    tx.textContent="₹"+(d.v/1000).toFixed(1)+"k Cr";svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:H-12,"text-anchor":"middle","font-size":10,fill:mut});lb.textContent=d.l;svg.appendChild(lb);});
+  var ar=el("text",{x:L+gap+bw+gap/2,y:T-6,"text-anchor":"middle","font-size":11,fill:cvar("--pos"),"font-family":cvar("--font-m")});
+  ar.textContent="+79%";svg.appendChild(ar);
+  box.innerHTML="";box.appendChild(svg);
+}
+
+// ---- donut: market share ----
+function donut(id,data){
+  var box=document.getElementById(id);var W=440,H=230,cx=150,cy=H/2,rO=82,rI=50;
+  var total=data.reduce(function(a,d){return a+d.v;},0),ang=-Math.PI/2;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d){var a2=ang+d.v/total*Math.PI*2;var large=(a2-ang)>Math.PI?1:0;
+    var x1=cx+rO*Math.cos(ang),y1=cy+rO*Math.sin(ang),x2=cx+rO*Math.cos(a2),y2=cy+rO*Math.sin(a2);
+    var xi1=cx+rI*Math.cos(a2),yi1=cy+rI*Math.sin(a2),xi2=cx+rI*Math.cos(ang),yi2=cy+rI*Math.sin(ang);
+    var p=el("path",{d:"M"+x1+","+y1+" A"+rO+","+rO+" 0 "+large+" 1 "+x2+","+y2+" L"+xi1+","+yi1+" A"+rI+","+rI+" 0 "+large+" 0 "+xi2+","+yi2+" Z",fill:d.c,stroke:cvar("--panel"),"stroke-width":2});
+    svg.appendChild(p);bind(p,"<b>"+d.l+"</b><br><span class='v'>"+d.v+"%</span>");ang=a2;});
+  // legend
+  data.forEach(function(d,i){var ly=cy-34+i*26;
+    svg.appendChild(el("rect",{x:270,y:ly,width:13,height:13,rx:3,fill:d.c}));
+    var t=el("text",{x:290,y:ly+11,"font-size":12,fill:cvar("--ink")});t.textContent=d.l+"  ·  "+d.v+"%";
+    t.setAttribute("font-family",cvar("--font-b"));svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+// ---- funnel (illustrative) ----
+function funnel(id,steps){
+  var box=document.getElementById(id);var W=440;var H=steps.length*38+10;
+  var max=steps[0].v;var br=cvar("--brand"),mut=cvar("--muted");
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*38+6,w=(W-150)*s.v/max;
+    var r=el("rect",{x:150,y:y,width:Math.max(w,3),height:26,rx:5,fill:br,opacity:1-i*0.14});
+    svg.appendChild(r);bind(r,"<b>"+s.l+"</b><br><span class='v'>"+s.v+"% of installs</span>");
+    var lb=el("text",{x:142,y:y+17,"text-anchor":"end","font-size":11,fill:cvar("--ink")});lb.textContent=s.l;svg.appendChild(lb);
+    var vl=el("text",{x:150+Math.max(w,3)+6,y:y+17,"font-size":10.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s.v+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+// ---- cohort heatmap (illustrative) ----
+function cohort(id){
+  var box=document.getElementById(id);var cohorts=["Jan","Feb","Mar","Apr","May"];
+  var months=[100,62,48,41,38,36],W=440,cell=34,x0=46,y0=22,gapc=6;
+  var H=y0+cohorts.length*(cell+gapc)+16;var svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var br=cvar("--brand"),mut=cvar("--muted");
+  for(var m=0;m<months.length;m++){var hx=x0+m*(cell+gapc);
+    var ht=el("text",{x:hx+cell/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});
+    ht.textContent="M"+m;svg.appendChild(ht);}
+  cohorts.forEach(function(ch,r){
+    var rt=el("text",{x:x0-8,y:y0+r*(cell+gapc)+cell/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=ch;svg.appendChild(rt);
+    for(var m=0;m<months.length;m++){var v=Math.max(0,months[m]-r*2+(r?Math.round(Math.sin(r+m)*2):0));
+      var op=0.14+0.86*(v/100);var x=x0+m*(cell+gapc),y=y0+r*(cell+gapc);
+      var rc=el("rect",{x:x,y:y,width:cell,height:cell,rx:5,fill:br,opacity:op});
+      svg.appendChild(rc);bind(rc,"<b>"+ch+" cohort · M"+m+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cell/2,y:y+cell/2+3.5,"text-anchor":"middle","font-size":9,
+        fill:(op>0.55?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v;svg.appendChild(vt);}
+  });
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function renderAll(){
+  waterfall("c-waterfall");
+  lineChart("c-stores",[{l:"Q2FY25",v:791},{l:"Q4FY25",v:1301},{l:"Q2FY26",v:1816},
+    {l:"Q4FY26",v:2243},{l:"Q1FY27",v:2443},{l:"Q2FY27",v:2751}],"stores");
+  bars2("c-nov",[{l:"Q2 FY26",v:11679},{l:"Q2 FY27",v:20940}],"Cr");
+  donut("c-share",[{l:"Blinkit",v:48,c:cvar("--c-sub")},{l:"Zepto",v:29,c:cvar("--c-a")},{l:"Instamart",v:23,c:cvar("--c-b")}]);
+  funnel("c-funnel",[{l:"Install",v:100},{l:"First order",v:34},{l:"2nd order ≤30d",v:19},
+    {l:"Habit (4+/mo)",v:11},{l:"Power user",v:6}]);
+  cohort("c-cohort");
+}
+
+// theme toggle
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");
+  if(t)return t==="dark";return window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("bk_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.addEventListener("click",function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");
+  try{localStorage.setItem("bk_theme",nd?"dark":"light");}catch(e){}setLabel();renderAll();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();renderAll();}});
+setLabel();renderAll();
+</script>

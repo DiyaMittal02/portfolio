@@ -1,0 +1,358 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Kuku Content Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Analyst content dashboard: dark-SaaS surface, Kuku crimson accent, tabbed modules, SVG charts, SQL inspector. */
+:root{
+  --bg:#0f0b0b; --panel:#17191e; --panel-2:#211919; --border:#2d2626;
+  --ink:#f4f1f1; --second:#bbb0b0; --muted:#7f7272;
+  --brand:#e8222c; --brand-ink:#fff4f4; --grid:#2a2222;
+  --pos:#34d399; --neg:#fb7185; --warn:#fbbf24; --teal:#2dd4bf;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#faf5f5; --panel:#ffffff; --panel-2:#fdf7f7; --border:#ecdede;
+  --ink:#1a1111; --second:#5a4e4e; --muted:#938383; --grid:#f2e8e8;
+  --brand:#c71823; --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700; --teal:#0d9488;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#faf5f5; --panel:#ffffff; --panel-2:#fdf7f7; --border:#ecdede;
+  --ink:#1a1111; --second:#5a4e4e; --muted:#938383; --grid:#f2e8e8;
+  --brand:#c71823; --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700; --teal:#0d9488;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.title{font-family:var(--font-d);font-weight:800;font-size:1rem}
+.title .r{color:var(--brand)}
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;color:var(--second);border:1px solid var(--border);border-radius:999px;padding:3px 9px;margin-left:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pos);display:inline-block}
+.tgl{margin-left:auto;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;cursor:pointer;font-family:var(--font-b)}
+.tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);margin-top:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:.84rem;padding:10px 12px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+main{padding:18px 0 40px}
+.note{color:var(--muted);font-size:.78rem;margin:0 0 14px}
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:1000px){.kgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 13px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--brand))}
+.kpi .lab{font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-size:1.35rem;font-weight:800;margin-top:.15rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .sub{font-size:.68rem;color:var(--second);margin:.1rem 0 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 14px 10px}
+.card .ct{font-family:var(--font-d);font-weight:700;font-size:.95rem}
+.card .cs{color:var(--muted);font-size:.76rem;margin:1px 0 8px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--ac,var(--brand));border-radius:12px;padding:12px 14px;margin:14px 0}
+.insight .k{font-family:var(--font-m);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ac,var(--brand))}
+.insight p{margin:.2rem 0 0;font-size:.9rem}
+.illus{display:inline-block;font-size:.64rem;color:var(--muted);border:1px dashed var(--border);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+.real{display:inline-block;font-size:.64rem;color:var(--pos);border:1px solid color-mix(in srgb,var(--pos) 45%,var(--border));border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+table.dt th{text-align:left;color:var(--muted);font-weight:600;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;padding:8px 9px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel)}
+table.dt td{padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt tr:hover td{background:color-mix(in srgb,var(--brand) 7%,transparent)}
+.num{text-align:right}
+.pill{display:inline-block;font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,var(--brand) 16%,transparent);color:var(--ink)}
+.scroll{max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.quote{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--neg);border-radius:10px;padding:10px 12px;margin:8px 0;color:var(--second);font-size:.86rem}
+.sqlbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+select{background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:var(--font-b);font-size:.84rem}
+pre.sql{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;overflow:auto;font-family:var(--font-m);font-size:.78rem;line-height:1.55;color:var(--ink);white-space:pre}
+.kw{color:var(--brand);font-weight:500}
+.run{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:.82rem}
+footer{border-top:1px solid var(--border);margin-top:18px;padding:16px 0 36px;color:var(--muted);font-size:.78rem}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.76rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+.lg{display:flex;gap:14px;font-size:.74rem;color:var(--second);margin:2px 0 6px}
+.lg span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="logo">k</span>
+  <span class="title">Kuku <span class="r">Content Analytics</span></span>
+  <span class="badge"><span class="dot"></span>Sep 2026</span>
+  <button class="tgl" id="tgl">Light</button>
+</div>
+<div class="wrap"><nav class="tabs" id="tabs"></nav></div>
+</div>
+
+<div class="wrap"><main>
+  <section data-tab="Overview">
+    <div class="note" id="syn-note"></div>
+    <div class="kgrid" id="kpi-over"></div>
+    <div class="insight"><div class="k">The one read</div><p id="over-insight"></p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct">Signup → subscription funnel<span class="illus">illustrative</span></div><div class="cs">Where new users fall out · from my Kuku case study</div><div id="c-funnel"></div></div>
+      <div class="card"><div class="ct">Monthly active listeners<span class="illus">illustrative</span></div><div class="cs">Synthetic growth trend</div><div id="c-mau"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Funnel & Retention" hidden>
+    <div class="note">Illustrative funnel &amp; retention model, grounded in my Kuku case study.</div>
+    <div class="kgrid" id="kpi-fun"></div>
+    <div class="insight" style="--ac:var(--brand)"><div class="k">The biggest leak</div>
+      <p>Only <b>~5% of signups subscribe</b>, and the steepest drop is <b>at the paywall</b>, not in the content. In a synthetic A/B, moving the paywall from ep 6 → 8 for high-hook genres lifted subscribe rate among wall-reachers <b>~7pp</b>.</p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct">Signup → subscription funnel<span class="illus">illustrative</span></div><div id="c-funnel2"></div></div>
+      <div class="card"><div class="ct">Retention by first-watched genre<span class="illus">illustrative</span></div><div class="cs">High-hook genres win D1 but lose the month</div>
+        <div class="lg"><span><span class="sw" style="background:var(--teal)"></span>D1</span><span><span class="sw" style="background:var(--brand)"></span>D30</span></div>
+        <div id="c-genre"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Content & Paywall" hidden>
+    <div class="note">Illustrative content model · episode-survival A/B from the case study.</div>
+    <div class="insight" style="--ac:var(--teal)"><div class="k">The paywall, not the content, is the cliff</div>
+      <p>Episode-survival curves fall gently with each episode — then drop sharply <b>exactly at the paywall</b>. Moving it later trades revenue-per-user for a longer engagement runway.</p></div>
+    <div class="card"><div class="ct">Episode survival by paywall position<span class="illus">illustrative</span></div><div class="cs">Share of a title's episode-1 listeners still listening</div>
+      <div class="lg"><span><span class="sw" style="background:var(--neg)"></span>Paywall at ep 6</span><span><span class="sw" style="background:var(--teal)"></span>Paywall at ep 8</span></div>
+      <div id="c-paywall"></div></div>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card"><div class="ct">Title leaderboard<span class="illus">illustrative</span></div><div class="cs">Top titles by reach</div><div class="scroll"><table class="dt" id="t-titles"></table></div></div>
+      <div class="card"><div class="ct">Minutes / user by format<span class="illus">illustrative</span></div><div id="c-format"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Voice of Customer" hidden>
+    <div class="note">Real public Play Store reviews (Kuku FM + Kuku TV) — 1,200 reviews, labelled by keyword rules.<span class="real">real data</span></div>
+    <div class="kgrid" id="kpi-voc"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">Top complaint — real reviews</div>
+      <p><b>Payments &amp; autopay</b> is the single most-common theme at <b>23.6%</b> of reviews, averaging <b>1.17★</b> — billing friction, not content, is what drags the rating down and caps conversion.</p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct">What 1,200 real reviews complain about<span class="real">real</span></div><div class="cs">Red = avg rating below 2.5</div><div id="c-themes"></div></div>
+      <div class="card"><div class="ct">Reviews are strongly polarised<span class="real">real</span></div><div class="cs">600 reviews per app · mostly 1★ or 5★</div>
+        <div class="lg"><span><span class="sw" style="background:var(--brand)"></span>Kuku FM</span><span><span class="sw" style="background:var(--warn)"></span>Kuku TV</span></div>
+        <div id="c-ratings"></div></div>
+    </div>
+    <div style="margin-top:12px"><b style="font-size:.85rem">Representative 1-star payment complaints</b><span class="real">real, verbatim</span>
+      <div class="quote">"Money deducted automatically after free trial without any notification. No option to cancel autopay. Very disappointing."</div>
+      <div class="quote">"They charged ₹899 from my account without asking. Customer care is not responding. Please refund."</div>
+    </div>
+  </section>
+
+  <section data-tab="Unit Economics" hidden>
+    <div class="note">Illustrative revenue-per-paying-user model<span class="illus">illustrative</span></div>
+    <div class="kgrid" id="kpi-ue"></div>
+    <div class="insight" style="--ac:var(--pos)"><div class="k">Now contribution-positive</div>
+      <p id="ue-insight"></p></div>
+    <div class="card"><div class="ct">Annual revenue per paying user — the P&amp;L of one subscriber</div><div class="cs">ARPU in, content/payments/acquisition out, contribution at the end</div><div id="c-ue"></div></div>
+  </section>
+
+  <section data-tab="SQL Inspector" hidden>
+    <div class="note">Every view here is powered by a real SQL query over the model. Read &amp; run one.</div>
+    <div class="sqlbar"><select id="sql-pick"></select><button class="run" id="sql-run">Run query</button></div>
+    <pre class="sql" id="sql-code"></pre>
+    <div class="scroll" style="margin-top:12px"><table class="dt" id="sql-out"></table></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main></div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+/* ---------- DATA ---------- */
+var REAL_KPIS=[
+ ["Revenue (FY26)","₹1,484 Cr","~6× YoY","var(--brand)"],
+ ["Net profit (FY26)","+₹183 Cr","swung from loss","var(--pos)"],
+ ["Paying subs","10M+","2026","var(--brand)"],
+ ["IPO target","~₹15,000 Cr","DRHP Jun 2026","var(--brand)"],
+ ["iOS rating","4.10★","Kuku FM","var(--brand)"],
+ ["Installs","400M+","across apps","var(--brand)"]];
+var OVER_INSIGHT="Kuku FM has won vernacular audio — and turned <b>profitable in FY26</b> (~₹183 Cr PAT on ₹1,484 Cr). "+
+ "But in 1,200 real reviews, <b>payments &amp; autopay is the #1 complaint</b> (23.6%, 1.17★) — the friction that "+
+ "still caps the <b>~5% signup→subscribe</b> conversion. The product model below is where an analyst attacks it.";
+var FUNNEL=[["Signed up",100],["Played an episode",92],["Activated (3+ in 72h)",47],["Hit the paywall",22],["Subscribed",5]];
+var MAU=[["Jan",3.1],["Feb",3.6],["Mar",4.2],["Apr",4.9],["May",5.6],["Jun",6.4],["Jul",7.1],["Aug",7.9]];
+var GENRE=[["Thriller",61,8],["Horror",57,10],["Crime",52,14],["Romance",44,22],["Drama",41,27],["Mythology",38,25]];
+var PAYWALL6=[100,88,79,72,66,61,34,30,27,25,23,22];
+var PAYWALL8=[100,89,81,74,69,65,61,57,38,34,31,29];
+var TITLES=[["Insaan","Thriller","Audio drama",48200,62],["Chanakya","Mythology","Audiobook",41100,71],
+ ["Pati Patni","Drama","Audio drama",38800,58],["Rahasya","Crime","Audio drama",35400,55],
+ ["Prem Kahani","Romance","Audio drama",33200,49],["Daulat","Thriller","Audio drama",29900,53],
+ ["Shiv Katha","Mythology","Audiobook",27600,66],["Dilli Nights","Crime","Audio drama",24100,47]];
+var FORMATS=[["Audiobook",38.4],["Audio drama",52.1]];
+var THEMES=[["Payments & autopay",23.6,1.17],["Content quality",15.8,3.2],["Pricing",8.3,1.2],
+ ["Playback / tech",4.1,1.33],["Ads",3.3,1.27],["Customer support",3.2,1.16],
+ ["Discovery / nav",1.0,1.83],["App stability",0.8,1.4]];
+var RATING_FM=[342,19,14,36,189], RATING_TV=[194,18,15,24,349];
+var UE=[["Annual ARPU",900,"rev"],["− Content royalty",-400,"cost"],["− Payments/infra",-110,"cost"],["− Acquisition (amort.)",-210,"cost"]];
+var SQL=[
+ {name:"Signup → subscription funnel",
+  sql:"WITH f AS (SELECT user_id, signup_ts FROM users),\n     act AS (SELECT user_id FROM consumption_events\n             WHERE ts <= signup_ts + INTERVAL 72 HOUR\n             GROUP BY user_id HAVING COUNT(DISTINCT episode_id) >= 3)\nSELECT 'Signed up' stage, COUNT(*) users FROM f\nUNION ALL SELECT 'Activated (3+ in 72h)', COUNT(*) FROM act\nUNION ALL SELECT 'Subscribed', COUNT(*) FROM subscriptions;",
+  cols:["stage","users","% of signup"],
+  rows:FUNNEL.map(function(s){return [s[0],Math.round(s[1]*1000),s[1]+"%"];})},
+ {name:"Retention by first-watched genre",
+  sql:"SELECT t.genre,\n   ROUND(100.0*AVG(returned_d1),1) AS d1,\n   ROUND(100.0*AVG(returned_d30),1) AS d30\nFROM first_watch f JOIN titles t USING(title_id)\nGROUP BY 1 ORDER BY d1 DESC;",
+  cols:["genre","d1","d30"],
+  rows:GENRE.map(function(g){return [g[0],g[1]+"%",g[2]+"%"];})},
+ {name:"Episode survival by paywall position",
+  sql:"SELECT ep_number,\n   ROUND(AVG(pct_of_ep1) FILTER(WHERE grp='paywall_ep6'),1) AS ep6,\n   ROUND(AVG(pct_of_ep1) FILTER(WHERE grp='paywall_ep8'),1) AS ep8\nFROM episode_survival\nGROUP BY ep_number ORDER BY ep_number;",
+  cols:["episode","ep6 %","ep8 %"],
+  rows:PAYWALL6.map(function(v,i){return ["Ep "+(i+1),v,PAYWALL8[i]];})},
+ {name:"Review themes (real reviews)",
+  sql:"SELECT theme,\n   COUNT(*) AS mentions,\n   ROUND(AVG(rating),2) AS avg_rating,\n   ROUND(100.0*COUNT(*)/SUM(COUNT(*)) OVER (),1) AS share_pct\nFROM review_labels\nGROUP BY theme ORDER BY mentions DESC;",
+  cols:["theme","share_pct","avg_rating"],
+  rows:THEMES.map(function(t){return [t[0],t[1]+"%",t[2]+"★"];})}
+];
+var SYN_NOTE="Real headline metrics (Sep 2026) + real Play Store review analysis + a clearly-labelled synthetic product model — not Kuku's internal data.";
+var FOOT="Headline KPIs: Kuku FY26 RoC filings / MediaNama / DRHP (2026). Review themes & ratings are real public Play Store data. Funnel, genre retention, paywall survival and unit-economics charts are clearly-labelled illustrative models. Built by Diya Mittal.";
+
+/* ---------- harness ---------- */
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+
+function funnelH(id,steps){var box=document.getElementById(id);if(!box)return;var W=460,H=steps.length*40+8,max=steps[0][1];
+  var mut=cvar("--muted"),br=cvar("--brand"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*40+6,w=(W-200)*s[1]/max;var r=el("rect",{x:190,y:y,width:Math.max(w,3),height:28,rx:5,fill:br,opacity:1-i*0.13});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+s[1]+"% of signups</span>");
+    var lb=el("text",{x:182,y:y+18,"text-anchor":"end","font-size":10,fill:cvar("--ink")});lb.textContent=s[0];svg.appendChild(lb);
+    var vl=el("text",{x:190+Math.max(w,3)+6,y:y+18,"font-size":10.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s[1]+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function lineChart(id,data,color){var box=document.getElementById(id);if(!box)return;var W=460,H=220,L=28,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.15,iw=W-L-R,ih=H-T-B,g=cvar("--grid"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=3;t++){var yy=T+ih*t/3;svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d[1]/max)];});
+  svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L")+" L"+pts[pts.length-1][0]+","+(T+ih)+" L"+pts[0][0]+","+(T+ih)+" Z",fill:color,opacity:0.12}));
+  svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L"),fill:"none",stroke:color,"stroke-width":2.4,"stroke-linejoin":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:3.6,fill:cvar("--panel"),stroke:color,"stroke-width":2});svg.appendChild(c);bind(c,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"M</span>");
+    var xl=el("text",{x:pts[i][0],y:H-9,"text-anchor":"middle","font-size":8.5,fill:mut});xl.textContent=d[0];svg.appendChild(xl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function lineMulti(id,seriesA,seriesB,cA,cB,walls){var box=document.getElementById(id);if(!box)return;var W=560,H=250,L=30,R=14,T=14,B=30;
+  var max=100,iw=W-L-R,ih=H-T-B,g=cvar("--grid"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=4;t++){var yy=T+ih*t/4;svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-5,y:yy+3,"text-anchor":"end","font-size":8,fill:mut,"font-family":cvar("--font-m")});yl.textContent=(100-t*25)+"%";svg.appendChild(yl);}
+  function draw(s,c){var pts=s.map(function(v,i){return [L+iw*i/(s.length-1),T+ih*(1-v/max)];});
+    svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L"),fill:"none",stroke:c,"stroke-width":2.4,"stroke-linejoin":"round"}));
+    s.forEach(function(v,i){var cc=el("circle",{cx:pts[i][0],cy:pts[i][1],r:3,fill:c});svg.appendChild(cc);bind(cc,"<b>Ep "+(i+1)+"</b><br><span class='v'>"+v+"%</span>");});}
+  walls.forEach(function(w){var x=L+iw*(w[0]-1)/(seriesA.length-1);svg.appendChild(el("line",{x1:x,y1:T,x2:x,y2:T+ih,stroke:w[1],"stroke-width":1.2,"stroke-dasharray":"3 3",opacity:.7}));});
+  draw(seriesA,cA);draw(seriesB,cB);
+  for(var i=0;i<seriesA.length;i++){var x=L+iw*i/(seriesA.length-1);var xl=el("text",{x:x,y:H-9,"text-anchor":"middle","font-size":8,fill:mut});xl.textContent=(i+1);svg.appendChild(xl);}
+  box.innerHTML="";box.appendChild(svg);}
+
+function groupBars(id,cats,s1,s2,c1,c2,suffix){var box=document.getElementById(id);if(!box)return;var W=460,H=220,L=24,R=12,T=14,B=30;
+  var max=Math.max(Math.max.apply(null,s1),Math.max.apply(null,s2))*1.2,iw=W-L-R,ih=H-T-B,mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=cats.length,gw=iw/n,bw=gw/2-4;
+  cats.forEach(function(ct,i){var gx=L+i*gw+4;
+    [[s1[i],c1,0],[s2[i],c2,bw+2]].forEach(function(b){var h=ih*b[0]/max,y=T+ih-h;var r=el("rect",{x:gx+b[2],y:y,width:bw,height:Math.max(h,1),rx:3,fill:b[1]});svg.appendChild(r);
+      bind(r,"<b>"+ct+"</b><br><span class='v'>"+b[0]+(suffix||"")+"</span>");});
+    var lb=el("text",{x:gx+bw,y:H-9,"text-anchor":"middle","font-size":8.2,fill:mut});lb.textContent=ct;svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function themesBar(id,data){var box=document.getElementById(id);if(!box)return;var W=460,rh=30,H=data.length*rh+8;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];})),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d,i){var y=i*rh+6,w=(W-230)*d[1]/max,col=d[2]<2.5?cvar("--neg"):cvar("--teal");
+    var r=el("rect",{x:150,y:y,width:Math.max(w,3),height:18,rx:4,fill:col});svg.appendChild(r);bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"% · avg "+d[2]+"★</span>");
+    var lb=el("text",{x:144,y:y+13,"text-anchor":"end","font-size":9,fill:cvar("--ink")});lb.textContent=d[0];svg.appendChild(lb);
+    var vl=el("text",{x:150+Math.max(w,3)+5,y:y+13,"font-size":8.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=d[1]+"% · "+d[2]+"★";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function barsV(id,data,color,suffix){var box=document.getElementById(id);if(!box)return;var W=460,H=200,L=18,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.2,iw=W-L-R,ih=H-T-B,mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length,bw=iw/n-14;
+  data.forEach(function(d,i){var x=L+i*(iw/n)+7,h=ih*d[1]/max,y=T+ih-h;var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:4,fill:color});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+(suffix||"")+"</span>");
+    var tx=el("text",{x:x+bw/2,y:y-5,"text-anchor":"middle","font-size":10,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=d[1];svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:H-9,"text-anchor":"middle","font-size":9,fill:mut});lb.textContent=d[0];svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function waterfall(id,steps){var box=document.getElementById(id);if(!box)return;var W=560,H=250,pad=24,base=H-46,top=16;
+  var net=steps.reduce(function(a,s){return a+s[1];},0),all=steps.concat([["Contribution",net,"net"]]);
+  var cum=steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0),scale=(base-top)/cum,n=all.length,slot=(W-pad*2)/n,bw=slot-14,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  all.forEach(function(s,i){var x=pad+i*slot+7,hiVal,loVal,col;
+    if(s[2]==="net"){hiVal=Math.max(s[1],0);loVal=Math.min(s[1],0);col=(s[1]<0?neg:pos);run=s[1];}
+    else if(s[1]<0){hiVal=run;loVal=run+s[1];run=loVal;col=neg;}
+    else{hiVal=run+s[1];loVal=run;run=run+s[1];col=br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s[2]==="net"&&s[1]<0){yTop=base;h=Math.max(Math.abs(s[1])*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s[1]<0&&s[2]!=="net")?0.9:1});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+(s[1]<0?"−":"")+"₹"+Math.abs(s[1])+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-5,"text-anchor":"middle","font-size":9.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s[1]<0?"−":"")+"₹"+Math.abs(s[1]);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+14,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s[0].length>16?s[0].slice(0,15)+"…":s[0];svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function kpiRow(id,items){var box=document.getElementById(id);if(!box)return;box.innerHTML=items.map(function(k){return '<div class="kpi" style="--ac:'+(k[3]||"var(--brand)")+'"><div class="lab">'+k[0]+'</div><div class="val">'+k[1]+'</div><div class="sub">'+k[2]+'</div></div>';}).join("");}
+function tableHTML(cols,rows){var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>2?' class="num"':'')+'>'+c+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>2?' class="num"':'')+'>'+c+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function sqlHTML(s){return esc(s).replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|USING|ON|AS|WITH|CASE|WHEN|THEN|ELSE|END|UNION ALL|AVG|COUNT|SUM|ROUND|MIN|MAX|FILTER|OVER|HAVING|INTERVAL|HOUR|DISTINCT|DESC|ASC)\b/g,'<span class="kw">$1</span>');}
+
+function render(){
+  document.getElementById("syn-note").textContent=SYN_NOTE;
+  document.getElementById("over-insight").innerHTML=OVER_INSIGHT;
+  document.getElementById("foot").textContent=FOOT;
+  kpiRow("kpi-over",REAL_KPIS);
+  funnelH("c-funnel",FUNNEL);funnelH("c-funnel2",FUNNEL);
+  lineChart("c-mau",MAU,cvar("--brand"));
+  kpiRow("kpi-fun",[["Signups","50,000","modelled","var(--brand)"],["Played episode","99%","of signups","var(--brand)"],
+    ["Activated","47%","3+ in 72h","var(--warn)"],["Hit paywall","22%","of signups","var(--brand)"],
+    ["Subscribed","4.9%","of signups","var(--pos)"],["Paywall A/B","+7pp","ep6→ep8","var(--teal)"]]);
+  groupBars("c-genre",GENRE.map(function(g){return g[0];}),GENRE.map(function(g){return g[1];}),GENRE.map(function(g){return g[2];}),cvar("--teal"),cvar("--brand"),"%");
+  lineMulti("c-paywall",PAYWALL6,PAYWALL8,cvar("--neg"),cvar("--teal"),[[6,cvar("--neg")],[8,cvar("--teal")]]);
+  document.getElementById("t-titles").innerHTML=tableHTML(["Title","Genre","Format","Listeners","Compl. %"],
+    TITLES.map(function(t){return [t[0],'<span class="pill">'+t[1]+'</span>',t[2],t[3].toLocaleString(),t[4]+"%"];}));
+  barsV("c-format",FORMATS,cvar("--brand"));
+  // VoC (real)
+  var reviews=THEMES.reduce(function(a,t){return a;},0);
+  kpiRow("kpi-voc",[["Reviews analysed","1,200","real public","var(--pos)"],["Top complaint","Payments","23.6% of reviews","var(--neg)"],
+    ["That theme's rating","1.17★","lowest","var(--neg)"],["Praise theme","14.4%","4.62★","var(--pos)"],
+    ["Kuku FM rating","4.10★","live iOS","var(--brand)"],["Kuku TV rating","4.23★","live iOS","var(--brand)"]]);
+  themesBar("c-themes",THEMES);
+  groupBars("c-ratings",["1★","2★","3★","4★","5★"],RATING_FM,RATING_TV,cvar("--brand"),cvar("--warn"),"");
+  // UE
+  var net=UE.reduce(function(a,s){return a+s[1];},0);
+  kpiRow("kpi-ue",[["Annual ARPU","₹900","blended","var(--brand)"],["Content royalty","₹400","per user","var(--neg)"],
+    ["Payments/infra","₹110","per user","var(--neg)"],["Acquisition","₹210","amortised","var(--neg)"],
+    ["Contribution","₹"+net,"per user","var(--pos)"],["Margin",Math.round(100*net/900)+"%","of ARPU","var(--pos)"]]);
+  document.getElementById("ue-insight").innerHTML="At <b>₹"+net+" contribution per paying user</b>, the model is positive — matching Kuku's FY26 swing to profit. The lever now is <b>retention &amp; renewal</b>: cutting involuntary churn (much of it payment failure) is the cheapest growth there is.";
+  waterfall("c-ue",UE);
+  // SQL
+  var sel=document.getElementById("sql-pick");sel.innerHTML=SQL.map(function(q,i){return '<option value="'+i+'">'+q.name+'</option>';}).join("");
+  function showSQL(){document.getElementById("sql-code").innerHTML=sqlHTML(SQL[+sel.value].sql);document.getElementById("sql-out").innerHTML="";}
+  sel.onchange=showSQL;showSQL();
+  document.getElementById("sql-run").onclick=function(){var q=SQL[+sel.value];document.getElementById("sql-out").innerHTML=tableHTML(q.cols,q.rows);};
+}
+
+/* ---------- tabs ---------- */
+var sections=[].slice.call(document.querySelectorAll("section[data-tab]")),tabsNav=document.getElementById("tabs");
+sections.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.getAttribute("data-tab");b.setAttribute("aria-selected",i===0?"true":"false");
+  b.onclick=function(){sections.forEach(function(x){x.hidden=true;});s.hidden=false;[].forEach.call(tabsNav.children,function(c){c.setAttribute("aria-selected","false");});b.setAttribute("aria-selected","true");};
+  tabsNav.appendChild(b);});
+
+/* ---------- theme ---------- */
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("kkd_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.onclick=function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("kkd_theme",nd?"dark":"light");}catch(e){}setLabel();render();};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();render();}});
+setLabel();render();
+</script>

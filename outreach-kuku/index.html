@@ -1,0 +1,285 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Kuku Outreach Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&display=swap">
+<style>
+  /* Layout: a dark "desk" holding two ruled note sheets; a utility sans bar binds the links. */
+  :root{
+    --desk:#1b1713; --desk-2:#241e18;
+    --paper:#f8f2e4; --paper-edge:#efe7d4;
+    --ink:#243049;           /* pen blue-black */
+    --ink-soft:#4a5068;
+    --red:#d81f27;           /* Kuku crimson */
+    --red-soft:#e9b9bb;
+    --rule:#c9ddea;          /* faint ruled line */
+    --ui:#efe9dd;
+    --font-hand:"Kalam","Segoe Print",cursive;
+    --font-display:"Caveat","Segoe Script",cursive;
+    --font-ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--desk);
+    color:var(--ink); font-family:var(--font-ui);
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-block:28px 48px;
+  }
+  .wrap{max-width:720px;margin:0 auto}
+
+  /* heading on the desk */
+  .deskhead{color:#efe3cf;text-align:center;margin:0 0 6px}
+  .deskhead h1{font-family:var(--font-display);font-weight:700;font-size:2.5rem;margin:0;letter-spacing:.5px}
+  .deskhead p{margin:.1rem 0 0;color:#c9bca6;font-size:.86rem}
+
+  /* link toolbar */
+  .linkbar{background:#2d261e;border:1px solid #3c3328;border-radius:12px;
+    padding:14px 16px;margin:16px 0 26px;color:#e9e0cf}
+  .linkbar h2{font-family:var(--font-ui);font-size:.74rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#b9a588;margin:0 0 10px}
+  .fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:620px){.fields{grid-template-columns:1fr}}
+  .field label{display:block;font-size:.68rem;color:#c3b393;margin:0 0 4px;font-weight:600;letter-spacing:.02em}
+  .field input{width:100%;background:#20190f;border:1px solid #473b2b;border-radius:8px;
+    color:#f4ead6;font-family:var(--font-ui);font-size:.82rem;padding:8px 10px}
+  .field input:focus{outline:2px solid var(--red);outline-offset:1px;border-color:var(--red)}
+  .hint{margin:9px 0 0;font-size:.72rem;color:#9a8a70}
+
+  /* a sheet of ruled paper */
+  .sheet{position:relative;background:var(--paper);border-radius:10px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45),0 2px 0 var(--paper-edge);
+    padding:30px 30px 26px 58px;margin:0 0 30px;overflow:hidden}
+  /* faint horizontal ruling + red margin rule, drawn as paper material */
+  .sheet::before{content:"";position:absolute;inset:0;
+    background-image:repeating-linear-gradient(var(--paper),var(--paper) 33px,var(--rule) 33px,var(--rule) 34px);
+    opacity:.55;pointer-events:none}
+  .sheet::after{content:"";position:absolute;top:0;bottom:0;left:40px;width:2px;background:var(--red);opacity:.55}
+  .sheet > *{position:relative}
+
+  .tag{display:inline-block;font-family:var(--font-ui);font-size:.66rem;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--red);
+    padding:3px 9px;border-radius:999px;margin:0 0 6px}
+  .subject{font-family:var(--font-ui);font-size:.8rem;color:var(--ink-soft);margin:2px 0 10px}
+  .subject b{color:var(--ink)}
+
+  .note{font-family:var(--font-hand);color:var(--ink);font-size:1.28rem;line-height:34px}
+  .note p{margin:0 0 6px}
+  .note ul{margin:4px 0 8px;padding-left:22px}
+  .note li{margin:0 0 2px}
+  .sig{font-family:var(--font-display);font-size:1.7rem;color:var(--ink);margin:10px 0 0}
+  .ph{color:var(--red);font-style:normal}
+
+  a.lnk{color:var(--red);font-weight:700;text-decoration:none;
+    border-bottom:2px solid var(--red-soft);padding-bottom:1px}
+  a.lnk:hover{border-bottom-color:var(--red)}
+  a.lnk.off{color:var(--ink-soft);border-bottom:2px dotted #c7bca3;cursor:not-allowed}
+
+  /* button row (utility) */
+  .row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+  .btn{font-family:var(--font-ui);font-size:.82rem;font-weight:600;text-decoration:none;
+    border-radius:9px;padding:9px 14px;border:1px solid transparent;cursor:pointer;display:inline-flex;
+    align-items:center;gap:7px}
+  .btn.primary{background:var(--red);color:#fff}
+  .btn.primary:hover{background:#b4151c}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:#cdbfa2}
+  .btn.ghost:hover{border-color:var(--red);color:var(--red)}
+  .btn.off{opacity:.45;pointer-events:none}
+  .copied{font-family:var(--font-ui);font-size:.78rem;color:#1a7a4f;align-self:center;opacity:0;transition:opacity .2s}
+  .copied.show{opacity:1}
+
+  footer{color:#9a8a70;font-size:.76rem;text-align:center;margin:8px 0 0;line-height:1.5}
+  footer a{color:#cdbda0}
+</style>
+
+<div class="wrap">
+  <div class="deskhead">
+    <h1>A note before I apply</h1>
+    <p>Two outreach drafts — paste your links once, they fill both. Then copy, or share this page.</p>
+  </div>
+
+  <div class="linkbar">
+    <h2>Your links</h2>
+    <div class="fields">
+      <div class="field">
+        <label for="f-dash">Live dashboard URL</label>
+        <input id="f-dash" type="url" inputmode="url" placeholder="https://your-app.streamlit.app">
+      </div>
+      <div class="field">
+        <label for="f-case">Case study (PDF) URL</label>
+        <input id="f-case" type="url" inputmode="url" placeholder="https://drive.google.com/…">
+      </div>
+      <div class="field">
+        <label for="f-li">Your LinkedIn URL</label>
+        <input id="f-li" type="url" inputmode="url" placeholder="https://linkedin.com/in/…">
+      </div>
+    </div>
+    <p class="hint">Links in the notes below turn red and clickable once filled. Saved in this browser only.</p>
+  </div>
+
+  <!-- LinkedIn note -->
+  <section class="sheet" id="sheet-li">
+    <span class="tag">LinkedIn message</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya — a product analyst, ex-Pocket FM (Scout team). Micro-drama &amp; audio
+         retention is the problem I think about most, and I'm a daily Kuku user.</p>
+      <p>I built a small, independent teardown of Kuku FM to test my own read. Two things stood out:</p>
+      <ul>
+        <li>the real drop inside a series isn't the content — it's the paywall episode
+            (an ep&nbsp;6&nbsp;→&nbsp;8 move lifts subscribe ~7pp),</li>
+        <li>and across 1,200 real Play Store reviews, payments &amp; autopay is the #1 complaint, not content.</li>
+      </ul>
+      <p>Dashboard&nbsp;→ <a class="lnk off" data-link="dash" href="#">[dashboard link]</a> &nbsp;·&nbsp;
+         Write-up&nbsp;→ <a class="lnk off" data-link="case" href="#">[case study]</a></p>
+      <p>Would love 15 minutes of your read — and I'm exploring Product Analyst roles on your team.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="dash" href="#" target="_blank" rel="noopener">Open dashboard</a>
+      <a class="btn ghost off" data-link="case" href="#" target="_blank" rel="noopener">Case study (PDF)</a>
+      <button class="btn ghost" data-copy="li">Copy message</button>
+      <span class="copied" data-for="li">Copied</span>
+    </div>
+  </section>
+
+  <!-- Email note -->
+  <section class="sheet" id="sheet-email">
+    <span class="tag">Email</span>
+    <p class="subject"><b>Subject:</b> Kuku FM teardown — where the funnel actually leaks</p>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya, a product analyst who spent the last stretch on the Scout team at Pocket FM,
+         so micro-drama and audio retention is exactly the space I live in. I'm also a daily Kuku
+         user, and I built an independent content-intelligence teardown of Kuku FM to pressure-test my own read.</p>
+      <p>A couple of findings worth 60 seconds:</p>
+      <ul>
+        <li>The paywall, not the content, is the cliff — survival curves fall gently through a series,
+            then drop sharply at the paywall episode; a simulated ep&nbsp;6&nbsp;→&nbsp;8 move lifts
+            subscribe rate among paywall-reachers ~7pp.</li>
+        <li>Payments is the churn story — across 1,200 real Play Store reviews, "payments &amp; autopay"
+            is the most-complained-about theme. Billing UX, not content, drags the rating.</li>
+      </ul>
+      <p>Product metrics are synthetic and clearly labelled; the review and company analysis use only real data.</p>
+      <p>Dashboard&nbsp;→ <a class="lnk off" data-link="dash" href="#">[dashboard link]</a> &nbsp;·&nbsp;
+         Case study&nbsp;→ <a class="lnk off" data-link="case" href="#">[PDF link]</a></p>
+      <p>If there's an opening on your analytics team I'd love to be considered — either way,
+         I'd value your honest read.</p>
+      <p class="sig">— Diya Mittal</p>
+      <p style="font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft);margin-top:2px">
+        <span class="ph">[phone]</span> ·
+        <a class="lnk off" data-link="li" href="#">[LinkedIn]</a></p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="dash" href="#" target="_blank" rel="noopener">Open dashboard</a>
+      <a class="btn ghost off" data-link="case" href="#" target="_blank" rel="noopener">Case study (PDF)</a>
+      <button class="btn ghost" data-copy="email">Copy email</button>
+      <span class="copied" data-for="email">Copied</span>
+    </div>
+  </section>
+
+  <footer>
+    Handwritten-style, but every link is live. Product metrics in the dashboard are synthetic and
+    labelled; company facts, reviews and app imagery are real public data, shown for analysis only.
+  </footer>
+</div>
+
+<script>
+  "use strict";
+  var KEY = "kuku_outreach_links_v1";
+  var state = {dash:"", case:"", li:""};
+  var inputs = {dash:document.getElementById("f-dash"),
+                "case":document.getElementById("f-case"),
+                li:document.getElementById("f-li")};
+
+  try { var s = JSON.parse(localStorage.getItem(KEY) || "{}");
+        ["dash","case","li"].forEach(function(k){ if(s[k]) state[k]=s[k]; }); } catch(e){}
+
+  function labelFor(role){
+    return role==="dash" ? "[dashboard link]" : role==="case" ? "[case study]" : "[LinkedIn]";
+  }
+  function apply(){
+    // inline anchors
+    document.querySelectorAll("a.lnk[data-link]").forEach(function(a){
+      var role=a.getAttribute("data-link"), url=state[role];
+      if(url){ a.href=url; a.target="_blank"; a.rel="noopener"; a.classList.remove("off");
+               a.textContent = url.replace(/^https?:\/\//,"").replace(/\/$/,""); }
+      else { a.href="#"; a.classList.add("off"); a.textContent=labelFor(role); }
+    });
+    // buttons
+    document.querySelectorAll("a.btn[data-link]").forEach(function(b){
+      var role=b.getAttribute("data-link"), url=state[role];
+      if(url){ b.href=url; b.classList.remove("off"); } else { b.href="#"; b.classList.add("off"); }
+    });
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  Object.keys(inputs).forEach(function(k){
+    var el=inputs[k]; if(!el) return;
+    el.value = state[k] || "";
+    el.addEventListener("input", function(){ state[k]=el.value.trim(); apply(); save(); });
+  });
+  apply();
+
+  // ---- copy templates (plain text with current links) ----
+  function L(role){ return state[role] || labelFor(role); }
+  function liText(){
+    return [
+"Hi [Name],",
+"",
+"I'm Diya — a product analyst, ex-Pocket FM (Scout team). Micro-drama & audio retention is the problem I think about most, and I'm a daily Kuku user.",
+"",
+"I built a small, independent teardown of Kuku FM to test my own read. Two things stood out:",
+"- the real drop inside a series isn't the content, it's the paywall episode (an ep 6 -> 8 move lifts subscribe ~7pp),",
+"- and across 1,200 real Play Store reviews, payments & autopay is the #1 complaint, not content.",
+"",
+"Dashboard -> "+L("dash")+"  ·  Write-up -> "+L("case"),
+"",
+"Would love 15 minutes of your read — and I'm exploring Product Analyst roles on your team.",
+"",
+"— Diya"].join("\n");
+  }
+  function emailText(){
+    return [
+"Subject: Kuku FM teardown — where the funnel actually leaks",
+"",
+"Hi [Name],",
+"",
+"I'm Diya, a product analyst who spent the last stretch on the Scout team at Pocket FM, so micro-drama and audio retention is exactly the space I live in. I'm also a daily Kuku user, and I built an independent content-intelligence teardown of Kuku FM to pressure-test my own read.",
+"",
+"A couple of findings worth 60 seconds:",
+"- The paywall, not the content, is the cliff — survival curves fall gently through a series, then drop sharply at the paywall episode; a simulated ep 6 -> 8 move lifts subscribe rate among paywall-reachers ~7pp.",
+"- Payments is the churn story — across 1,200 real Play Store reviews, \"payments & autopay\" is the most-complained-about theme. Billing UX, not content, drags the rating.",
+"",
+"Product metrics are synthetic and clearly labelled; the review and company analysis use only real data.",
+"",
+"Dashboard -> "+L("dash")+"  ·  Case study -> "+L("case"),
+"",
+"If there's an opening on your analytics team I'd love to be considered — either way, I'd value your honest read.",
+"",
+"Thanks,",
+"Diya Mittal · [phone] · "+L("li")].join("\n");
+  }
+
+  function flash(which){
+    var el=document.querySelector('.copied[data-for="'+which+'"]');
+    if(!el) return; el.classList.add("show"); setTimeout(function(){ el.classList.remove("show"); },1400);
+  }
+  function copyText(txt, which){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ flash(which); }).catch(function(){ fallback(txt,which); });
+    } else { fallback(txt,which); }
+  }
+  function fallback(txt,which){
+    var ta=document.createElement("textarea"); ta.value=txt;
+    ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); flash(which); }catch(e){} document.body.removeChild(ta);
+  }
+  document.querySelectorAll("button[data-copy]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var which=b.getAttribute("data-copy");
+      copyText(which==="li"?liText():emailText(), which);
+    });
+  });
+</script>

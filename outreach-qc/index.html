@@ -1,0 +1,268 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Q-Commerce Outreach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@300;400;700&family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&display=swap">
+<style>
+/* A dark "desk" holding ruled note sheets; per-company margin colour (Blinkit yellow, Zepto purple). Committed light-paper look. */
+:root{
+  --desk:#16130f; --paper:#f8f2e4; --paper-edge:#efe7d4;
+  --ink:#243049; --ink-soft:#4a5068;
+  --blink:#E8B400; --zepto:#8A2BB2;
+  --rule:#cde0ec;
+  --font-hand:"Kalam","Segoe Print",cursive;
+  --font-display:"Caveat","Segoe Script",cursive;
+  --font-ui:"DM Sans",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--font-ui);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 52px}
+.wrap{max-width:760px;margin:0 auto}
+.deskhead{text-align:center;margin:0 0 6px}
+.deskhead h1{font-family:var(--font-display);font-weight:700;font-size:2.6rem;margin:0;color:#f1e6cf;letter-spacing:.5px}
+.deskhead p{margin:.1rem 0 0;color:#bdae95;font-size:.88rem}
+
+.linkbar{background:#241f17;border:1px solid #3a3225;border-radius:12px;padding:14px 16px;margin:16px 0 26px;color:#ece3d1}
+.linkbar h2{font-family:var(--font-ui);font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#b6a07f;margin:0 0 10px}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:640px){.fields{grid-template-columns:1fr}}
+.field label{display:block;font-size:.68rem;color:#c3b393;margin:0 0 4px;font-weight:600}
+.field input{width:100%;background:#1b160d;border:1px solid #473b2b;border-radius:8px;color:#f4ead6;
+  font-family:var(--font-ui);font-size:.82rem;padding:8px 10px}
+.field input:focus{outline:2px solid var(--blink);outline-offset:1px;border-color:var(--blink)}
+.hint{margin:9px 0 0;font-size:.72rem;color:#9a8a70}
+
+.co{display:flex;align-items:center;gap:10px;margin:26px 0 12px}
+.co .dot{width:12px;height:12px;border-radius:50%}
+.co h3{font-family:var(--font-ui);font-weight:700;font-size:1.05rem;color:#f0e7d5;margin:0}
+.co.blink .dot{background:var(--blink)} .co.zepto .dot{background:var(--zepto)}
+
+.sheet{position:relative;background:var(--paper);border-radius:10px;
+  box-shadow:0 16px 36px rgba(0,0,0,.45),0 2px 0 var(--paper-edge);
+  padding:26px 28px 22px 56px;margin:0 0 20px;overflow:hidden}
+.sheet::before{content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(var(--paper),var(--paper) 32px,var(--rule) 32px,var(--rule) 33px);
+  opacity:.5;pointer-events:none}
+.sheet::after{content:"";position:absolute;top:0;bottom:0;left:38px;width:2px;opacity:.6}
+.sheet.blink::after{background:var(--blink)} .sheet.zepto::after{background:var(--zepto)}
+.sheet>*{position:relative}
+.tag{display:inline-block;font-family:var(--font-ui);font-size:.64rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#fff;padding:3px 9px;border-radius:999px;margin:0 0 6px}
+.sheet.blink .tag{background:var(--blink);color:#1a1500} .sheet.zepto .tag{background:var(--zepto)}
+.subject{font-family:var(--font-ui);font-size:.8rem;color:var(--ink-soft);margin:2px 0 10px}
+.subject b{color:var(--ink)}
+.note{font-family:var(--font-hand);color:var(--ink);font-size:1.24rem;line-height:33px}
+.note p{margin:0 0 6px}
+.note ul{margin:4px 0 8px;padding-left:22px}
+.note li{margin:0 0 2px}
+.sig{font-family:var(--font-display);font-size:1.6rem;margin:8px 0 0}
+.ph{font-style:normal}
+.sheet.blink .ph{color:#b8860b} .sheet.zepto .ph{color:var(--zepto)}
+a.lnk{font-weight:700;text-decoration:none;padding-bottom:1px}
+.sheet.blink a.lnk{color:#9a6f00;border-bottom:2px solid #e7cf86}
+.sheet.zepto a.lnk{color:var(--zepto);border-bottom:2px solid #d9b6e7}
+a.lnk.off{color:var(--ink-soft);border-bottom:2px dotted #c7bca3;cursor:not-allowed}
+
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 0}
+.btn{font-family:var(--font-ui);font-size:.8rem;font-weight:600;text-decoration:none;border-radius:9px;
+  padding:8px 13px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.sheet.blink .btn.primary{background:var(--blink);color:#1a1500}
+.sheet.zepto .btn.primary{background:var(--zepto);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border-color:#cdbfa2}
+.btn.ghost:hover{border-color:#999;}
+.btn.off{opacity:.4;pointer-events:none}
+.copied{font-family:var(--font-ui);font-size:.76rem;color:#1a7a4f;align-self:center;opacity:0;transition:opacity .2s}
+.copied.show{opacity:1}
+footer{color:#9a8a70;font-size:.76rem;text-align:center;margin:10px 0 0;line-height:1.5}
+</style>
+
+<div class="wrap">
+  <div class="deskhead">
+    <h1>Cold outreach — Blinkit &amp; Zepto</h1>
+    <p>Four notes. Paste your links once, they fill every message. Then copy, or share this page.</p>
+  </div>
+
+  <div class="linkbar">
+    <h2>Your links</h2>
+    <div class="fields">
+      <div class="field"><label for="f-blink">Blinkit teardown URL</label>
+        <input id="f-blink" type="url" placeholder="https://diyamittal02.github.io/portfolio/…"></div>
+      <div class="field"><label for="f-zepto">Zepto teardown URL</label>
+        <input id="f-zepto" type="url" placeholder="https://diyamittal02.github.io/portfolio/…"></div>
+      <div class="field"><label for="f-li">Your LinkedIn URL</label>
+        <input id="f-li" type="url" placeholder="https://linkedin.com/in/…"></div>
+    </div>
+    <p class="hint">Teardown links are pre-filled with your two pages. Make each one public (its Share menu)
+      before sending, or the recipient can't open it. Saved in this browser only.</p>
+  </div>
+
+  <!-- BLINKIT -->
+  <div class="co blink"><span class="dot"></span><h3>Blinkit · Eternal</h3></div>
+
+  <section class="sheet blink">
+    <span class="tag">LinkedIn message</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya — a product analyst (ex-Pocket FM, Scout team), and a daily Blinkit user. I work mostly
+         on funnel &amp; retention analytics for consumer apps.</p>
+      <p>To think through the product, I built an independent teardown of Blinkit — unit economics, the
+         growth→margin shift, a north-star metric tree and an experiment backlog.</p>
+      <p>Teardown → <a class="lnk off" data-link="blink" href="#">[Blinkit teardown]</a></p>
+      <p>Would love to connect — I'm keen on Product Analyst roles on the Blinkit / Eternal team.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="blink" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="blinkLi">Copy message</button>
+      <span class="copied" data-for="blinkLi">Copied</span>
+    </div>
+  </section>
+
+  <section class="sheet blink">
+    <span class="tag">Email</span>
+    <p class="subject"><b>Subject:</b> Blinkit teardown — where the next margin comes from</p>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya, a product analyst (ex-Pocket FM, Scout). Retention &amp; funnel analytics for consumer
+         apps is what I do, and I'm a daily Blinkit user — so I built an independent teardown to
+         pressure-test my own read.</p>
+      <ul>
+        <li>Blinkit has won the land grab; the next S-curve is <b>margin</b> — an analytics problem of
+            AOV, order frequency and per-order fulfilment cost.</li>
+        <li>Adjusted-EBITDA loss is already ~-1.3% of order value. Moving blended contribution 1–2pp
+            (basket-builder for AOV, membership for frequency) flips the network to profit.</li>
+      </ul>
+      <p>Company figures are real &amp; sourced; the funnel / cohort / unit-economics pieces are
+         clearly-labelled analyst frameworks.</p>
+      <p>Teardown → <a class="lnk off" data-link="blink" href="#">[Blinkit teardown]</a></p>
+      <p>If there's an opening on the Blinkit / Eternal analytics team, I'd love to be considered — either
+         way, I'd value your read.</p>
+      <p class="sig">— Diya Mittal</p>
+      <p style="font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft);margin-top:2px">
+        <span class="ph">[phone]</span> · <a class="lnk off" data-link="li" href="#">[LinkedIn]</a></p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="blink" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="blinkEmail">Copy email</button>
+      <span class="copied" data-for="blinkEmail">Copied</span>
+    </div>
+  </section>
+
+  <!-- ZEPTO -->
+  <div class="co zepto"><span class="dot"></span><h3>Zepto</h3></div>
+
+  <section class="sheet zepto">
+    <span class="tag">LinkedIn message</span>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya — a product analyst (ex-Pocket FM, Scout team), and a daily Zepto user. I work mostly on
+         funnel &amp; retention analytics.</p>
+      <p>I built an independent teardown of Zepto — unit economics, the pre-IPO "profitable frequency"
+         problem, a north-star metric tree and an experiment backlog (Zepto Pass, Super Saver, Café).</p>
+      <p>Teardown → <a class="lnk off" data-link="zepto" href="#">[Zepto teardown]</a></p>
+      <p>Would love to connect — I'm keen on Product Analyst roles at Zepto.</p>
+      <p class="sig">— Diya</p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="zepto" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="zeptoLi">Copy message</button>
+      <span class="copied" data-for="zeptoLi">Copied</span>
+    </div>
+  </section>
+
+  <section class="sheet zepto">
+    <span class="tag">Email</span>
+    <p class="subject"><b>Subject:</b> Zepto teardown — turning category love into profitable frequency</p>
+    <div class="note">
+      <p>Hi <span class="ph">[Name]</span>,</p>
+      <p>I'm Diya, a product analyst (ex-Pocket FM, Scout). I live in funnel &amp; retention analytics, and
+         I'm a daily Zepto user — so I built an independent teardown to pressure-test my read.</p>
+      <ul>
+        <li>Zepto has the category love (highest rating in the sector) but the heaviest burn. The whole
+            pre-IPO question is converting that love into <b>profitable frequency</b>.</li>
+        <li>That's an analytics job — a trustworthy per-order contribution model, then Pass / Super Saver /
+            Café experiments that lift frequency without breaking margin.</li>
+      </ul>
+      <p>Company figures are real &amp; sourced; funnel / cohort / unit-economics pieces are
+         clearly-labelled frameworks.</p>
+      <p>Teardown → <a class="lnk off" data-link="zepto" href="#">[Zepto teardown]</a></p>
+      <p>If there's an opening on the Zepto analytics team I'd love to be considered — either way, I'd
+         value your honest read.</p>
+      <p class="sig">— Diya Mittal</p>
+      <p style="font-family:var(--font-ui);font-size:.78rem;color:var(--ink-soft);margin-top:2px">
+        <span class="ph">[phone]</span> · <a class="lnk off" data-link="li" href="#">[LinkedIn]</a></p>
+    </div>
+    <div class="row">
+      <a class="btn primary off" data-link="zepto" href="#" target="_blank" rel="noopener">Open teardown</a>
+      <button class="btn ghost" data-copy="zeptoEmail">Copy email</button>
+      <span class="copied" data-for="zeptoEmail">Copied</span>
+    </div>
+  </section>
+
+  <footer>
+    Handwritten-style, every link live. Teardowns use real sourced data with clearly-labelled illustrative
+    frameworks. Blinkit, Zepto &amp; their marks belong to their owners.
+  </footer>
+</div>
+
+<script>
+"use strict";
+var KEY="qc_outreach_v1";
+var DEF={blink:"https://diyamittal02.github.io/portfolio/blinkit/",
+         zepto:"https://diyamittal02.github.io/portfolio/zepto/", li:""};
+var state={blink:DEF.blink,zepto:DEF.zepto,li:""};
+var inputs={blink:document.getElementById("f-blink"),zepto:document.getElementById("f-zepto"),li:document.getElementById("f-li")};
+try{var s=JSON.parse(localStorage.getItem(KEY)||"{}");["blink","zepto","li"].forEach(function(k){if(typeof s[k]==="string"&&s[k])state[k]=s[k];});}catch(e){}
+function labelFor(role){return role==="blink"?"[Blinkit teardown]":role==="zepto"?"[Zepto teardown]":"[LinkedIn]";}
+function apply(){
+  document.querySelectorAll("a.lnk[data-link]").forEach(function(a){
+    var role=a.getAttribute("data-link"),url=state[role];
+    if(url){a.href=url;a.target="_blank";a.rel="noopener";a.classList.remove("off");
+      a.textContent=url.replace(/^https?:\/\//,"").replace(/\/$/,"");}
+    else{a.href="#";a.classList.add("off");a.textContent=labelFor(role);}});
+  document.querySelectorAll("a.btn[data-link]").forEach(function(b){
+    var url=state[b.getAttribute("data-link")];
+    if(url){b.href=url;b.classList.remove("off");}else{b.href="#";b.classList.add("off");}});
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+Object.keys(inputs).forEach(function(k){var el=inputs[k];if(!el)return;el.value=state[k]||"";
+  el.addEventListener("input",function(){state[k]=el.value.trim();apply();save();});});
+apply();
+
+function L(role){return state[role]||labelFor(role);}
+var T={
+ blinkLi:function(){return["Hi [Name],","",
+  "I'm Diya — a product analyst (ex-Pocket FM, Scout team), and a daily Blinkit user. I work mostly on funnel & retention analytics for consumer apps.","",
+  "To think through the product, I built an independent teardown of Blinkit — unit economics, the growth-to-margin shift, a north-star metric tree and an experiment backlog.","",
+  "Teardown -> "+L("blink"),"",
+  "Would love to connect — I'm keen on Product Analyst roles on the Blinkit / Eternal team.","","— Diya"].join("\n");},
+ blinkEmail:function(){return["Subject: Blinkit teardown — where the next margin comes from","","Hi [Name],","",
+  "I'm Diya, a product analyst (ex-Pocket FM, Scout). Retention & funnel analytics for consumer apps is what I do, and I'm a daily Blinkit user — so I built an independent teardown to pressure-test my own read.","",
+  "- Blinkit has won the land grab; the next S-curve is margin — an analytics problem of AOV, order frequency and per-order fulfilment cost.",
+  "- Adjusted-EBITDA loss is already ~-1.3% of order value. Moving blended contribution 1-2pp (basket-builder for AOV, membership for frequency) flips the network to profit.","",
+  "Company figures are real & sourced; the funnel / cohort / unit-economics pieces are clearly-labelled analyst frameworks.","",
+  "Teardown -> "+L("blink"),"",
+  "If there's an opening on the Blinkit / Eternal analytics team, I'd love to be considered — either way, I'd value your read.","","Thanks,","Diya Mittal · [phone] · "+L("li")].join("\n");},
+ zeptoLi:function(){return["Hi [Name],","",
+  "I'm Diya — a product analyst (ex-Pocket FM, Scout team), and a daily Zepto user. I work mostly on funnel & retention analytics.","",
+  "I built an independent teardown of Zepto — unit economics, the pre-IPO 'profitable frequency' problem, a north-star metric tree and an experiment backlog (Zepto Pass, Super Saver, Cafe cross-sell).","",
+  "Teardown -> "+L("zepto"),"",
+  "Would love to connect — I'm keen on Product Analyst roles at Zepto.","","— Diya"].join("\n");},
+ zeptoEmail:function(){return["Subject: Zepto teardown — turning category love into profitable frequency","","Hi [Name],","",
+  "I'm Diya, a product analyst (ex-Pocket FM, Scout). I live in funnel & retention analytics, and I'm a daily Zepto user — so I built an independent teardown to pressure-test my read.","",
+  "- Zepto has the category love (highest rating in the sector) but the heaviest burn. The whole pre-IPO question is converting that love into profitable frequency.",
+  "- That's an analytics job — a trustworthy per-order contribution model, then Pass / Super Saver / Cafe experiments that lift frequency without breaking margin.","",
+  "Company figures are real & sourced; funnel / cohort / unit-economics pieces are clearly-labelled frameworks.","",
+  "Teardown -> "+L("zepto"),"",
+  "If there's an opening on the Zepto analytics team I'd love to be considered — either way, I'd value your honest read.","","Thanks,","Diya Mittal · [phone] · "+L("li")].join("\n");}
+};
+function flash(w){var e=document.querySelector('.copied[data-for="'+w+'"]');if(!e)return;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1400);}
+function fallback(txt,w){var ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();try{document.execCommand("copy");flash(w);}catch(e){}document.body.removeChild(ta);}
+function copyText(txt,w){if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(txt).then(function(){flash(w);}).catch(function(){fallback(txt,w);});}else{fallback(txt,w);}}
+document.querySelectorAll("button[data-copy]").forEach(function(b){
+  b.addEventListener("click",function(){var w=b.getAttribute("data-copy");copyText(T[w](),w);});});
+</script>

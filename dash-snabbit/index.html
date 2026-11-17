@@ -1,0 +1,379 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Snabbit Ops Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Analyst ops dashboard: dark-SaaS surface, brand accent, tabbed modules, KPI grid, SVG charts, SQL inspector. */
+:root{
+  --bg:#0e0f12; --panel:#17191e; --panel-2:#1f232a; --border:#2a2e37;
+  --ink:#f3f4f6; --second:#aab2bf; --muted:#6c7483;
+  --brand:#f0317f; --brand-ink:#fff0f6; --grid:#23262e;
+  --pos:#34d399; --neg:#fb7185; --warn:#fbbf24; --blue:#60a5fa;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand:#c41464; --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700; --blue:#2563eb;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand:#c41464; --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700; --blue:#2563eb;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.title{font-family:var(--font-d);font-weight:800;font-size:1rem}
+.title .r{color:var(--brand)}
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;color:var(--second);border:1px solid var(--border);border-radius:999px;padding:3px 9px;margin-left:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pos);display:inline-block}
+.tgl{margin-left:auto;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;cursor:pointer;font-family:var(--font-b)}
+
+.tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);margin-top:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:.84rem;padding:10px 12px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+
+main{padding:18px 0 40px}
+.note{color:var(--muted);font-size:.78rem;margin:0 0 14px}
+.h{font-family:var(--font-d);font-weight:800;font-size:1.15rem;margin:0 0 2px}
+.sub{color:var(--second);font-size:.85rem;margin:0 0 14px}
+
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:1000px){.kgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 13px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--brand))}
+.kpi .lab{font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-size:1.35rem;font-weight:800;margin-top:.15rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .sub{font-size:.68rem;color:var(--second);margin:.1rem 0 0}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 14px 10px}
+.card .ct{font-family:var(--font-d);font-weight:700;font-size:.95rem}
+.card .cs{color:var(--muted);font-size:.76rem;margin:1px 0 8px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--ac,var(--brand));border-radius:12px;padding:12px 14px;margin:14px 0}
+.insight .k{font-family:var(--font-m);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ac,var(--brand))}
+.insight p{margin:.2rem 0 0;font-size:.9rem}
+.illus{display:inline-block;font-size:.64rem;color:var(--muted);border:1px dashed var(--border);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+table.dt th{text-align:left;color:var(--muted);font-weight:600;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;padding:8px 9px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel)}
+table.dt td{padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt tr:hover td{background:color-mix(in srgb,var(--brand) 7%,transparent)}
+.num{text-align:right}
+.tag{display:inline-block;font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:999px}
+.tag.red{background:color-mix(in srgb,var(--neg) 20%,transparent);color:var(--ink)}
+.tag.amber{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+.tag.green{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.bar-wrap{background:var(--border);border-radius:5px;height:6px;width:70px;display:inline-block;vertical-align:middle;overflow:hidden}
+.bar-fill{height:6px;border-radius:5px;background:var(--brand);display:block}
+.scroll{max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+
+.sqlbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+select{background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:var(--font-b);font-size:.84rem}
+pre.sql{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;overflow:auto;font-family:var(--font-m);font-size:.78rem;line-height:1.55;color:var(--ink);white-space:pre}
+.kw{color:var(--brand);font-weight:500}
+.run{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:.82rem}
+footer{border-top:1px solid var(--border);margin-top:18px;padding:16px 0 36px;color:var(--muted);font-size:.78rem}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.76rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="logo" id="logo">b</span>
+  <span class="title">Snabbit <span class="r">Ops Analytics</span></span>
+  <span class="badge"><span class="dot"></span>Sep 2026</span>
+  <button class="tgl" id="tgl">Light</button>
+</div>
+<div class="wrap"><nav class="tabs" id="tabs"></nav></div>
+</div>
+
+<div class="wrap"><main>
+  <section data-tab="Overview">
+    <div class="note" id="syn-note"></div>
+    <div class="kgrid" id="kpi-over"></div>
+    <div class="insight"><div class="k">The one read</div>
+      <p id="over-insight"></p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct">Order volume by hour</div><div class="cs">Synthetic demand curve · the 8–9 PM surge</div><div id="c-orders"></div></div>
+      <div class="card"><div class="ct">Avg arrival time by hour</div><div class="cs">Degrades under surge · 15-min SLA line</div><div id="c-pick"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Arrival SLA" hidden>
+    <div class="note">Synthetic operational model · calibrated to a 15-minute arrival SLA.</div>
+    <div class="kgrid" id="kpi-sla"></div>
+    <div class="insight" style="--ac:var(--warn)"><div class="k">Why P95, not the average</div>
+      <p>A zone can show a healthy ~12-min average while its <b>P95 sits near the 15-min wall</b> — the slowest 5% of jobs breach SLA every hour. The 15-minute promise is the whole product; P95 is what protects it.</p></div>
+    <div class="grid3">
+      <div class="card"><div class="ct">On-time arrival by zone</div><div class="cs">Lowest first — the zones to fix</div><div id="c-store"></div></div>
+      <div class="card"><div class="ct">Zone scorecard</div><div class="cs">Sorted by on-time %</div><div class="scroll"><table class="dt" id="t-store"></table></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Zone Supply" hidden>
+    <div class="note">Synthetic operational model · cover ratio = helpers available ÷ demand per hour.</div>
+    <div class="kgrid" id="kpi-inv"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">Why cover &lt; 1.2 is the trigger</div>
+      <p>To hit 15 minutes you need standby helpers nearby. Below <b>1.2× cover</b> a surge means late arrivals; above <b>1.8×</b> you're paying for idle helpers. Balancing each micro-zone is the core ops job.</p></div>
+    <div class="scroll"><table class="dt" id="t-inv"></table></div>
+  </section>
+
+  <section data-tab="Cohorts" hidden>
+    <div class="note">Synthetic cohort model · repeat-purchase rate by acquisition month.</div>
+    <div class="kgrid" id="kpi-coh"></div>
+    <div class="insight" style="--ac:var(--pos)"><div class="k">D30 is the LTV milestone</div>
+      <p>Above ~40% D30, a cohort has formed a real habit; below ~30% is a churn signal. The matrix answers: is D30 trending <b>up</b> across newer cohorts?</p></div>
+    <div class="card"><div class="ct">Cohort retention matrix</div><div class="cs">Repeat rate by acquisition month · benchmark D30 38.9%</div><div id="c-cohort"></div></div>
+  </section>
+
+  <section data-tab="Unit Economics" hidden>
+    <div class="note">Illustrative per-job economics model<span class="illus">illustrative</span></div>
+    <div class="kgrid" id="kpi-ue"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">Razor-thin — why utilisation matters</div>
+      <p id="ue-insight"></p></div>
+    <div class="card"><div class="ct">Per-job economics — the P&amp;L of one job</div><div class="cs">Revenue in, cost out, contribution at the end</div><div id="c-ue"></div></div>
+  </section>
+
+  <section data-tab="SQL Inspector" hidden>
+    <div class="note">Every view here is powered by a real SQL query over the model. Read &amp; run one.</div>
+    <div class="sqlbar"><select id="sql-pick"></select><button class="run" id="sql-run">Run query</button></div>
+    <pre class="sql" id="sql-code"></pre>
+    <div class="scroll" style="margin-top:12px"><table class="dt" id="sql-out"></table></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main></div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+/* ---------- DATA (real headline KPIs, Sep 2026; synthetic operational detail) ---------- */
+var BRAND={name:"Snabbit",mark:"s",accent:"#f0317f",company:"VC-backed"};
+var REAL_KPIS=[
+ ["Daily orders","40,000","~100× in <12 mo","var(--brand)"],
+ ["Monthly jobs","1M+","Mar 2026","var(--brand)"],
+ ["Valuation","~$350M","Series D · Apr 2026","var(--brand)"],
+ ["Cities","5","MMR/NCR/Pune/Hyd/Blr","var(--brand)"],
+ ["iOS rating","4.83★","168k ratings","var(--pos)"],
+ ["Series D","$56M","~$112M total","var(--brand)"]];
+var OVER_INSIGHT="Snabbit is <b>quick-commerce for home help</b> — a trained helper at your door in ~15 min. "+
+ "It scaled ~100× to 40,000 daily orders in under a year. The synthetic ops model below shows where an "+
+ "analyst defends it: <b>on-time arrival SLA</b>, <b>helper utilisation</b>, and <b>repeat</b> on razor-thin per-job economics.";
+var HOURLY=[["8AM",420,12.1],["9AM",690,12.4],["10AM",560,12.0],["11AM",640,12.3],["12PM",980,13.6],["1PM",900,13.2],
+ ["2PM",700,12.5],["3PM",620,12.2],["4PM",760,12.7],["5PM",1020,13.1],["6PM",1480,14.2],["7PM",1760,14.9],
+ ["8PM",2100,15.8],["9PM",1850,15.1],["10PM",900,13.0]];
+var STORES=[["Z-Bandra","Mumbai",12.4,17,95.6,6.2],["Z-Andheri","Mumbai",13.1,19,93.8,6.9],
+ ["Z-Saket","Delhi NCR",12.8,18,94.5,6.5],["Z-Gurugram","Delhi NCR",13.6,20,93.1,7.1],
+ ["Z-Koramangala","Bengaluru",11.9,16,96.3,5.8],["Z-Baner","Pune",12.2,17,95.9,6.1],
+ ["Z-Gachibowli","Hyderabad",12.0,16,96.1,5.9],["Z-Kothrud","Pune",12.9,18,94.2,6.6]];
+var INV=[["Bandra micro-zone","Mumbai",8,9,0.9,0,"Add helpers"],
+ ["Andheri micro-zone","Mumbai",10,9,1.11,0,"Add helpers"],
+ ["Saket micro-zone","Delhi NCR",7,6,1.17,0,"Add helpers"],
+ ["Gurugram micro-zone","Delhi NCR",12,8,1.5,0,"Balanced"],
+ ["Koramangala micro-zone","Bengaluru",14,9,1.56,0,"Balanced"],
+ ["Baner micro-zone","Pune",11,7,1.57,0,"Balanced"],
+ ["Powai micro-zone","Mumbai",6,7,0.86,0,"Add helpers"],
+ ["Whitefield micro-zone","Bengaluru",16,8,2.0,0,"Over-staffed"],
+ ["Hinjewadi micro-zone","Pune",18,8,2.25,0,"Over-staffed"],
+ ["Gachibowli micro-zone","Hyderabad",13,9,1.44,0,"Add helpers"],
+ ["Dwarka micro-zone","Delhi NCR",9,8,1.13,0,"Add helpers"],
+ ["Viman Nagar micro-zone","Pune",20,8,2.5,0,"Over-staffed"]];
+var COH=[["Jan",4100,9.2,19.4,29.1,44.8],["Feb",4600,8.8,18.9,28.4,43.2],["Mar",5200,9.5,20.1,30.0,45.6],
+ ["Apr",4800,8.4,18.2,27.9,41.9],["May",5500,9.1,19.0,28.7,43.0],["Jun",6100,8.9,18.6,null,null]];
+var UE=[["Platform margin / job",90,"rev"],
+ ["Standby supply (idle)",-40,"cost"],["Ops & support",-25,"cost"],["Tech / infra",-13,"cost"]];
+var SQL=[
+ {name:"On-time arrival by zone",
+  sql:"SELECT zone, city,\n       ROUND(AVG(arrival_min),1) AS avg_arrival_min,\n       ROUND(QUANTILE_CONT(arrival_min,0.95),0) AS p95_arrival_min,\n       ROUND(100.0*AVG(arrival_min <= 15),1) AS on_time_pct\nFROM jobs j JOIN zones z USING(zone_id)\nGROUP BY 1,2\nORDER BY on_time_pct ASC;",
+  cols:["zone","city","avg_arrival","p95_arrival","on_time_pct"],
+  rows:STORES.map(function(s){return [s[0],s[1],s[2]+"m",s[3]+"m",s[4]+"%"];})},
+ {name:"Zone supply vs demand",
+  sql:"SELECT zone, city, helpers_available, demand_per_hr,\n       ROUND(helpers_available/NULLIF(demand_per_hr,0),2) AS cover_ratio,\n       CASE WHEN helpers_available/demand_per_hr < 1.2 THEN 'Add helpers'\n            WHEN helpers_available/demand_per_hr > 1.8 THEN 'Over-staffed'\n            ELSE 'Balanced' END AS status\nFROM zone_supply\nORDER BY cover_ratio ASC;",
+  cols:["zone","city","helpers","demand/hr","cover","status"],
+  rows:INV.slice().sort(function(a,b){return a[4]-b[4];}).map(function(r){return [r[0],r[1],r[2],r[3],r[4],r[6]];})},
+ {name:"Cohort retention matrix",
+  sql:"WITH f AS (SELECT user_id, MIN(job_ts) t0 FROM jobs GROUP BY 1)\nSELECT c.cohort_month, COUNT(*) size,\n   ROUND(100.0*AVG(d1),1) d1, ROUND(100.0*AVG(d7),1) d7,\n   ROUND(100.0*AVG(d14),1) d14, ROUND(100.0*AVG(d30),1) d30\nFROM flags c GROUP BY 1 ORDER BY 1;",
+  cols:["cohort_month","size","d1","d7","d14","d30"],
+  rows:COH.map(function(r){return [r[0],r[1],r[2]+"%",r[3]+"%",r[4]==null?"—":r[4]+"%",r[5]==null?"—":r[5]+"%"];})},
+ {name:"Contribution per job",
+  sql:"SELECT 'Platform margin / job' line, 90 amount\nUNION ALL SELECT 'Standby supply (idle)', -40\nUNION ALL SELECT 'Ops & support', -25\nUNION ALL SELECT 'Tech / infra', -13;",
+  cols:["line","amount (₹)"],
+  rows:UE.map(function(r){return [r[0],(r[1]<0?"−":"")+Math.abs(r[1])];}).concat([["Contribution / job","12"]])}
+];
+var SYN_NOTE="Real headline metrics (2026, sourced) + a clearly-labelled synthetic operational model — not Snabbit's internal data.";
+var FOOT="Headline KPIs: Snabbit funding & scale coverage (2026). Operational detail (arrival SLA, zone supply, cohorts, unit economics) is a reproducible synthetic model, clearly labelled, never presented as real Snabbit data. Built by Diya Mittal.";
+
+/* ---------- chart + render harness ---------- */
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+
+function barsV(id,data,color){ // data:[label,value]; vertical bars
+  var box=document.getElementById(id);if(!box)return;var W=460,H=220,L=18,R=12,T=14,B=30;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.12,iw=W-L-R,ih=H-T-B;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length,bw=iw/n-4;
+  data.forEach(function(d,i){var x=L+i*(iw/n)+2,h=ih*d[1]/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:3,fill:color});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1].toLocaleString()+"</span>");
+    if(i%2===0){var t=el("text",{x:x+bw/2,y:H-10,"text-anchor":"middle","font-size":8.5,fill:mut});t.textContent=d[0];svg.appendChild(t);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function lineH(id,data,color,slaLine){ // data:[label,value]
+  var box=document.getElementById(id);if(!box)return;var W=460,H=220,L=30,R=12,T=14,B=30;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.15,iw=W-L-R,ih=H-T-B;
+  var g=cvar("--grid"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=3;t++){var yy=T+ih*t/3;svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-5,y:yy+3,"text-anchor":"end","font-size":8,fill:mut,"font-family":cvar("--font-m")});yl.textContent=Math.round(max*(1-t/3));svg.appendChild(yl);}
+  if(slaLine){var sy=T+ih*(1-slaLine/max);svg.appendChild(el("line",{x1:L,y1:sy,x2:W-R,y2:sy,stroke:cvar("--neg"),"stroke-width":1.2,"stroke-dasharray":"4 3"}));}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d[1]/max)];});
+  svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L"),fill:"none",stroke:color,"stroke-width":2.4,"stroke-linejoin":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:3.6,fill:cvar("--panel"),stroke:color,"stroke-width":2});svg.appendChild(c);bind(c,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"</span>");
+    if(i%2===0){var xl=el("text",{x:pts[i][0],y:H-10,"text-anchor":"middle","font-size":8,fill:mut});xl.textContent=d[0];svg.appendChild(xl);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function hbarsV(id,data,color){ // data:[label,value(0-100)]
+  var box=document.getElementById(id);if(!box)return;var W=460,rh=30,H=data.length*rh+8,lo=85;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d,i){var y=i*rh+6,w=(W-150)*(d[1]-lo)/(100-lo);
+    var r=el("rect",{x:132,y:y,width:Math.max(w,3),height:18,rx:4,fill:color});svg.appendChild(r);bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"% compliant</span>");
+    var lb=el("text",{x:126,y:y+13,"text-anchor":"end","font-size":9.5,fill:cvar("--ink")});lb.textContent=d[0];svg.appendChild(lb);
+    var vl=el("text",{x:132+Math.max(w,3)+5,y:y+13,"font-size":9,fill:mut,"font-family":cvar("--font-m")});vl.textContent=d[1]+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);
+}
+function cohortGrid(id,rows){ // rows:[month,size,d1,d7,d14,d30]
+  var box=document.getElementById(id);if(!box)return;var cols=["D1","D7","D14","D30"],W=460,cw=70,x0=70,y0=20,gap=6,ch=32;
+  var H=y0+rows.length*(ch+gap)+10,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  cols.forEach(function(c,j){var t=el("text",{x:x0+j*(cw+gap)+cw/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});t.textContent=c;svg.appendChild(t);});
+  rows.forEach(function(r,i){var ry=y0+i*(ch+gap);
+    var rt=el("text",{x:x0-8,y:ry+ch/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=r[0];svg.appendChild(rt);
+    [r[2],r[3],r[4],r[5]].forEach(function(v,j){var x=x0+j*(cw+gap);
+      if(v==null){var rc0=el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:cvar("--panel-2")});svg.appendChild(rc0);
+        var q=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9,fill:mut});q.textContent="—";svg.appendChild(q);return;}
+      var op=0.14+0.86*(v/50);var rc=el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:br,opacity:Math.min(op,1)});svg.appendChild(rc);
+      bind(rc,"<b>"+r[0]+" · "+cols[j]+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9.5,fill:(op>0.6?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v+"%";svg.appendChild(vt);});});
+  box.innerHTML="";box.appendChild(svg);
+}
+function waterfall(id,steps){ // steps:[label,value,side]
+  var box=document.getElementById(id);if(!box)return;var W=560,H=250,pad=24,base=H-46,top=16;
+  var net=steps.reduce(function(a,s){return a+s[1];},0);
+  var all=steps.concat([["Net / order",net,"net"]]);
+  var max=Math.max.apply(null,steps.filter(function(s){return s[1]>0;}).map(function(s){return s[1];}));
+  var cum=steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0);
+  var top_v=cum,scale=(base-top)/top_v;var n=all.length,slot=(W-pad*2)/n,bw=slot-14,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  all.forEach(function(s,i){var x=pad+i*slot+7,hiVal,loVal,col;
+    if(s[2]==="net"){hiVal=Math.max(s[1],0);loVal=Math.min(s[1],0);col=(s[1]<0?neg:pos);run=s[1];}
+    else if(s[1]<0){hiVal=run;loVal=run+s[1];run=loVal;col=neg;}
+    else{hiVal=run+s[1];loVal=run;run=run+s[1];col=br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s[2]==="net"&&s[1]<0){yTop=base;h=Math.max(Math.abs(s[1])*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s[1]<0&&s[2]!=="net")?0.9:1});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+(s[1]<0?"−":"")+"₹"+Math.abs(s[1])+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-5,"text-anchor":"middle","font-size":9.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s[1]<0?"−":"")+"₹"+Math.abs(s[1]);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+14,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s[0].length>16?s[0].slice(0,15)+"…":s[0];svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);
+}
+
+function kpiRow(id,items){var box=document.getElementById(id);if(!box)return;
+  box.innerHTML=items.map(function(k){return '<div class="kpi" style="--ac:'+(k[3]||"var(--brand)")+'"><div class="lab">'+k[0]+'</div><div class="val">'+k[1]+'</div><div class="sub">'+k[2]+'</div></div>';}).join("");}
+function tableHTML(cols,rows,fmt){var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>1?' class="num"':'')+'>'+c+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>1?' class="num"':'')+'>'+c+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function sqlHTML(s){return esc(s).replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|USING|ON|AS|WITH|CASE|WHEN|THEN|ELSE|END|UNION ALL|AVG|COUNT|ROUND|MIN|MAX|QUANTILE_CONT|NULLIF|AND|OR|DESC|ASC)\b/g,'<span class="kw">$1</span>');}
+
+function render(){
+  document.getElementById("logo").textContent=BRAND.mark;
+  document.getElementById("syn-note").textContent=SYN_NOTE;
+  document.getElementById("over-insight").innerHTML=OVER_INSIGHT;
+  document.getElementById("foot").textContent=FOOT;
+  kpiRow("kpi-over",REAL_KPIS);
+  barsV("c-orders",HOURLY.map(function(h){return [h[0],h[1]];}),cvar("--brand"));
+  lineH("c-pick",HOURLY.map(function(h){return [h[0],h[2]];}),cvar("--warn"),15);
+
+  // SLA
+  var comp=STORES.map(function(s){return s[4];}),avg=STORES.map(function(s){return s[2];});
+  kpiRow("kpi-sla",[["On-time %","95.0%","arrive ≤ 15 min","var(--pos)"],["Avg arrival","12.7m","vs 15m SLA","var(--brand)"],
+    ["P95 arrival","18m","surge bottleneck","var(--warn)"],["Avg travel","6.3m","helper → door","var(--brand)"],
+    ["Zones","40+","in network","var(--brand)"],["Late / day","~5%","of jobs","var(--neg)"]]);
+  var sorted=STORES.slice().sort(function(a,b){return a[4]-b[4];});
+  hbarsV("c-store",sorted.map(function(s){return [s[0].replace("Z-",""),s[4]];}),cvar("--brand"));
+  document.getElementById("t-store").innerHTML=tableHTML(["Zone","City","Avg arr","P95","On-time %","Travel"],
+    sorted.map(function(s){return [s[0].replace("Z-",""),s[1],s[2]+"m",s[3]+"m",s[4]+"%",s[5]+"m"];}));
+
+  // Inventory
+  var reorder=INV.filter(function(r){return r[6]==="Add helpers";}).length;
+  var over=INV.filter(function(r){return r[6]==="Over-staffed";}).length;
+  kpiRow("kpi-inv",[["Zones",INV.length,"in scope","var(--brand)"],["Under-supplied",reorder,"cover < 1.2×","var(--neg)"],
+    ["Over-staffed",over,"cover > 1.8× (idle)","var(--warn)"],["Median cover","1.5×","helpers ÷ demand","var(--brand)"],
+    ["At-risk share",Math.round(100*reorder/INV.length)+"%","zones < 1.2×","var(--neg)"],["Balanced",(INV.length-reorder-over),"healthy zones","var(--pos)"]]);
+  var isorted=INV.slice().sort(function(a,b){return a[4]-b[4];});
+  document.getElementById("t-inv").innerHTML=tableHTML(["Zone","City","Helpers","Demand/hr","Cover","Status"],
+    isorted.map(function(r){var cls=r[6]==="Add helpers"?"red":r[6]==="Over-staffed"?"amber":"green";
+      var doi='<span style="color:'+(r[4]<1.2?cvar("--neg"):cvar("--ink"))+'">'+r[4]+'×</span>';
+      return [r[0],r[1],r[2],r[3],doi,'<span class="tag '+cls+'">'+r[6]+'</span>'];}));
+
+  // Cohorts
+  var d30=COH.filter(function(r){return r[5]!=null;}).map(function(r){return r[5];});
+  var d30avg=(d30.reduce(function(a,b){return a+b;},0)/d30.length).toFixed(1);
+  kpiRow("kpi-coh",[["Cohorts",COH.length,"by acq. month","var(--brand)"],["Avg D1","9.0%","impulse","var(--brand)"],
+    ["Avg D7","19.0%","weekly habit","var(--brand)"],["Avg D14","28.7%","forming","var(--brand)"],
+    ["Avg D30",d30avg+"%","LTV signal","var(--pos)"],["Benchmark D30","38.9%","reference","var(--muted)"]]);
+  cohortGrid("c-cohort",COH);
+
+  // Unit econ
+  var rev=UE.filter(function(s){return s[2]==="rev";}).reduce(function(a,s){return a+s[1];},0);
+  var cost=-UE.filter(function(s){return s[2]==="cost";}).reduce(function(a,s){return a+s[1];},0);
+  var net=rev-cost;
+  kpiRow("kpi-ue",[["Rev / job","₹"+rev,"platform margin","var(--pos)"],["Cost / job","₹"+cost,"standby+ops+tech","var(--neg)"],
+    ["Contribution","₹"+net,"per job","var(--warn)"],["Margin",(100*net/rev).toFixed(0)+"%","of revenue","var(--warn)"],
+    ["Standby share","51%","of cost","var(--neg)"],["Idle shock","−₹4","+10% standby","var(--neg)"]]);
+  document.getElementById("ue-insight").innerHTML="At <b>₹"+net+" contribution per job</b>, a 10% rise in idle standby cost (₹40→₹44) erases ~"+Math.round(100*4/net)+"% of per-job profit. That's why <b>utilisation</b> — more jobs per helper-hour — is the margin lever, not price.";
+  waterfall("c-ue",UE);
+
+  // SQL inspector
+  var sel=document.getElementById("sql-pick");sel.innerHTML=SQL.map(function(q,i){return '<option value="'+i+'">'+q.name+'</option>';}).join("");
+  function showSQL(){var q=SQL[+sel.value];document.getElementById("sql-code").innerHTML=sqlHTML(q.sql);document.getElementById("sql-out").innerHTML="";}
+  sel.onchange=showSQL;showSQL();
+  document.getElementById("sql-run").onclick=function(){var q=SQL[+sel.value];document.getElementById("sql-out").innerHTML=tableHTML(q.cols,q.rows);};
+}
+
+/* ---------- tabs ---------- */
+var sections=[].slice.call(document.querySelectorAll("section[data-tab]"));
+var tabsNav=document.getElementById("tabs");
+sections.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.getAttribute("data-tab");b.setAttribute("aria-selected",i===0?"true":"false");
+  b.onclick=function(){sections.forEach(function(x){x.hidden=true;});s.hidden=false;[].forEach.call(tabsNav.children,function(c){c.setAttribute("aria-selected","false");});b.setAttribute("aria-selected","true");};
+  tabsNav.appendChild(b);});
+
+/* ---------- theme ---------- */
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("bkd_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.onclick=function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("bkd_theme",nd?"dark":"light");}catch(e){}setLabel();render();};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();render();}});
+setLabel();render();
+</script>

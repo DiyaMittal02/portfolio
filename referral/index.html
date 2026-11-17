@@ -1,0 +1,164 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Referral Outreach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Clean referral generator: pick company + enter LinkedIn, 5 scenario cards render copy-paste ready. */
+:root{
+  --bg:#0e1016; --panel:#181b22; --panel-2:#20242d; --border:#2a2f3a;
+  --ink:#f2f4f7; --second:#aab2bf; --muted:#6c7483;
+  --accent:#10b981; --kuku:#e8222c; --blinkit:#f0b400; --zepto:#a855d6;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f5f6f9; --panel:#ffffff; --panel-2:#f6f8fa; --border:#e4e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f5f6f9; --panel:#ffffff; --panel-2:#f6f8fa; --border:#e4e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:14.5px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:26px 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.wrap{max-width:820px;margin:0 auto}
+h1{font-family:var(--font-d);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;margin:0}
+h1 .r{color:var(--ac,var(--accent))}
+.lede{color:var(--second);font-size:.92rem;margin:.3rem 0 0}
+.toprow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;cursor:pointer;font-family:var(--font-b)}
+
+.bar{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin:16px 0 18px}
+.bar label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bar input{width:100%;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;color:var(--ink);font-family:var(--font-b);font-size:.9rem;padding:9px 11px}
+.bar input:focus{outline:2px solid var(--ac,var(--accent));outline-offset:1px}
+.links{margin-top:10px;font-size:.78rem;color:var(--muted);font-family:var(--font-m);word-break:break-all}
+.links a{color:var(--ac,var(--accent));text-decoration:none}
+.hint{margin-top:8px;font-size:.74rem;color:var(--muted)}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{background:var(--panel);border:1px solid var(--border);color:var(--second);font-weight:700;font-size:.86rem;padding:8px 16px;border-radius:999px;cursor:pointer;font-family:var(--font-b);display:flex;align-items:center;gap:7px}
+.tabs button .dot{width:9px;height:9px;border-radius:50%}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--ac,var(--accent));background:color-mix(in srgb,var(--ac,var(--accent)) 12%,transparent)}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.card .head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.card .lab{font-family:var(--font-d);font-weight:700;font-size:1rem}
+.card .when{font-size:.72rem;color:var(--muted)}
+.msg{white-space:pre-wrap;font-size:.9rem;color:var(--ink);background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:12px 13px;line-height:1.6}
+.msg .ph{color:var(--ac,var(--accent));font-weight:600}
+.msg a{color:var(--ac,var(--accent));text-decoration:none;word-break:break-all}
+.row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.copy{background:var(--ac,var(--accent));color:#fff;border:0;border-radius:9px;padding:8px 15px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:.84rem}
+.copy.light-ink{color:#1a1500}
+.done{font-size:.78rem;color:#2ecc71;opacity:0;transition:opacity .2s}
+.done.show{opacity:1}
+.note{font-size:.78rem;color:var(--muted);margin-top:4px}
+footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:18px;line-height:1.5}
+</style>
+
+<div class="wrap">
+  <div class="toprow">
+    <div>
+      <h1>Referral <span class="r">Outreach</span></h1>
+      <p class="lede">Pick a company, drop your LinkedIn in once — each scenario fills in that company's hook, teardown &amp; dashboard links, ready to copy.</p>
+    </div>
+    <button class="tgl" id="tgl">Light</button>
+  </div>
+
+  <div class="bar">
+    <label for="li">Your LinkedIn URL</label>
+    <input id="li" type="url" placeholder="https://linkedin.com/in/your-handle">
+    <div class="links" id="links"></div>
+    <div class="hint">Make the teardown &amp; dashboard public (each page's Share menu → "anyone with the link") before you send. Personalize the first line every time — specific beats generic.</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="cards"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+"use strict";
+var CO={
+  kuku:{name:"Kuku FM",color:"#e8222c",lightInk:false,
+    td:"https://diyamittal02.github.io/portfolio/kuku/",
+    db:"https://diyamittal02.github.io/portfolio/dash-kuku/",
+    hook:"Two things stood out — payments & autopay is the #1 complaint across 1,200 real reviews, and the paywall (not the content) is where users drop."},
+  blinkit:{name:"Blinkit",color:"#f0b400",lightInk:true,
+    td:"https://diyamittal02.github.io/portfolio/blinkit/",
+    db:"https://diyamittal02.github.io/portfolio/dash-blinkit/",
+    hook:"The read: Blinkit just turned EBITDA-positive, so the next game is widening margin — AOV, order frequency and per-order fulfilment cost."},
+  zepto:{name:"Zepto",color:"#a855d6",lightInk:false,
+    td:"https://diyamittal02.github.io/portfolio/zepto/",
+    db:"https://diyamittal02.github.io/portfolio/dash-zepto/",
+    hook:"The read: Zepto has the category love but the heaviest burn — the whole pre-IPO story is turning that into profitable frequency."}
+};
+var ORDER=["kuku","blinkit","zepto"];
+var state={co:"kuku",li:""};
+function LI(){return state.li||"[your LinkedIn]";}
+
+var SCEN=[
+ {id:"followup",lab:"a · Someone you already messaged",when:"follow-up",
+  build:function(c){return "Hi [Name], circling back on my note from [last week] — totally understand if it slipped through. Since then I've refreshed my "+c.name+" work with the latest Sep-2026 numbers and built a live analytics dashboard to go with the teardown. "+c.hook+"\n\nTeardown: "+c.td+"\nLive dashboard: "+c.db+"\n\nI'd still love 10 minutes of your read, and if it lands, a referral into the analytics team whenever a Product Analyst seat opens. Either way, thanks for your time! — Diya";}},
+ {id:"cold",lab:"b · Someone you've never reached out to",when:"cold first touch",
+  build:function(c){return "Hi [Name], I'm Diya — a product analyst (ex-PocketFM, Scout team) and a daily "+c.name+" user. I built an independent teardown of "+c.name+" plus a live ops/analytics dashboard with a SQL inspector, as a way to think through the product. "+c.hook+"\n\nTeardown: "+c.td+"\nDashboard: "+c.db+"\n\nI'm exploring Product Analyst roles and would love to connect — if the work holds up, a referral or a pointer to the right person on the analytics team would mean a lot.";}},
+ {id:"vit",lab:"c · VIT Bhopal alum / ex-PocketFM",when:"your warmest, highest-yield",
+  build:function(c){return "Hi [Name] — fellow VIT Bhopal! [or: we overlapped at PocketFM — I was on the Scout team.] I'm moving toward Product Analyst roles and have been studying "+c.name+" closely — built a full teardown plus a live analytics dashboard (funnel, unit economics, SQL inspector). "+c.hook+"\n\nTeardown: "+c.td+"\nDashboard: "+c.db+"\n\nI'd really value your honest read, and if you know anyone on "+c.name+"'s data/analytics team, an intro would mean a lot. Happy to return the favour anytime.";}},
+ {id:"pfm",lab:"d · Current PocketFM, but ex-"+ "{CO}",when:"shared-employer angle",
+  build:function(c){return "Hi [Name], I'm Diya — I was on the Scout team at PocketFM, so we're PocketFM-adjacent :) I saw you were at "+c.name+" before — I just built a product-analyst teardown and a live dashboard of it, and would genuinely value your insider read on whether it rings true. "+c.hook+"\n\nTeardown: "+c.td+"\nDashboard: "+c.db+"\n\nIf it holds up and you're still in touch with the analytics folks there, an intro to the right person would be hugely appreciated.";}},
+ {id:"hr",lab:"e · HR / recruiter (no open role)",when:"talent-pipeline framing",
+  build:function(c){return "Hi [Name], I know there isn't an open Product Analyst role at "+c.name+" right now, so I'm not asking you to create one — I'd just love to be on your radar for when one does. For context: I'm ex-PocketFM (Scout analytics), and I built an independent teardown and a live analytics dashboard of "+c.name+"'s product as a work sample.\n\nTeardown: "+c.td+"\nDashboard: "+c.db+"\n\nCould I send my resume to keep in your pipeline, and would you be open to a quick 15-min intro so I'm a known name when a seat opens? Thank you!";}}
+];
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function render(){
+  var c=CO[state.co];
+  document.documentElement.style.setProperty("--ac",c.color);
+  document.getElementById("links").innerHTML="Teardown: <a href='"+c.td+"' target='_blank' rel='noopener'>"+c.td+"</a><br>Dashboard: <a href='"+c.db+"' target='_blank' rel='noopener'>"+c.db+"</a>";
+  var cards=document.getElementById("cards");cards.innerHTML="";
+  SCEN.forEach(function(s){
+    var label=s.lab.replace("{CO}",c.name);
+    var raw=s.build(c);
+    // display: replace plain-text LI placeholder? these templates don't use LI except none; keep as-is
+    var html=esc(raw).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>')
+      .replace(/(https:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+    var div=document.createElement("div");div.className="card";
+    div.innerHTML='<div class="head"><span class="lab">'+label+'</span><span class="when">'+s.when+'</span></div>'+
+      '<div class="msg">'+html+'</div>'+
+      '<div class="row"><button class="copy'+(c.lightInk?" light-ink":"")+'" data-id="'+s.id+'">Copy message</button><span class="done" data-for="'+s.id+'">Copied</span>'+
+      (s.id==="cold"||s.id==="vit"?'<span class="note">For a LinkedIn connection request, trim to the first 2 sentences (300-char limit).</span>':'')+'</div>';
+    cards.appendChild(div);
+    div.querySelector("button").addEventListener("click",function(){copyText(raw,s.id);});
+  });
+  document.getElementById("foot").textContent="Links point to your "+c.name+" teardown + live dashboard. All messages: ex-PocketFM (Scout), Product Analyst. Tailor the opener before sending.";
+}
+function flash(id){var e=document.querySelector('.done[data-for="'+id+'"]');if(!e)return;e.classList.add("show");setTimeout(function(){e.classList.remove("show");},1400);}
+function copyText(t,id){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){flash(id);}).catch(function(){fb(t,id);});}else fb(t,id);}
+function fb(t,id){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");flash(id);}catch(e){}document.body.removeChild(ta);}
+
+// tabs
+var tabs=document.getElementById("tabs");
+ORDER.forEach(function(k,i){var c=CO[k];var b=document.createElement("button");b.setAttribute("aria-selected",i===0?"true":"false");
+  b.innerHTML='<span class="dot" style="background:'+c.color+'"></span>'+c.name;
+  b.onclick=function(){state.co=k;[].forEach.call(tabs.children,function(x){x.setAttribute("aria-selected","false");});b.setAttribute("aria-selected","true");render();};
+  tabs.appendChild(b);});
+
+// linkedin input (used if templates reference it in future; kept for signature use)
+var liInput=document.getElementById("li");
+try{var sv=localStorage.getItem("ref_li");if(sv){state.li=sv;liInput.value=sv;}}catch(e){}
+liInput.addEventListener("input",function(){state.li=liInput.value.trim();try{localStorage.setItem("ref_li",state.li);}catch(e){}render();});
+
+// theme
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var t=localStorage.getItem("ref_theme");if(t)root.setAttribute("data-theme",t);}catch(e){}
+tglb.onclick=function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("ref_theme",nd?"dark":"light");}catch(e){}setLabel();};
+setLabel();render();
+</script>
