@@ -1,0 +1,365 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Dashverse AI-content Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0e0f12; --panel:#17191e; --panel-2:#1f232a; --border:#2a2e37;
+  --ink:#f3f4f6; --second:#aab2bf; --muted:#6c7483;
+  --brand:#5b8cff; --brand-ink:#ffffff; --grid:#23262e;
+  --pos:#34d399; --neg:#fb7185; --warn:#fbbf24;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.title{font-family:var(--font-d);font-weight:800;font-size:1rem}
+.title .r{color:var(--brand)}
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;color:var(--second);border:1px solid var(--border);border-radius:999px;padding:3px 9px;margin-left:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pos);display:inline-block}
+.tgl{margin-left:auto;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;cursor:pointer;font-family:var(--font-b)}
+.tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);margin-top:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:.84rem;padding:10px 12px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+main{padding:18px 0 40px}
+.note{color:var(--muted);font-size:.78rem;margin:0 0 14px}
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:1000px){.kgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 13px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--brand))}
+.kpi .lab{font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-size:1.3rem;font-weight:800;margin-top:.15rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .sub{font-size:.68rem;color:var(--second);margin:.1rem 0 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 14px 10px}
+.card .ct{font-family:var(--font-d);font-weight:700;font-size:.95rem}
+.card .cs{color:var(--muted);font-size:.76rem;margin:1px 0 8px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--ac,var(--brand));border-radius:12px;padding:12px 14px;margin:14px 0}
+.insight .k{font-family:var(--font-m);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ac,var(--brand))}
+.insight p{margin:.2rem 0 0;font-size:.9rem}
+.illus{display:inline-block;font-size:.64rem;color:var(--muted);border:1px dashed var(--border);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+.real{display:inline-block;font-size:.64rem;color:var(--pos);border:1px solid color-mix(in srgb,var(--pos) 45%,transparent);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+table.dt th{text-align:left;color:var(--muted);font-weight:600;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt td{padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt tr:hover td{background:color-mix(in srgb,var(--brand) 7%,transparent)}
+.num{text-align:right}
+.tag{display:inline-block;font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:999px}
+.tag.red{background:color-mix(in srgb,var(--neg) 20%,transparent);color:var(--ink)}
+.tag.amber{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+.tag.green{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.bar-wrap{background:var(--border);border-radius:5px;height:6px;width:64px;display:inline-block;vertical-align:middle;overflow:hidden}
+.bar-fill{height:6px;border-radius:5px;background:var(--brand);display:block}
+.scroll{max-height:440px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.vb{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:11px 13px;margin:0 0 9px}
+.vb .r{display:inline-block;font-family:var(--font-m);font-size:.68rem;font-weight:600;border-radius:5px;padding:1px 6px;margin-right:7px;vertical-align:middle}
+.vb .r.lo{background:color-mix(in srgb,var(--neg) 22%,transparent);color:var(--ink)}
+.vb .r.hi{background:color-mix(in srgb,var(--pos) 22%,transparent);color:var(--ink)}
+.vb .tx{font-size:.86rem}
+.vb .m{color:var(--muted);font-size:.7rem;margin-top:4px;font-family:var(--font-m)}
+.vcol h4{font-family:var(--font-d);font-size:.8rem;margin:2px 0 9px;color:var(--second);font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.sqlbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+select{background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:var(--font-b);font-size:.84rem}
+pre.sql{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;overflow:auto;font-family:var(--font-m);font-size:.78rem;line-height:1.55;color:var(--ink);white-space:pre}
+.kw{color:var(--brand);font-weight:500}
+.run{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:.82rem}
+footer{border-top:1px solid var(--border);margin-top:18px;padding:16px 0 36px;color:var(--muted);font-size:.78rem}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.76rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="logo" id="logo">x</span>
+  <span class="title" id="title"></span>
+  <span class="badge"><span class="dot"></span><span id="badge"></span></span>
+  <button class="tgl" id="tgl">Light</button>
+</div>
+<div class="wrap"><nav class="tabs" id="tabs"></nav></div>
+</div>
+
+<div class="wrap"><main>
+  <section data-tab="Overview">
+    <div class="note" id="syn-note"></div>
+    <div class="kgrid" id="kpi-over"></div>
+    <div class="insight"><div class="k">The one read</div><p id="over-insight"></p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct" id="ca-t"></div><div class="cs" id="ca-s"></div><div id="c-a"></div></div>
+      <div class="card"><div class="ct" id="cb-t"></div><div class="cs" id="cb-s"></div><div id="c-b"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Funnel & Ops" hidden>
+    <div class="note">Synthetic operational model, clearly labelled — not internal data.</div>
+    <div class="insight" style="--ac:var(--warn)"><div class="k">Where it leaks</div><p id="fn-insight"></p></div>
+    <div class="grid3">
+      <div class="card"><div class="ct">Conversion funnel</div><div class="cs">% of the top of funnel</div><div id="c-funnel"></div></div>
+      <div class="card"><div class="ct" id="seg-t"></div><div class="cs" id="seg-s"></div><div class="scroll"><table class="dt" id="t-seg"></table></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Cohorts" hidden>
+    <div class="note">Synthetic cohort model · cumulative repeat rate by acquisition month.</div>
+    <div class="kgrid" id="kpi-coh"></div>
+    <div class="insight" style="--ac:var(--pos)"><div class="k">D30 is the LTV milestone</div><p id="coh-insight"></p></div>
+    <div class="card"><div class="ct">Cohort retention matrix</div><div class="cs" id="coh-s"></div><div id="c-cohort"></div></div>
+  </section>
+
+  <section data-tab="Unit Economics" hidden>
+    <div class="note">Illustrative per-unit economics model<span class="illus">illustrative</span></div>
+    <div class="kgrid" id="kpi-ue"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">The margin lever</div><p id="ue-insight"></p></div>
+    <div class="card"><div class="ct">Per-unit economics — revenue in, cost out</div><div class="cs">Contribution at the end</div><div id="c-ue"></div></div>
+  </section>
+
+  <section data-tab="Voice of Customer" hidden>
+    <div class="note" id="rev-note"></div>
+    <div class="kgrid" id="kpi-rev"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">What the reviews say <span class="real">real data</span></div><p id="rev-insight"></p></div>
+    <div class="grid3">
+      <div class="card"><div class="ct">Rating distribution</div><div class="cs" id="rev-dist-s"></div><div id="c-rating"></div></div>
+      <div class="card"><div class="ct">Complaint &amp; praise themes</div><div class="cs">Keyword-tagged · sorted by mentions · avg rating shows the pain</div><div class="scroll"><table class="dt" id="t-theme"></table></div></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="vcol"><h4>Representative complaints (≤ 2★)</h4><div id="vb-neg"></div></div>
+      <div class="vcol"><h4>Representative praise (5★)</h4><div id="vb-pos"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Product ideas" hidden>
+    <div class="note">Feature recommendations drawn straight from the real reviews — each tied to a complaint theme, with a rough impact / effort call. Opinion, clearly labelled.</div>
+    <div class="insight" style="--ac:var(--brand)"><div class="k">The product read</div><p id="ideas-intro"></p></div>
+    <div id="ideas-list" class="grid2"></div>
+  </section>
+
+  <section data-tab="SQL Inspector" hidden>
+    <div class="note">Every view here is powered by a query over the model. Read &amp; run one — the review-themes query is real data.</div>
+    <div class="sqlbar"><select id="sql-pick"></select><button class="run" id="sql-run">Run query</button></div>
+    <pre class="sql" id="sql-code"></pre>
+    <div class="scroll" style="margin-top:12px"><table class="dt" id="sql-out"></table></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main></div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+var CFG={"name": "Dashverse", "sub": "AI-content Analytics", "mark": "D", "accent": "#7c5cff", "badge": "Nov 2026", "kpis": [["Series A", "$13M", "Peak XV · 2025", "var(--brand)"], ["Ecosystem users", "20M+", "global", "var(--brand)"], ["Apps", "3", "Dashtoon/DashReels/Frameo", "var(--muted)"], ["DashReels", "5M+", "downloads at launch", "var(--brand)"], ["Play sample", "4.07★", "600 (Dashtoon)", "var(--pos)"], ["Model", "Coins + ads", "micro-payments", "var(--muted)"]], "over_insight": "Dashverse is an <b>AI-content studio</b> — Dashtoon (AI webcomics), DashReels (micro-drama) and Frameo.AI (gen video). The reviewed app here is <b>Dashtoon</b> (4.07★): content is loved (395 of 600 five-star), the friction is <b>access/loading</b> (can't open chapters) and coin pricing. The analyst job: the read → unlock → repeat funnel across an AI-generated catalogue.", "chartA": {"t": "New readers by month", "s": "Synthetic · catalogue-led", "data": [["Jun", 140], ["Jul", 165], ["Aug", 190], ["Sep", 180], ["Oct", 220], ["Nov", 250]]}, "chartB": {"t": "Chapter-load success by hour", "s": "Dips where loading breaks · 97% target", "data": [["6PM", 97], ["8PM", 95], ["9PM", 93], ["10PM", 92], ["11PM", 94], ["12AM", 96]], "sla": 97}, "funnel": {"insight": "The hook converts to a paywall; the leaks are <b>load failures</b> (can't open chapters) before the paywall, and coin-pricing clarity after it.", "steps": [["Installed", 100], ["Read ch 1", 72], ["Hit paywall", 44], ["Unlocked (coins)", 23], ["Retained M2", 15]], "seg": {"t": "Format scorecard", "s": "Synthetic · webcomics lead today", "cols": ["Format", "Share*", "Completion", "Unlock %", "Status"], "rows": [["Webcomics (Dashtoon)", "55%", "60%", "24%", "Core"], ["Micro-drama (DashReels)", "30%", "54%", "21%", "Grow"], ["Gen-video (Frameo)", "10%", "—", "—", "Watch"], ["Originals", "5%", "58%", "26%", "Grow"]]}}, "cohorts": {"bench": "24.0", "insight": "Serialised content retains on <b>catalogue velocity</b> — new chapters/episodes. ~24% D30 is a real binge habit; load failures are what pull newer cohorts under it.", "rows": [["Jun", 140000, 18, 28, 24, 26], ["Jul", 165000, 17, 27, 23, 25], ["Aug", 190000, 19, 29, 25, 27], ["Sep", 180000, 16, 26, 22, 24], ["Oct", 220000, 18, 28, 24, 26], ["Nov", 250000, 17, 27, null, null]]}, "ue": {"insight": "AI lowers content cost, so contribution rides <b>unlocks per reader</b>. The lever is catalogue velocity × a clean coin flow — a load failure is a lost unlock no AI can recover.", "steps": [["Coin/ad rev / reader", 90], ["Content & infra (AI)", -35], ["Payment", -7], ["Support & refunds", -13]]}, "rev_insight": "Across <b>600 real Dashtoon reviews</b> (avg 4.07★) the content is loved but the pain is <b>access</b>: app/tech 3.31★ (can't open/read chapters), wait 3.07★ and coin pricing 3.06★. The fixes are reliability and pricing clarity, not content. <i>External: $13M Peak XV Series A; DashReels is the micro-drama sibling. Reddit not accessible.</i>", "reviews": {"n": 600, "avg": 4.07, "dist": [90, 30, 25, 60, 395], "range": ["2024-08-22", "2026-11-06"], "pkg": "com.dashtoon.app", "themes": [{"theme": "App / tech", "mentions": 109, "pct": 18.2, "avg_rating": 3.31}, {"theme": "Wait / ETA / delay", "mentions": 59, "pct": 9.8, "avg_rating": 3.07}, {"theme": "Pricing & fares", "mentions": 34, "pct": 5.7, "avg_rating": 3.06}, {"theme": "Payments & refunds", "mentions": 16, "pct": 2.7, "avg_rating": 2.31}, {"theme": "Service quality", "mentions": 13, "pct": 2.2, "avg_rating": 2.0}, {"theme": "Support", "mentions": 3, "pct": 0.5, "avg_rating": 3.33}, {"theme": "Cancellations", "mentions": 3, "pct": 0.5, "avg_rating": 1.33}, {"theme": "Driver / partner", "mentions": 1, "pct": 0.2, "avg_rating": 1.0}, {"theme": "Booking / availability", "mentions": 1, "pct": 0.2, "avg_rating": 3.0}], "neg": [{"rating": 1, "thumbs_up": 23, "text": "I'll give this a rating of only one, because I can't even open and read the one I want to read like the \"vow of fury\" and some other webcomics. I'll only give this a five star if you can fix it asap."}, {"rating": 2, "thumbs_up": 11, "text": "i hate it when you delete the watch ads to unlock an episode."}, {"rating": 1, "thumbs_up": 9, "text": "I don't want to use a app why are you not giving me to cancel the subscription plan please give me the option I don't want to use your app"}, {"rating": 1, "thumbs_up": 4, "text": "well I like the stories but they're not long enough you don't give much credit to watch you have to keep watching ads just to look at and episode if you want a better view's you all must do better with your app"}, {"rating": 1, "thumbs_up": 4, "text": "fake app hai isme payment Auto detect per chali jati hai or apne aap paise cut hone lagte hai isliye is app ko use mat karna bro fake app hai"}], "pos": [{"rating": 5, "thumbs_up": 22, "text": "Easily my favorite reading app. The art is good and the drama is better. Plus it has pictures?! I haven't been into other apps because they are so expensive and just not appealing to me. I love Dashtoon!"}, {"rating": 5, "thumbs_up": 15, "text": "I like it very much and I definitely recommend it to others because it's literally the cartoon version of some of your favorite stories or books that you might have read online in a novel read app! It's some what the same, but different!"}, {"rating": 5, "thumbs_up": 15, "text": "This is my 1st time in an app like this one, when you can either wait a couple of hours for another chapter, or watch 3 videos for about 3 chapters to show. I also like it because the chapters are free"}], "kpis": [["Reviews analysed", "600", "recent Play sample", "var(--brand)"], ["Avg rating", "4.07★", "this sample", "var(--pos)"], ["1-star share", "15.0%", "of the sample", "var(--neg)"], ["Top theme", "App / tech", "18.2% of reviews", "var(--brand)"], ["Angriest theme", "Driver / partner", "avg 1.0★", "var(--neg)"], ["Themes tracked", "9", "keyword-tagged", "var(--muted)"]]}, "ideas_intro": "The content is loved; the leaks are access and coin pricing. Every idea is a real complaint theme.", "ideas": [{"t": "Fix chapter open/load failures", "why": "Top complaint (app/tech 3.31★) — “can’t even open the one I want to read”.", "impact": "Removes the biggest drop-off before the paywall → more unlocks.", "imp": "High", "eff": "Med"}, {"t": "Transparent coin pricing & bundles", "why": "Pricing 3.06★ — coin cost and what unlocks what is unclear.", "impact": "Higher paywall→unlock conversion, fewer refunds.", "imp": "High", "eff": "Low"}, {"t": "Offline / download chapters", "why": "Access complaints and spotty loading.", "impact": "Reading continuity → retention in low-connectivity Bharat.", "imp": "Med", "eff": "Med"}, {"t": "Lighter ad load for engaged readers", "why": "Ad friction surfaces in service-quality 1-stars.", "impact": "Protects session depth and completion.", "imp": "Med", "eff": "Low"}], "sql": [{"name": "Funnel conversion", "sql": "SELECT stage, users,\n       ROUND(100.0*users/FIRST_VALUE(users) OVER (ORDER BY step), 1) AS pct_of_top\nFROM funnel\nORDER BY step;", "cols": ["stage", "pct_of_top"], "rows": [["Installed", "100%"], ["Read ch 1", "72%"], ["Hit paywall", "44%"], ["Unlocked (coins)", "23%"], ["Retained M2", "15%"]]}, {"name": "Segment scorecard", "sql": "SELECT format, metric, status\nFROM segment_scorecard\nORDER BY metric DESC;", "cols": ["Format", "Share*", "Completion", "Unlock %", "Status"], "rows": [["Webcomics (Dashtoon)", "55%", "60%", "24%", "Core"], ["Micro-drama (DashReels)", "30%", "54%", "21%", "Grow"], ["Gen-video (Frameo)", "10%", "—", "—", "Watch"], ["Originals", "5%", "58%", "26%", "Grow"]]}, {"name": "Review themes (real data)", "sql": "-- Over 600 REAL Google Play reviews (com.dashtoon.app)\nSELECT theme,\n       COUNT(*)              AS mentions,\n       ROUND(AVG(rating), 2) AS avg_rating\nFROM review_themes\nGROUP BY theme\nORDER BY mentions DESC;", "cols": ["theme", "mentions", "avg_rating"], "rows": [["App / tech", 109, "3.31★"], ["Wait / ETA / delay", 59, "3.07★"], ["Pricing & fares", 34, "3.06★"], ["Payments & refunds", 16, "2.31★"], ["Service quality", 13, "2.0★"], ["Support", 3, "3.33★"], ["Cancellations", 3, "1.33★"], ["Driver / partner", 1, "1.0★"], ["Booking / availability", 1, "3.0★"]]}], "syn_note": "Real headline metrics (2026, sourced) + a clearly-labelled synthetic operational model. The Voice-of-Customer tab uses REAL Google Play reviews. Not Dashverse's internal data.", "foot": "Headline KPIs: public Dashverse coverage (2026). Operational detail (funnel, segments, cohorts, unit economics) is a reproducible synthetic model, clearly labelled, never presented as real Dashverse data. Voice of Customer: 600 real Google Play reviews (2024-08-22 to 2026-11-06), user names not stored; reviews are self-selected. Built by Diya Mittal."};
+
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+
+function barsV(id,data,color,allLabels){
+  var box=document.getElementById(id);if(!box)return;var W=460,H=210,L=18,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.14,iw=W-L-R,ih=H-T-B;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length;
+  data.forEach(function(d,i){var x=L+i*(iw/n)+2,bw=iw/n-4,h=ih*d[1]/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:3,fill:(d[2]||color)});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1].toLocaleString()+"</span>");
+    if(allLabels||i%2===0){var t=el("text",{x:x+bw/2,y:H-9,"text-anchor":"middle","font-size":8.5,fill:mut});t.textContent=d[0];svg.appendChild(t);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function lineH(id,data,color,slaLine){
+  var box=document.getElementById(id);if(!box)return;var W=460,H=210,L=28,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.12,iw=W-L-R,ih=H-T-B;
+  var g=cvar("--grid"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=3;t++){var yy=T+ih*t/3;svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-5,y:yy+3,"text-anchor":"end","font-size":8,fill:mut,"font-family":cvar("--font-m")});yl.textContent=Math.round(max*(1-t/3));svg.appendChild(yl);}
+  if(slaLine){var sy=T+ih*(1-slaLine/max);svg.appendChild(el("line",{x1:L,y1:sy,x2:W-R,y2:sy,stroke:cvar("--neg"),"stroke-width":1.2,"stroke-dasharray":"4 3"}));}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d[1]/max)];});
+  svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L"),fill:"none",stroke:color,"stroke-width":2.4,"stroke-linejoin":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:3.6,fill:cvar("--panel"),stroke:color,"stroke-width":2});svg.appendChild(c);bind(c,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"%</span>");
+    if(i%2===0){var xl=el("text",{x:pts[i][0],y:H-9,"text-anchor":"middle","font-size":8,fill:mut});xl.textContent=d[0];svg.appendChild(xl);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function funnelH(id,steps,color){
+  var box=document.getElementById(id);if(!box)return;var W=460,rh=34,H=steps.length*rh+6,x0=116,bw=W-x0-40;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*rh+5,w=bw*s[1]/100;
+    svg.appendChild(el("rect",{x:x0,y:y,width:bw,height:20,rx:4,fill:cvar("--panel-2")}));
+    var r=el("rect",{x:x0,y:y,width:Math.max(w,3),height:20,rx:4,fill:color});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+s[1]+"% of top</span>");
+    var lb=el("text",{x:x0-8,y:y+14,"text-anchor":"end","font-size":9.5,fill:cvar("--ink")});lb.textContent=s[0];svg.appendChild(lb);
+    var vl=el("text",{x:x0+Math.max(w,3)+6,y:y+14,"font-size":9,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s[1]+"%";svg.appendChild(vl);
+    if(i>0){var drop=steps[i-1][1]-s[1];if(drop>0){var dt=el("text",{x:W-4,y:y+14,"text-anchor":"end","font-size":8,fill:cvar("--neg"),"font-family":cvar("--font-m")});dt.textContent="−"+drop;svg.appendChild(dt);}}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function distBars(id,counts,color){
+  var box=document.getElementById(id);if(!box)return;var data=counts.map(function(c,i){return [(i+1)+"★",c];});
+  var tot=counts.reduce(function(a,b){return a+b;},0);
+  var cols=[cvar("--neg"),cvar("--neg"),cvar("--warn"),cvar("--brand"),cvar("--pos")];
+  var W=460,H=210,L=20,R=12,T=14,B=26,max=Math.max.apply(null,counts)*1.14,iw=W-L-R,ih=H-T-B,n=5;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d,i){var x=L+i*(iw/n)+8,bw=iw/n-16,h=ih*d[1]/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:4,fill:cols[i]});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+" ("+(100*d[1]/tot).toFixed(0)+"%)</span>");
+    var vt=el("text",{x:x+bw/2,y:y-4,"text-anchor":"middle","font-size":8.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});vt.textContent=d[1];svg.appendChild(vt);
+    var t=el("text",{x:x+bw/2,y:H-8,"text-anchor":"middle","font-size":9,fill:mut});t.textContent=d[0];svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);
+}
+function cohortGrid(id,rows){
+  var box=document.getElementById(id);if(!box)return;var cols=["D1","D7","D14","D30"],W=460,cw=70,x0=70,y0=20,gap=6,ch=30;
+  var H=y0+rows.length*(ch+gap)+8,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  cols.forEach(function(c,j){var t=el("text",{x:x0+j*(cw+gap)+cw/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});t.textContent=c;svg.appendChild(t);});
+  rows.forEach(function(r,i){var ry=y0+i*(ch+gap);
+    var rt=el("text",{x:x0-8,y:ry+ch/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=r[0];svg.appendChild(rt);
+    [r[2],r[3],r[4],r[5]].forEach(function(v,j){var x=x0+j*(cw+gap);
+      if(v==null){svg.appendChild(el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:cvar("--panel-2")}));
+        var q=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9,fill:mut});q.textContent="—";svg.appendChild(q);return;}
+      var op=0.14+0.86*(v/Math.max(70,1));var rc=el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:br,opacity:Math.min(op,1)});svg.appendChild(rc);
+      bind(rc,"<b>"+r[0]+" · "+cols[j]+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9.5,fill:(op>0.6?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v+"%";svg.appendChild(vt);});});
+  box.innerHTML="";box.appendChild(svg);
+}
+function waterfall(id,steps,unit){
+  var box=document.getElementById(id);if(!box)return;var W=560,H=250,pad=24,base=H-46,top=16,u=unit||"₹";
+  var net=steps.reduce(function(a,s){return a+s[1];},0);
+  var all=steps.concat([["Contribution",net,"net"]]);
+  var cum=steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0);
+  var scale=(base-top)/Math.max(cum,1);var n=all.length,slot=(W-pad*2)/n,bw=slot-14,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  all.forEach(function(s,i){var x=pad+i*slot+7,hiVal,loVal,col;
+    if(s[2]==="net"){hiVal=Math.max(s[1],0);loVal=Math.min(s[1],0);col=(s[1]<0?neg:pos);run=s[1];}
+    else if(s[1]<0){hiVal=run;loVal=run+s[1];run=loVal;col=neg;}
+    else{hiVal=run+s[1];loVal=run;run=run+s[1];col=br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s[2]==="net"&&s[1]<0){yTop=base;h=Math.max(Math.abs(s[1])*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+(s[1]<0?"−":"")+u+Math.abs(s[1])+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-5,"text-anchor":"middle","font-size":9.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s[1]<0?"−":"")+u+Math.abs(s[1]);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+14,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s[0].length>15?s[0].slice(0,14)+"…":s[0];svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);
+}
+function kpiRow(id,items){var box=document.getElementById(id);if(!box)return;
+  box.innerHTML=items.map(function(k){return '<div class="kpi" style="--ac:'+(k[3]||"var(--brand)")+'"><div class="lab">'+esc(k[0])+'</div><div class="val">'+esc(k[1])+'</div><div class="sub">'+esc(k[2])+'</div></div>';}).join("");}
+function tableHTML(cols,rows){var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>0?' class="num"':'')+'>'+esc(c)+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>0?' class="num"':'')+'>'+esc(c)+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function segHTML(cols,rows){var map={Healthy:"green",Core:"green",Balanced:"green",Watch:"amber",Grow:"amber",Fix:"red",Over:"amber"};
+  var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>0?' class="num"':'')+'>'+esc(c)+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){
+    if(i===r.length-1){return '<td class="num"><span class="tag '+(map[c]||"amber")+'">'+esc(c)+'</span></td>';}
+    return '<td'+(i>0?' class="num"':'')+'>'+esc(c)+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function themeHTML(themes){var maxp=Math.max.apply(null,themes.map(function(t){return t.pct;}));
+  var h="<thead><tr><th>Theme</th><th class='num'>Mentions</th><th class='num'>Share</th><th class='num'>Avg ★</th></tr></thead><tbody>";
+  h+=themes.map(function(t){var w=Math.round(60*t.pct/maxp);
+    var ac=t.avg_rating<2.5?cvar("--neg"):t.avg_rating<3.5?cvar("--warn"):cvar("--ink");
+    return "<tr><td>"+esc(t.theme)+"</td><td class='num'>"+t.mentions+"</td>"+
+      "<td class='num'>"+t.pct+"% <span class='bar-wrap'><span class='bar-fill' style='width:"+w+"px'></span></span></td>"+
+      "<td class='num' style='color:"+ac+";font-weight:700'>"+t.avg_rating+"</td></tr>";}).join("")+"</tbody>";return h;}
+function verbatims(id,list){var box=document.getElementById(id);if(!box)return;
+  box.innerHTML=list.map(function(v){var hi=v.rating>=4;var m=v.thumbs_up>0?(v.thumbs_up+" found this helpful"):"";
+    return '<div class="vb"><span class="r '+(hi?"hi":"lo")+'">'+v.rating+'★</span><span class="tx">“'+esc(v.text)+'”</span>'+(m?'<div class="m">'+m+'</div>':'')+'</div>';}).join("");}
+function sqlHTML(s){return esc(s).replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|USING|ON|AS|WITH|CASE|WHEN|THEN|ELSE|END|UNION ALL|OVER|FIRST_VALUE|AVG|COUNT|ROUND|MIN|MAX|DESC|ASC)\b/g,'<span class="kw">$1</span>');}
+
+function render(){
+  var brand=cvar("--brand"),warn=cvar("--warn"),pos=cvar("--pos");
+  document.getElementById("logo").textContent=CFG.mark;
+  document.getElementById("title").innerHTML=CFG.name+' <span class="r">'+CFG.sub+'</span>';
+  document.getElementById("badge").textContent=CFG.badge;
+  document.getElementById("syn-note").textContent=CFG.syn_note;
+  document.getElementById("foot").textContent=CFG.foot;
+  document.documentElement.style.setProperty("--brand",CFG.accent);
+  document.getElementById("over-insight").innerHTML=CFG.over_insight;
+  kpiRow("kpi-over",CFG.kpis);
+  // overview charts
+  document.getElementById("ca-t").textContent=CFG.chartA.t;document.getElementById("ca-s").textContent=CFG.chartA.s;
+  document.getElementById("cb-t").textContent=CFG.chartB.t;document.getElementById("cb-s").textContent=CFG.chartB.s;
+  barsV("c-a",CFG.chartA.data.map(function(d){return [d[0],d[1]];}),CFG.accent);
+  lineH("c-b",CFG.chartB.data.map(function(d){return [d[0],d[1]];}),warn,CFG.chartB.sla);
+  // funnel & ops
+  document.getElementById("fn-insight").innerHTML=CFG.funnel.insight;
+  funnelH("c-funnel",CFG.funnel.steps,CFG.accent);
+  document.getElementById("seg-t").textContent=CFG.funnel.seg.t;document.getElementById("seg-s").textContent=CFG.funnel.seg.s;
+  document.getElementById("t-seg").innerHTML=segHTML(CFG.funnel.seg.cols,CFG.funnel.seg.rows);
+  // cohorts
+  var coh=CFG.cohorts.rows,d30=coh.filter(function(r){return r[5]!=null;}).map(function(r){return r[5];});
+  var d30a=(d30.reduce(function(a,b){return a+b;},0)/d30.length).toFixed(1);
+  var avg=function(ix){var v=coh.filter(function(r){return r[ix]!=null;}).map(function(r){return r[ix];});return (v.reduce(function(a,b){return a+b;},0)/v.length).toFixed(1);};
+  kpiRow("kpi-coh",[["Cohorts",coh.length,"by acq. month","var(--brand)"],["Avg D1",avg(2)+"%","first repeat","var(--brand)"],
+    ["Avg D7",avg(3)+"%","weekly","var(--brand)"],["Avg D14",avg(4)+"%","forming","var(--brand)"],
+    ["Avg D30",d30a+"%","LTV signal","var(--pos)"],["Benchmark D30",CFG.cohorts.bench+"%","reference","var(--muted)"]]);
+  document.getElementById("coh-insight").innerHTML=CFG.cohorts.insight;
+  document.getElementById("coh-s").textContent="Cumulative repeat by acquisition month · benchmark D30 "+CFG.cohorts.bench+"%";
+  cohortGrid("c-cohort",coh);
+  // unit economics
+  var rev=CFG.ue.steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0);
+  var cost=-CFG.ue.steps.filter(function(s){return s[1]<0;}).reduce(function(a,s){return a+s[1];},0);
+  var net=rev-cost;
+  kpiRow("kpi-ue",[["Revenue / unit","₹"+rev,"gross","var(--pos)"],["Cost / unit","₹"+cost,"all-in","var(--neg)"],
+    ["Contribution",(net<0?"−₹"+Math.abs(net):"₹"+net),"per unit",(net<0?"var(--neg)":"var(--warn)")],
+    ["Margin",(100*net/rev).toFixed(0)+"%","of revenue",(net<0?"var(--neg)":"var(--warn)")],
+    ["Steps",CFG.ue.steps.length,"in the bridge","var(--muted)"],["Model","illustrative","not real P&L","var(--muted)"]]);
+  document.getElementById("ue-insight").innerHTML=CFG.ue.insight;
+  waterfall("c-ue",CFG.ue.steps);
+  // voice of customer (REAL)
+  var rv=CFG.reviews;
+  document.getElementById("rev-note").textContent="REAL Google Play reviews · "+rv.n+" in sample ("+rv.range[0]+" to "+rv.range[1]+") · package "+rv.pkg+" · user names not stored · self-selected sample.";
+  kpiRow("kpi-rev",rv.kpis);
+  document.getElementById("rev-insight").innerHTML=CFG.rev_insight;
+  document.getElementById("rev-dist-s").textContent="Share of "+rv.n+" reviews by star · avg "+rv.avg+"★";
+  distBars("c-rating",rv.dist);
+  document.getElementById("t-theme").innerHTML=themeHTML(rv.themes);
+  verbatims("vb-neg",rv.neg);verbatims("vb-pos",rv.pos);
+  // product ideas
+  document.getElementById("ideas-intro").innerHTML=CFG.ideas_intro;
+  document.getElementById("ideas-list").innerHTML=CFG.ideas.map(function(d,i){
+    return '<div class="card" style="border-left:3px solid var(--brand)">'+
+      '<div class="ct" style="font-size:1rem"><span class="mono" style="color:var(--brand)">'+(i+1)+'. </span>'+esc(d.t)+'</div>'+
+      '<div style="margin:9px 0 0;font-size:.85rem;line-height:1.5"><span class="mono" style="color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em">From the reviews</span><br>'+d.why+'</div>'+
+      '<div style="margin:8px 0 0;font-size:.85rem;line-height:1.5"><span class="mono" style="color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em">Expected impact</span><br>'+d.impact+'</div>'+
+      '<div style="margin:11px 0 2px;display:flex;gap:8px"><span class="tag green">Impact: '+esc(d.imp)+'</span><span class="tag amber">Effort: '+esc(d.eff)+'</span></div></div>';
+  }).join("");
+  // sql
+  var sel=document.getElementById("sql-pick");sel.innerHTML=CFG.sql.map(function(q,i){return '<option value="'+i+'">'+esc(q.name)+'</option>';}).join("");
+  function showSQL(){var q=CFG.sql[+sel.value];document.getElementById("sql-code").innerHTML=sqlHTML(q.sql);document.getElementById("sql-out").innerHTML="";}
+  sel.onchange=showSQL;showSQL();
+  document.getElementById("sql-run").onclick=function(){var q=CFG.sql[+sel.value];document.getElementById("sql-out").innerHTML=tableHTML(q.cols,q.rows);};
+}
+
+var sections=[].slice.call(document.querySelectorAll("section[data-tab]"));
+var tabsNav=document.getElementById("tabs");
+sections.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.getAttribute("data-tab");b.setAttribute("aria-selected",i===0?"true":"false");
+  b.onclick=function(){sections.forEach(function(x){x.hidden=true;});s.hidden=false;[].forEach.call(tabsNav.children,function(c){c.setAttribute("aria-selected","false");});b.setAttribute("aria-selected","true");};
+  tabsNav.appendChild(b);});
+
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("dk_dashverse_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.onclick=function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("dk_dashverse_theme",nd?"dark":"light");}catch(e){}setLabel();render();};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();render();}});
+setLabel();render();
+</script>
