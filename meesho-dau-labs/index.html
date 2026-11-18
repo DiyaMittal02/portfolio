@@ -1,0 +1,283 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Meesho DAU Labs — which canvas first</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0f0d10; --panel:#181419; --panel-2:#211b22; --border:#302935;
+  --ink:#f6f3f6; --second:#c0b6c0; --muted:#8a7f8a; --grid:#262029;
+  --brand:#e84393; --brand-ink:#ffffff; --pos:#36c98d; --neg:#fb7185; --warn:#fbbf24;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif; --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#fbf4f8; --panel:#ffffff; --panel-2:#fdf6fa; --border:#efe1ea; --ink:#1a1016; --second:#5c4e56; --muted:#937f8b; --grid:#f4e8ef; --brand:#be185d; color-scheme:light;}}
+:root[data-theme="light"]{--bg:#fbf4f8; --panel:#ffffff; --panel-2:#fdf6fa; --border:#efe1ea; --ink:#1a1016; --second:#5c4e56; --muted:#937f8b; --grid:#f4e8ef; --brand:#be185d; color-scheme:light;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+a{color:inherit}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:800;font-size:1rem}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800}
+.brand .r{color:var(--brand)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:.8rem;color:var(--second);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)}
+section{padding-block:30px;scroll-margin-top:70px;border-top:1px solid var(--border)}
+section:first-of-type{border-top:0}
+.eyebrow{font-family:var(--font-m);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.sec-h{font-size:clamp(1.3rem,3.4vw,1.85rem);font-weight:800;margin:.25rem 0 .3rem}
+.sec-sub{color:var(--second);max-width:72ch;margin:0 0 16px}
+.hero{padding-top:34px;border-top:0}
+.hero h1{font-size:clamp(1.9rem,5.6vw,3rem);font-weight:800;letter-spacing:-.02em;line-height:1.04}
+.hero h1 .r{color:var(--brand)}
+.hero .tag{color:var(--second);font-size:1.04rem;margin:.6rem 0 0;max-width:70ch}
+.disc{display:inline-block;margin-top:12px;font-size:.75rem;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 11px}
+.dl{display:inline-block;margin:12px 0 0 8px;font-family:var(--font-m);font-size:.78rem;font-weight:600;color:var(--brand-ink);background:var(--brand);border-radius:999px;padding:6px 15px;text-decoration:none}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+@media(max-width:720px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.chip b{display:block;font-family:var(--font-m);font-size:1.2rem;font-weight:500}
+.chip span{font-size:.72rem;color:var(--muted);display:block;margin-top:2px;line-height:1.3}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 18px}
+.card h3{font-size:1.02rem;font-weight:700;margin-bottom:5px}
+.card p{color:var(--second);margin:.2rem 0 0;font-size:.92rem}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;margin:16px 0}
+.insight .k{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.insight p{margin:.25rem 0 0;color:var(--ink);font-size:.98rem}
+.pick{background:color-mix(in srgb,var(--brand) 9%,transparent);border:1px solid color-mix(in srgb,var(--brand) 35%,var(--border))}
+ol.lessons{counter-reset:l;list-style:none;padding:0;margin:0}
+ol.lessons li{position:relative;padding:12px 0 12px 44px;border-bottom:1px solid var(--border)}
+ol.lessons li:last-child{border-bottom:0}
+ol.lessons li::before{counter-increment:l;content:counter(l);position:absolute;left:0;top:12px;width:28px;height:28px;border-radius:8px;background:var(--panel-2);border:1px solid var(--border);color:var(--brand);font-family:var(--font-m);font-weight:600;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+ol.lessons li b{color:var(--ink)}
+table.sc{width:100%;border-collapse:collapse;font-size:.84rem}
+table.sc th,table.sc td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.sc th{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+table.sc td b{color:var(--ink)}
+.scroll{overflow-x:auto;border:1px solid var(--border);border-radius:14px}
+.tag{display:inline-block;font-size:.66rem;font-weight:600;padding:2px 8px;border-radius:999px;font-family:var(--font-m)}
+.tag.hi{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.tag.md{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+.tag.lo{background:color-mix(in srgb,var(--neg) 20%,transparent);color:var(--ink)}
+.tag.one{background:var(--brand);color:var(--brand-ink)}
+.tree{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:14px}
+.tree .node{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
+.tree .node b{font-family:var(--font-m)}
+.tree .ops{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tree .ops .node{border-top:3px solid var(--brand)}
+.tree .x{color:var(--muted);font-family:var(--font-m)}
+.src-note{color:var(--muted);font-size:.8rem}
+ul.clean{margin:.3rem 0 0;padding-left:18px}
+ul.clean li{margin-bottom:6px;color:var(--second)}
+ul.clean li b{color:var(--ink)}
+.exp{width:100%;border-collapse:collapse;font-size:.86rem}
+.exp th,.exp td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.exp th{font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.pill{display:inline-block;font-size:.66rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--brand) 20%,transparent);color:var(--ink)}
+.ev{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ev a{font-size:.8rem;font-family:var(--font-m);color:var(--brand);text-decoration:none;border:1px solid color-mix(in srgb,var(--brand) 35%,var(--border));border-radius:999px;padding:4px 11px}
+footer{border-top:1px solid var(--border);margin-top:10px;padding:20px 0 44px;color:var(--muted);font-size:.82rem}
+footer b{color:var(--second)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="brand"><span class="logo">D</span><span>DAU Labs <span class="r">· canvas memo</span></span></span>
+  <nav class="nav">
+    <a href="#q">The question</a><a href="#lens">The lens</a><a href="#score">Scorecard</a>
+    <a href="#pick">The pick</a><a href="#measure">Measure</a><a href="#plan">First 90 days</a><a href="#me">Why me</a>
+  </nav>
+  <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
+</div></div>
+
+<div class="wrap">
+  <section class="hero" id="top">
+    <div class="eyebrow">Independent product memo · for Meesho DAU Labs</div>
+    <h1>Which engagement canvas should <span class="r">DAU Labs</span> build first?</h1>
+    <p class="tag">A product-analyst's answer to one question — how to make Meesho the first app a Bharat user opens every day —
+      grounded in independent teardowns of <b>28 India consumer apps</b>, including the leaders of the canvases on your list.</p>
+    <span class="disc">Independent analysis by Diya Mittal · not affiliated with Meesho · grounded in public teardowns + real Play Store reviews · as of 2026</span>
+    <a class="dl" href="dau-canvas-memo.pdf" download>↓ Download this memo (PDF)</a>
+    <div class="chips">
+      <div class="chip"><b>28</b><span>India consumer apps torn down</span></div>
+      <div class="chip"><b>5 / 7</b><span>Of your canvases — leaders studied</span></div>
+      <div class="chip"><b>600</b><span>Real reviews analysed per app</span></div>
+      <div class="chip"><b>1</b><span>Recommended canvas to build first</span></div>
+    </div>
+  </section>
+
+  <section id="q">
+    <div class="eyebrow">01 · The question, reframed</div>
+    <h2 class="sec-h">DAU Labs isn't a commerce problem — it's a daily-habit problem</h2>
+    <p class="sec-sub">The brief is to make Meesho the first app a Bharat user opens every day. But shopping isn't a daily act —
+      a value-conscious Bharat user shops weekly, not hourly. So the real job is to add a <b>reason to open every day</b> that
+      pulls back into commerce. The canvas you pick first decides whether that daily habit <b>compounds Meesho's core or competes with it</b>.</p>
+    <div class="insight"><div class="k">The lens I'll use</div>
+      <p>A good first canvas does three things at once: it creates a <b>structural daily ritual</b> (a reason to open, not just content to scroll),
+        it fits <b>Meesho's exact user</b> (value-conscious, Tier-2/3, heavily female), and it has a <b>native pull-through to commerce</b>.
+        I scored all seven canvases on that, using what the category leaders' real reviews taught me.</p></div>
+  </section>
+
+  <section id="lens">
+    <div class="eyebrow">02 · What 28 teardowns taught me</div>
+    <h2 class="sec-h">Three cross-cutting lessons DAU Labs can bank on</h2>
+    <p class="sec-sub">I tore down the leaders of every canvas on your list — astro, drama, gaming, live-social, news — each on 600
+      real Play Store reviews. The same three patterns showed up everywhere.</p>
+    <ol class="lessons">
+      <li><b>The hook is easy; daily return is won on ritual + trust.</b> Eloelo's StoryTV gets ~95 min/day and Matiks' DAU doubled —
+        but the apps that retain <i>daily</i> have a recurring ritual, not just bingeable content. A canvas without a daily trigger is a spike, not a habit.</li>
+      <li><b>The #1 killer across these apps is billing / recharge / trust friction — and it's Meesho's unfair advantage.</b> Astrotalk's
+        angriest theme is wallet recharge (2.05★); Seekho and STAGE bleed on autopay; Pop's whole base fell when cashback broke. Meesho already owns
+        UPI-native payments and user trust — it can win a canvas on the exact thing the incumbents are worst at.</li>
+      <li><b>The most Meesho-shaped canvases skew Bharat and female — your core base.</b> Astrology is ~60% women and Tier-2/3; micro-drama and
+        devotional content index on the same user. These aren't new audiences to acquire — they're Meesho's existing users, given a daily reason to return.</li>
+    </ol>
+  </section>
+
+  <section id="score">
+    <div class="eyebrow">03 · The canvas scorecard</div>
+    <h2 class="sec-h">Scoring all seven on daily-habit × Meesho-fit × commerce pull</h2>
+    <p class="sec-sub">Each canvas, the leader I tore down, the real-review lesson, and a call. Scores are my judgement, clearly labelled.</p>
+    <div class="scroll"><table class="sc">
+      <thead><tr><th>Canvas</th><th>Leader (teardown)</th><th>Daily habit</th><th>Meesho fit</th><th>Commerce pull</th><th>Build cost</th><th>Trust risk</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><b>Astro</b></td><td>Astrotalk · 4.17★</td><td><span class="tag hi">High</span></td><td><span class="tag hi">High</span></td><td><span class="tag hi">High</span></td><td><span class="tag md">Low-Med</span></td><td><span class="tag md">Med</span></td><td><span class="tag one">Build #1</span></td></tr>
+        <tr><td><b>Discovery / lookbooks</b></td><td>(shoppable content)</td><td><span class="tag md">Med-High</span></td><td><span class="tag hi">High</span></td><td><span class="tag hi">Very High</span></td><td><span class="tag md">Med</span></td><td><span class="tag hi">Low</span></td><td><span class="tag md">Fast-follow</span></td></tr>
+        <tr><td><b>Drama (micro)</b></td><td>Kuku · STAGE · Flick TV · Eloelo</td><td><span class="tag hi">High</span></td><td><span class="tag hi">High</span></td><td><span class="tag md">Med</span></td><td><span class="tag lo">High (content)</span></td><td><span class="tag md">Med</span></td><td><span class="tag md">Later</span></td></tr>
+        <tr><td><b>Gaming</b></td><td>Matiks · 4.05★</td><td><span class="tag hi">High</span></td><td><span class="tag md">Med-High</span></td><td><span class="tag md">Low-Med</span></td><td><span class="tag md">Med</span></td><td><span class="tag hi">Low</span></td><td><span class="tag md">Later</span></td></tr>
+        <tr><td><b>Streams / live</b></td><td>Eloelo · Chingari</td><td><span class="tag md">Med</span></td><td><span class="tag md">Med</span></td><td><span class="tag md">Med (live-shop)</span></td><td><span class="tag md">Med</span></td><td><span class="tag lo">High (moderation)</span></td><td><span class="tag md">Later</span></td></tr>
+        <tr><td><b>News</b></td><td>Lokal · 4.69★</td><td><span class="tag hi">High</span></td><td><span class="tag md">Med</span></td><td><span class="tag lo">Low</span></td><td><span class="tag hi">Low</span></td><td><span class="tag lo">High (misinfo)</span></td><td><span class="tag lo">Deprioritise</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="src-note" style="margin-top:8px">Ratings are the recent 600-review Play Store samples from my teardowns. Scores are an independent product-analyst's judgement.</p>
+  </section>
+
+  <section id="pick">
+    <div class="eyebrow">04 · The recommendation</div>
+    <h2 class="sec-h">Build <span style="color:var(--brand)">Astro</span> first — the daily ritual that creates the open</h2>
+    <p class="sec-sub">Astro is the only canvas that creates a <b>structural daily open</b> at near-zero marginal cost, maps perfectly to
+      Meesho's base, and pulls straight into commerce. Discovery/lookbooks is the obvious commerce answer — but it monetises <i>existing</i>
+      shopping intent; astro <b>manufactures the daily habit</b> that discovery then converts. Create the open first.</p>
+    <div class="grid2">
+      <div class="card pick"><h3>Why astro wins the daily open</h3>
+        <p>A free <b>daily horoscope</b> is a zero-marginal-cost reason to open Meesho every single morning — the cleanest daily ritual
+          on the list. Content canvases (drama, gaming) hope you come back; a horoscope <i>expects</i> you to.</p></div>
+      <div class="card pick"><h3>Meesho's base <i>is</i> the astro base</h3>
+        <p>Astrology is ~60% women, value-conscious and Tier-2/3 — Meesho's exact demographic. India's faith economy is ~₹35,000 Cr.
+          This isn't a new audience to acquire; it's your current one, given a daily reason to return.</p></div>
+      <div class="card pick"><h3>Commerce pull-through is native</h3>
+        <p>Astro leads straight to <b>gemstones, rudraksha, puja kits, idols</b> — all Meesho SKUs. Astrotalk bolted a store onto consults and
+          did ~₹140 Cr; Meesho already has the catalogue, logistics and price advantage.</p></div>
+      <div class="card pick"><h3>You'd beat the leader on its own weakness</h3>
+        <p>Astrotalk's angriest theme is <b>wallet-recharge friction (2.05★)</b>. Meesho owns UPI-native payments — launch a
+          <b>recharge-free, pay-per-consult</b> astro and you leapfrog the category leader on the exact thing users hate most.</p></div>
+    </div>
+    <div class="insight" style="margin-top:16px"><div class="k">The sequencing</div>
+      <p><b>Astro creates the daily open → discovery/lookbooks converts it → drama & gaming deepen time-spent.</b> Astro first because it
+        manufactures the habit; the rest compound it. And astrologer supply is a two-sided marketplace — the exact ops muscle Meesho already
+        runs for its sellers.</p></div>
+  </section>
+
+  <section id="measure">
+    <div class="eyebrow">05 · How I'd measure it</div>
+    <h2 class="sec-h">The DAU metric tree — proving "first app opened daily"</h2>
+    <p class="sec-sub">One number the org can move, decomposed into the levers a team owns — and the guardrails so we don't win a vanity metric.</p>
+    <div class="card">
+      <div class="tree">
+        <div class="node" style="border-top:3px solid var(--brand)"><b>Daily opens that start a session</b><br><span class="src-note">north star · the "first app daily" proxy</span></div>
+        <div class="x">=</div>
+        <div class="ops">
+          <div class="node"><b>DAU / MAU</b><br><span class="src-note">daily-habit depth</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>Sessions / user / day</b><br><span class="src-note">ritual frequency</span></div>
+          <div class="x">×</div>
+          <div class="node"><b>Session → commerce pull</b><br><span class="src-note">does engagement feed GMV?</span></div>
+        </div>
+      </div>
+      <p style="margin-top:14px"><b>Leading indicators:</b> daily-horoscope open-rate · consult-start rate · astro→shop click-through · D1/D7/D30 <i>daily-habit</i> retention (not just install retention).
+        <br><b>Guardrails:</b> astrologer CSAT & quality · no dark-pattern recharge · commerce cannibalisation · trust/compliance.</p>
+    </div>
+  </section>
+
+  <section id="plan">
+    <div class="eyebrow">06 · The first experiments</div>
+    <h2 class="sec-h">What I'd ship in the first 90 days</h2>
+    <p class="sec-sub">Each tied to the metric tree, each with a guardrail so one number doesn't win by breaking another.</p>
+    <div class="card" style="padding:4px 4px"><table class="exp">
+      <thead><tr><th>Experiment</th><th>Lever</th><th>Primary metric</th><th>Guardrail</th></tr></thead>
+      <tbody>
+        <tr><td><b>Daily free horoscope widget</b> on the Meesho home feed — a zero-cost daily hook.</td><td><span class="pill">daily open</span></td><td>DAU / daily-open lift</td><td>Notification opt-out rate</td></tr>
+        <tr><td><b>UPI-native pay-per-consult</b> astro MVP — no wallet recharge, pay per minute.</td><td><span class="pill">conversion</span></td><td>Consult-start rate</td><td>Astrologer CSAT</td></tr>
+        <tr><td><b>Astro-commerce shelf</b> (gemstones, puja kits) tied to a reading.</td><td><span class="pill">commerce pull</span></td><td>Astro → GMV</td><td>Commerce cannibalisation</td></tr>
+        <tr><td><b>Daily-ritual notification</b> A/B (horoscope-ready prompt, timing &amp; copy).</td><td><span class="pill">retention</span></td><td>D7 daily-habit retention</td><td>Uninstall / opt-out</td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="font-family:var(--font-d);margin:22px 0 10px;font-size:1.1rem">30 · 60 · 90</h3>
+    <ul class="clean">
+      <li><b>Days 0–30 —</b> ship the free daily horoscope widget + a DAU-habit dashboard (daily-open rate, D1/D7/D30 daily retention), so the team has one source of truth on the habit.</li>
+      <li><b>Days 30–60 —</b> launch the recharge-free consult MVP and measure horoscope → consult conversion; beat Astrotalk's recharge friction by design.</li>
+      <li><b>Days 60–90 —</b> wire the astro-commerce shelf and build the astro→GMV pull-through model, so the canvas is proven to <i>compound</i> Meesho's core, not compete with it.</li>
+    </ul>
+  </section>
+
+  <section id="risk">
+    <div class="eyebrow">07 · Risks &amp; how I'd de-risk</div>
+    <h2 class="sec-h">What could go wrong — and the guardrail</h2>
+    <div class="grid2">
+      <div class="card"><h3>Astrologer quality &amp; moderation</h3><p>A marketplace lives on consult quality. Guardrail: vetting, CSAT-gating and transparent ratings from day one — the thing Astrotalk's reviews say is uneven.</p></div>
+      <div class="card"><h3>Trust &amp; compliance</h3><p>Astrology draws scrutiny and GST exposure (Astrotalk faced a ~₹47.5 Cr demand). Guardrail: clear "for guidance/entertainment" framing, clean billing, and compliance built in.</p></div>
+      <div class="card"><h3>Commerce cannibalisation</h3><p>A new canvas shouldn't steal attention from shopping. Guardrail: measure astro→GMV pull-through as a primary success metric, not just time-spent.</p></div>
+      <div class="card"><h3>Novelty fatigue</h3><p>A daily ritual can go stale. Guardrail: personalisation (your sign, your reading) and a living astrologer marketplace keep the content fresh without a content factory.</p></div>
+    </div>
+  </section>
+
+  <section id="me">
+    <div class="eyebrow">08 · Why me</div>
+    <h2 class="sec-h">I don't just have takes on this — I have the teardowns</h2>
+    <p class="sec-sub">I'm a product analyst (ex-Pocket FM, Scout analytics) who thinks in engagement funnels and retention. Over the last
+      stretch I built independent teardowns + dashboards of 28 India consumer apps, each on 600 real Play Store reviews — including the leaders
+      of the exact canvases DAU Labs is building. This memo is a sample of how I'd decide <b>what to build</b> and <b>how to measure the daily habit</b>.</p>
+    <div class="card"><h3>The evidence behind this memo</h3>
+      <p class="src-note" style="margin:2px 0 8px">Each is a full teardown + interactive dashboard + real-review analysis.</p>
+      <div class="ev">
+        <a href="../astrotalk/" target="_blank" rel="noopener">Astrotalk (astro)</a>
+        <a href="../kuku/" target="_blank" rel="noopener">Kuku (drama)</a>
+        <a href="../flicktv/" target="_blank" rel="noopener">Flick TV (drama)</a>
+        <a href="../eloelo/" target="_blank" rel="noopener">Eloelo (streams)</a>
+        <a href="../matiks/" target="_blank" rel="noopener">Matiks (gaming)</a>
+        <a href="../chingari/" target="_blank" rel="noopener">Chingari (live)</a>
+        <a href="../lokal/" target="_blank" rel="noopener">Lokal (news)</a>
+        <a href="../" target="_blank" rel="noopener">All 28 teardowns →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Independent concept memo by Diya Mittal</b> — ex-Pocket FM (Scout). Not affiliated with or endorsed by Meesho; prepared as a work sample for
+    the DAU Labs role. Company facts and app ratings are real and sourced from public teardowns + Google Play reviews; the canvas scores, metric tree
+    and experiment plan are a product-analyst's illustrative frameworks, clearly labelled. · diyamittal02.github.io/portfolio · +91 8532006740 · linkedin.com/in/diya-mittal-837939251
+  </footer>
+</div>
+
+<script>
+"use strict";
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("mdl_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.addEventListener("click",function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("mdl_theme",nd?"dark":"light");}catch(e){}setLabel();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme"))setLabel();});
+setLabel();
+</script>
