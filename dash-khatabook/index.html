@@ -1,0 +1,365 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Khatabook SME Fintech Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0e0f12; --panel:#17191e; --panel-2:#1f232a; --border:#2a2e37;
+  --ink:#f3f4f6; --second:#aab2bf; --muted:#6c7483;
+  --brand:#5b8cff; --brand-ink:#ffffff; --grid:#23262e;
+  --pos:#34d399; --neg:#fb7185; --warn:#fbbf24;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f7f8fa; --border:#e5e8ee;
+  --ink:#131720; --second:#51596a; --muted:#8b93a3; --grid:#eef1f5;
+  --brand-ink:#ffffff; --pos:#0f9d6b; --neg:#e11d48; --warn:#c77700;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.title{font-family:var(--font-d);font-weight:800;font-size:1rem}
+.title .r{color:var(--brand)}
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:700;color:var(--second);border:1px solid var(--border);border-radius:999px;padding:3px 9px;margin-left:4px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pos);display:inline-block}
+.tgl{margin-left:auto;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.76rem;cursor:pointer;font-family:var(--font-b)}
+.tabs{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);margin-top:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--muted);font-weight:600;font-size:.84rem;padding:10px 12px;cursor:pointer;white-space:nowrap;font-family:var(--font-b)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--brand)}
+main{padding:18px 0 40px}
+.note{color:var(--muted);font-size:.78rem;margin:0 0 14px}
+.kgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:16px}
+@media(max-width:1000px){.kgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 13px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--brand))}
+.kpi .lab{font-size:.66rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font-size:1.3rem;font-weight:800;margin-top:.15rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.kpi .sub{font-size:.68rem;color:var(--second);margin:.1rem 0 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 14px 10px}
+.card .ct{font-family:var(--font-d);font-weight:700;font-size:.95rem}
+.card .cs{color:var(--muted);font-size:.76rem;margin:1px 0 8px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--ac,var(--brand));border-radius:12px;padding:12px 14px;margin:14px 0}
+.insight .k{font-family:var(--font-m);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ac,var(--brand))}
+.insight p{margin:.2rem 0 0;font-size:.9rem}
+.illus{display:inline-block;font-size:.64rem;color:var(--muted);border:1px dashed var(--border);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+.real{display:inline-block;font-size:.64rem;color:var(--pos);border:1px solid color-mix(in srgb,var(--pos) 45%,transparent);border-radius:5px;padding:1px 6px;margin-left:6px;font-family:var(--font-m);vertical-align:middle}
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+table.dt th{text-align:left;color:var(--muted);font-weight:600;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt td{padding:8px 9px;border-bottom:1px solid var(--border)}
+table.dt tr:hover td{background:color-mix(in srgb,var(--brand) 7%,transparent)}
+.num{text-align:right}
+.tag{display:inline-block;font-size:.66rem;font-weight:600;padding:2px 7px;border-radius:999px}
+.tag.red{background:color-mix(in srgb,var(--neg) 20%,transparent);color:var(--ink)}
+.tag.amber{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--ink)}
+.tag.green{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.bar-wrap{background:var(--border);border-radius:5px;height:6px;width:64px;display:inline-block;vertical-align:middle;overflow:hidden}
+.bar-fill{height:6px;border-radius:5px;background:var(--brand);display:block}
+.scroll{max-height:440px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.vb{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:11px 13px;margin:0 0 9px}
+.vb .r{display:inline-block;font-family:var(--font-m);font-size:.68rem;font-weight:600;border-radius:5px;padding:1px 6px;margin-right:7px;vertical-align:middle}
+.vb .r.lo{background:color-mix(in srgb,var(--neg) 22%,transparent);color:var(--ink)}
+.vb .r.hi{background:color-mix(in srgb,var(--pos) 22%,transparent);color:var(--ink)}
+.vb .tx{font-size:.86rem}
+.vb .m{color:var(--muted);font-size:.7rem;margin-top:4px;font-family:var(--font-m)}
+.vcol h4{font-family:var(--font-d);font-size:.8rem;margin:2px 0 9px;color:var(--second);font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.sqlbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+select{background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:7px 10px;font-family:var(--font-b);font-size:.84rem}
+pre.sql{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;overflow:auto;font-family:var(--font-m);font-size:.78rem;line-height:1.55;color:var(--ink);white-space:pre}
+.kw{color:var(--brand);font-weight:500}
+.run{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer;font-family:var(--font-b);font-size:.82rem}
+footer{border-top:1px solid var(--border);margin-top:18px;padding:16px 0 36px;color:var(--muted);font-size:.78rem}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.76rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+</style>
+
+<div class="topbar"><div class="wrap">
+  <span class="logo" id="logo">x</span>
+  <span class="title" id="title"></span>
+  <span class="badge"><span class="dot"></span><span id="badge"></span></span>
+  <button class="tgl" id="tgl">Light</button>
+</div>
+<div class="wrap"><nav class="tabs" id="tabs"></nav></div>
+</div>
+
+<div class="wrap"><main>
+  <section data-tab="Overview">
+    <div class="note" id="syn-note"></div>
+    <div class="kgrid" id="kpi-over"></div>
+    <div class="insight"><div class="k">The one read</div><p id="over-insight"></p></div>
+    <div class="grid2">
+      <div class="card"><div class="ct" id="ca-t"></div><div class="cs" id="ca-s"></div><div id="c-a"></div></div>
+      <div class="card"><div class="ct" id="cb-t"></div><div class="cs" id="cb-s"></div><div id="c-b"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Funnel & Ops" hidden>
+    <div class="note">Synthetic operational model, clearly labelled — not internal data.</div>
+    <div class="insight" style="--ac:var(--warn)"><div class="k">Where it leaks</div><p id="fn-insight"></p></div>
+    <div class="grid3">
+      <div class="card"><div class="ct">Conversion funnel</div><div class="cs">% of the top of funnel</div><div id="c-funnel"></div></div>
+      <div class="card"><div class="ct" id="seg-t"></div><div class="cs" id="seg-s"></div><div class="scroll"><table class="dt" id="t-seg"></table></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Cohorts" hidden>
+    <div class="note">Synthetic cohort model · cumulative repeat rate by acquisition month.</div>
+    <div class="kgrid" id="kpi-coh"></div>
+    <div class="insight" style="--ac:var(--pos)"><div class="k">D30 is the LTV milestone</div><p id="coh-insight"></p></div>
+    <div class="card"><div class="ct">Cohort retention matrix</div><div class="cs" id="coh-s"></div><div id="c-cohort"></div></div>
+  </section>
+
+  <section data-tab="Unit Economics" hidden>
+    <div class="note">Illustrative per-unit economics model<span class="illus">illustrative</span></div>
+    <div class="kgrid" id="kpi-ue"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">The margin lever</div><p id="ue-insight"></p></div>
+    <div class="card"><div class="ct">Per-unit economics — revenue in, cost out</div><div class="cs">Contribution at the end</div><div id="c-ue"></div></div>
+  </section>
+
+  <section data-tab="Voice of Customer" hidden>
+    <div class="note" id="rev-note"></div>
+    <div class="kgrid" id="kpi-rev"></div>
+    <div class="insight" style="--ac:var(--neg)"><div class="k">What the reviews say <span class="real">real data</span></div><p id="rev-insight"></p></div>
+    <div class="grid3">
+      <div class="card"><div class="ct">Rating distribution</div><div class="cs" id="rev-dist-s"></div><div id="c-rating"></div></div>
+      <div class="card"><div class="ct">Complaint &amp; praise themes</div><div class="cs">Keyword-tagged · sorted by mentions · avg rating shows the pain</div><div class="scroll"><table class="dt" id="t-theme"></table></div></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="vcol"><h4>Representative complaints (≤ 2★)</h4><div id="vb-neg"></div></div>
+      <div class="vcol"><h4>Representative praise (5★)</h4><div id="vb-pos"></div></div>
+    </div>
+  </section>
+
+  <section data-tab="Product ideas" hidden>
+    <div class="note">Feature recommendations drawn straight from the real reviews — each tied to a complaint theme, with a rough impact / effort call. Opinion, clearly labelled.</div>
+    <div class="insight" style="--ac:var(--brand)"><div class="k">The product read</div><p id="ideas-intro"></p></div>
+    <div id="ideas-list" class="grid2"></div>
+  </section>
+
+  <section data-tab="SQL Inspector" hidden>
+    <div class="note">Every view here is powered by a query over the model. Read &amp; run one — the review-themes query is real data.</div>
+    <div class="sqlbar"><select id="sql-pick"></select><button class="run" id="sql-run">Run query</button></div>
+    <pre class="sql" id="sql-code"></pre>
+    <div class="scroll" style="margin-top:12px"><table class="dt" id="sql-out"></table></div>
+  </section>
+
+  <footer id="foot"></footer>
+</main></div>
+
+<div class="tt" id="tt"></div>
+
+<script>
+"use strict";
+var CFG={"name": "Khatabook", "sub": "SME Fintech Analytics", "mark": "K", "accent": "#c62828", "badge": "Nov 2026", "kpis": [["Downloads", "50M+", "13 languages", "var(--brand)"], ["MAU", "~10M", "self-reported", "var(--brand)"], ["FY24 revenue", "₹103 Cr", "losses narrowing", "var(--pos)"], ["Total funding", "~$187M", "peak ~$600M val (2021)", "var(--muted)"], ["Play sample", "3.97★", "600 reviews", "var(--pos)"], ["Lending AUM goal", "₹1,000 Cr", "the profitability bet", "var(--brand)"]], "over_insight": "Khatabook digitised the paper <b>khata</b> for 50M+ small merchants by being <b>free and simple</b>. The pivot now is to <b>profitability</b> through three monetisation levers — a <b>Pro subscription</b> that paywalls once-free basics, <b>ads</b>, and a <b>lending</b> business — and the reviews show all three straining the trust that made the ledger sticky. The model below tracks the free→paid funnel and where monetisation meets churn.", "chartA": {"t": "Daily active merchants by month", "s": "Synthetic · post-paywall plateau", "data": [["Jun", 100], ["Jul", 99], ["Aug", 97], ["Sep", 95], ["Oct", 94], ["Nov", 93]]}, "chartB": {"t": "Free→Pro conversion by week", "s": "Synthetic · 8% target line", "data": [["W1", 7.5], ["W2", 7.0], ["W3", 6.6], ["W4", 6.3], ["W5", 6.5], ["W6", 6.8]], "sla": 8}, "funnel": {"insight": "The ledger acquires and activates well; the leak is at <b>monetisation</b> — the Pro paywall on once-free features and the lending push convert a minority while <b>souring long-tenure merchants</b>, who churn or leave a 1-star.", "steps": [["Installed", 100], ["Logged first entry", 78], ["Daily active merchant", 46], ["Started Pro trial", 18], ["Paid Pro", 11]], "seg": {"t": "Monetisation-line scorecard", "s": "Synthetic · sorted by review sentiment", "cols": ["Line", "Share*", "Review avg", "Trust risk", "Status"], "rows": [["Ledger (free)", "core", "4.4★", "Low", "Core"], ["Payments (UPI/QR)", "grow", "3.0★", "Med", "Grow"], ["Pro subscription", "~11%", "2.9★", "High", "Watch"], ["Lending", "push", "1.9★", "Severe", "Fix"]]}}, "cohorts": {"bench": "34.0", "insight": "A bookkeeping habit should be very sticky — a merchant uses it daily. ~34% D30 is healthy; watch whether <b>post-paywall cohorts</b> fall below it as once-free features move behind Pro.", "rows": [["Jun", 900000, 22, 30, 33, 36], ["Jul", 920000, 21, 29, 32, 35], ["Aug", 940000, 22, 30, 33, 36], ["Sep", 900000, 19, 27, 30, 33], ["Oct", 910000, 20, 28, 31, 34], ["Nov", 930000, 20, 28, null, null]]}, "ue": {"insight": "Revenue now rides three streams — <b>Pro subscription</b>, a <b>payments take</b>, and <b>lending</b> (interest + partner commission). Lending is the highest-margin but the most <b>trust-expensive</b>: a bad loan experience costs the ledger relationship too.", "steps": [["Blended rev / merchant", 60], ["Content & ops", -18], ["Lending risk & collections", -20], ["Support", -14]]}, "rev_insight": "Across <b>600 real Play Store reviews</b> (avg 3.97★, but <b>22% are 1-star</b>) the ledger is still valued — the pain is the <b>monetisation layer</b>: <b>lending</b> (46 reviews, avg 1.93★ — “fake loan app, spam calls, shares my data, ruins my credit score, no loan statement/closing”), the <b>subscription paywall</b> on once-free features (2.92★ — “only 3 entries/day free, no export without paying, filthy greedy model after 5 years”) and <b>ads</b> (1.71★). <i>External: FY24 ₹103 Cr revenue; ~$187M raised; ₹1,000 Cr lending-AUM push. Reddit not accessible.</i>", "reviews": {"n": 600, "avg": 3.97, "dist": [127, 7, 20, 51, 395], "range": ["2026-10-09", "2026-11-19"], "pkg": "com.vaibhavkalpe.android.khatabook", "themes": [{"theme": "App / tech", "mentions": 185, "pct": 30.8, "avg_rating": 3.78}, {"theme": "Service quality", "mentions": 37, "pct": 6.2, "avg_rating": 2.11}, {"theme": "Wait / ETA / delay", "mentions": 29, "pct": 4.8, "avg_rating": 2.03}, {"theme": "Support", "mentions": 24, "pct": 4.0, "avg_rating": 3.71}, {"theme": "Payments & refunds", "mentions": 18, "pct": 3.0, "avg_rating": 3.06}, {"theme": "Pricing & fares", "mentions": 13, "pct": 2.2, "avg_rating": 2.62}, {"theme": "Driver / partner", "mentions": 4, "pct": 0.7, "avg_rating": 2.5}, {"theme": "Booking / availability", "mentions": 2, "pct": 0.3, "avg_rating": 1.0}, {"theme": "Cancellations", "mentions": 1, "pct": 0.2, "avg_rating": 1.0}], "neg": [{"rating": 2, "thumbs_up": 23, "text": "The app does not open without internet. and When opening app its showing to update (in app) but on google play there is no update available for the app."}, {"rating": 1, "thumbs_up": 10, "text": "Go to Cash Book Make any back date entery a black pop up appers over in out button and I'm waiting to add another entry it takes 3 seconds to disappear. It's taken more times if you enter more cash book entry at once."}, {"rating": 1, "thumbs_up": 6, "text": "Cons : -1 Not yet received fingerprint app lock --2 update are coming but still waiting for fingerprint app lock ---3 even after many review not able to provide fingerprint lock in app ----4 need khatabook plus for fingerprint app lock 🤣😂"}, {"rating": 1, "thumbs_up": 6, "text": "Entries do not backup instantly. SMS goes to customer with old data. App degrading day by day"}, {"rating": 1, "thumbs_up": 5, "text": "Earlier it was good, now they only wanted paid customers. not good for simple use. you can't add more than 3 transaction n you can't take screenshot.I will download other app if they the same things continues."}], "pos": [{"rating": 5, "thumbs_up": 736, "text": "Rating raised to 5 star.. App too good user interface, data backup so comfortable. Just one drawback- Can't use desktop version parallely and moreover desktop version unable to buy.. Found no option to purchase."}, {"rating": 5, "thumbs_up": 20, "text": "Excellent app for daily business accounting, credit management, and sending payment reminders to customers. It is very simple to use and keeps all financial records safe with automatic cloud backup."}, {"rating": 5, "thumbs_up": 2, "text": "it's easy to use and very supportive it's a good reminder too"}], "kpis": [["Reviews analysed", "600", "recent Play sample", "var(--brand)"], ["Avg rating", "3.97★", "this sample", "var(--warn)"], ["1-star share", "21.2%", "of the sample", "var(--neg)"], ["Top theme", "App / tech", "30.8% of reviews", "var(--brand)"], ["Top severe theme", "Lending", "46 · 1.93★", "var(--neg)"], ["Themes tracked", "9", "keyword-tagged", "var(--muted)"]]}, "ideas_intro": "The ledger is loved; the monetisation layer is the churn driver. Protect the trust that made the khata sticky, then monetise around it — not through it.", "ideas": [{"t": "Separate the loan business from the ledger brand", "why": "Lending is the angriest theme (46 reviews, 1.93★) — “spam calls, shares my data, ruins credit score”.", "impact": "Protects the core ledger trust from loan-collections anger.", "imp": "High", "eff": "Med"}, {"t": "Rethink the export / entry-limit paywall for long-tenure users", "why": "“Only 3 entries/day free, no export without paying” — 5-year users leaving over the ₹199 model.", "impact": "Retains the loyal base that compounds word-of-mouth.", "imp": "High", "eff": "Low"}, {"t": "Loan statement, closing & responsive support", "why": "“Not providing loan statement or closing option, no customer care.”", "impact": "Compliance and trust on the money product.", "imp": "High", "eff": "Med"}, {"t": "Cap and clarify ads (make Pro’s value honest)", "why": "Ads are the lowest-rated theme (1.71★) — injected into a daily utility.", "impact": "Less rage; a cleaner reason to buy Pro.", "imp": "Med", "eff": "Low"}, {"t": "Fix app weight on low-end merchant phones", "why": "“App bohot heavy, keyboard not working, slow load.”", "impact": "Protects daily use on the devices merchants actually have.", "imp": "Med", "eff": "Med"}], "sql": [{"name": "Funnel conversion", "sql": "SELECT stage, users,\n       ROUND(100.0*users/FIRST_VALUE(users) OVER (ORDER BY step), 1) AS pct_of_top\nFROM funnel\nORDER BY step;", "cols": ["stage", "pct_of_top"], "rows": [["Installed", "100%"], ["Logged first entry", "78%"], ["Daily active merchant", "46%"], ["Started Pro trial", "18%"], ["Paid Pro", "11%"]]}, {"name": "Segment scorecard", "sql": "SELECT line, metric, status\nFROM segment_scorecard\nORDER BY metric DESC;", "cols": ["Line", "Share*", "Review avg", "Trust risk", "Status"], "rows": [["Ledger (free)", "core", "4.4★", "Low", "Core"], ["Payments (UPI/QR)", "grow", "3.0★", "Med", "Grow"], ["Pro subscription", "~11%", "2.9★", "High", "Watch"], ["Lending", "push", "1.9★", "Severe", "Fix"]]}, {"name": "Review themes (real data)", "sql": "-- Over 600 REAL Google Play reviews (com.vaibhavkalpe.android.khatabook)\nSELECT theme,\n       COUNT(*)              AS mentions,\n       ROUND(AVG(rating), 2) AS avg_rating\nFROM review_themes\nGROUP BY theme\nORDER BY mentions DESC;", "cols": ["theme", "mentions", "avg_rating"], "rows": [["App / tech", 185, "3.78★"], ["Service quality", 37, "2.11★"], ["Wait / ETA / delay", 29, "2.03★"], ["Support", 24, "3.71★"], ["Payments & refunds", 18, "3.06★"], ["Pricing & fares", 13, "2.62★"], ["Driver / partner", 4, "2.5★"], ["Booking / availability", 2, "1.0★"], ["Cancellations", 1, "1.0★"]]}], "syn_note": "Real headline metrics (2026, sourced) + a clearly-labelled synthetic operational model. The Voice-of-Customer tab uses REAL Google Play reviews. Not Khatabook's internal data.", "foot": "Headline KPIs: public Khatabook coverage (2026). Operational detail (funnel, segments, cohorts, unit economics) is a reproducible synthetic model, clearly labelled, never presented as real Khatabook data. Voice of Customer: 600 real Google Play reviews (2026-10-09 to 2026-11-19), user names not stored; reviews are self-selected. Built by Diya Mittal."};
+
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+
+function barsV(id,data,color,allLabels){
+  var box=document.getElementById(id);if(!box)return;var W=460,H=210,L=18,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.14,iw=W-L-R,ih=H-T-B;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length;
+  data.forEach(function(d,i){var x=L+i*(iw/n)+2,bw=iw/n-4,h=ih*d[1]/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:3,fill:(d[2]||color)});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1].toLocaleString()+"</span>");
+    if(allLabels||i%2===0){var t=el("text",{x:x+bw/2,y:H-9,"text-anchor":"middle","font-size":8.5,fill:mut});t.textContent=d[0];svg.appendChild(t);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function lineH(id,data,color,slaLine){
+  var box=document.getElementById(id);if(!box)return;var W=460,H=210,L=28,R=12,T=14,B=28;
+  var max=Math.max.apply(null,data.map(function(d){return d[1];}))*1.12,iw=W-L-R,ih=H-T-B;
+  var g=cvar("--grid"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  for(var t=0;t<=3;t++){var yy=T+ih*t/3;svg.appendChild(el("line",{x1:L,y1:yy,x2:W-R,y2:yy,stroke:g,"stroke-width":1}));
+    var yl=el("text",{x:L-5,y:yy+3,"text-anchor":"end","font-size":8,fill:mut,"font-family":cvar("--font-m")});yl.textContent=Math.round(max*(1-t/3));svg.appendChild(yl);}
+  if(slaLine){var sy=T+ih*(1-slaLine/max);svg.appendChild(el("line",{x1:L,y1:sy,x2:W-R,y2:sy,stroke:cvar("--neg"),"stroke-width":1.2,"stroke-dasharray":"4 3"}));}
+  var pts=data.map(function(d,i){return [L+iw*i/(data.length-1),T+ih*(1-d[1]/max)];});
+  svg.appendChild(el("path",{d:"M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" L"),fill:"none",stroke:color,"stroke-width":2.4,"stroke-linejoin":"round"}));
+  data.forEach(function(d,i){var c=el("circle",{cx:pts[i][0],cy:pts[i][1],r:3.6,fill:cvar("--panel"),stroke:color,"stroke-width":2});svg.appendChild(c);bind(c,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+"%</span>");
+    if(i%2===0){var xl=el("text",{x:pts[i][0],y:H-9,"text-anchor":"middle","font-size":8,fill:mut});xl.textContent=d[0];svg.appendChild(xl);}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function funnelH(id,steps,color){
+  var box=document.getElementById(id);if(!box)return;var W=460,rh=34,H=steps.length*rh+6,x0=116,bw=W-x0-40;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*rh+5,w=bw*s[1]/100;
+    svg.appendChild(el("rect",{x:x0,y:y,width:bw,height:20,rx:4,fill:cvar("--panel-2")}));
+    var r=el("rect",{x:x0,y:y,width:Math.max(w,3),height:20,rx:4,fill:color});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+s[1]+"% of top</span>");
+    var lb=el("text",{x:x0-8,y:y+14,"text-anchor":"end","font-size":9.5,fill:cvar("--ink")});lb.textContent=s[0];svg.appendChild(lb);
+    var vl=el("text",{x:x0+Math.max(w,3)+6,y:y+14,"font-size":9,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s[1]+"%";svg.appendChild(vl);
+    if(i>0){var drop=steps[i-1][1]-s[1];if(drop>0){var dt=el("text",{x:W-4,y:y+14,"text-anchor":"end","font-size":8,fill:cvar("--neg"),"font-family":cvar("--font-m")});dt.textContent="−"+drop;svg.appendChild(dt);}}});
+  box.innerHTML="";box.appendChild(svg);
+}
+function distBars(id,counts,color){
+  var box=document.getElementById(id);if(!box)return;var data=counts.map(function(c,i){return [(i+1)+"★",c];});
+  var tot=counts.reduce(function(a,b){return a+b;},0);
+  var cols=[cvar("--neg"),cvar("--neg"),cvar("--warn"),cvar("--brand"),cvar("--pos")];
+  var W=460,H=210,L=20,R=12,T=14,B=26,max=Math.max.apply(null,counts)*1.14,iw=W-L-R,ih=H-T-B,n=5;
+  var mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d,i){var x=L+i*(iw/n)+8,bw=iw/n-16,h=ih*d[1]/max,y=T+ih-h;
+    var r=el("rect",{x:x,y:y,width:bw,height:Math.max(h,1),rx:4,fill:cols[i]});svg.appendChild(r);
+    bind(r,"<b>"+d[0]+"</b><br><span class='v'>"+d[1]+" ("+(100*d[1]/tot).toFixed(0)+"%)</span>");
+    var vt=el("text",{x:x+bw/2,y:y-4,"text-anchor":"middle","font-size":8.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});vt.textContent=d[1];svg.appendChild(vt);
+    var t=el("text",{x:x+bw/2,y:H-8,"text-anchor":"middle","font-size":9,fill:mut});t.textContent=d[0];svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);
+}
+function cohortGrid(id,rows){
+  var box=document.getElementById(id);if(!box)return;var cols=["D1","D7","D14","D30"],W=460,cw=70,x0=70,y0=20,gap=6,ch=30;
+  var H=y0+rows.length*(ch+gap)+8,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  cols.forEach(function(c,j){var t=el("text",{x:x0+j*(cw+gap)+cw/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});t.textContent=c;svg.appendChild(t);});
+  rows.forEach(function(r,i){var ry=y0+i*(ch+gap);
+    var rt=el("text",{x:x0-8,y:ry+ch/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=r[0];svg.appendChild(rt);
+    [r[2],r[3],r[4],r[5]].forEach(function(v,j){var x=x0+j*(cw+gap);
+      if(v==null){svg.appendChild(el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:cvar("--panel-2")}));
+        var q=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9,fill:mut});q.textContent="—";svg.appendChild(q);return;}
+      var op=0.14+0.86*(v/Math.max(70,1));var rc=el("rect",{x:x,y:ry,width:cw,height:ch,rx:5,fill:br,opacity:Math.min(op,1)});svg.appendChild(rc);
+      bind(rc,"<b>"+r[0]+" · "+cols[j]+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cw/2,y:ry+ch/2+4,"text-anchor":"middle","font-size":9.5,fill:(op>0.6?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v+"%";svg.appendChild(vt);});});
+  box.innerHTML="";box.appendChild(svg);
+}
+function waterfall(id,steps,unit){
+  var box=document.getElementById(id);if(!box)return;var W=560,H=250,pad=24,base=H-46,top=16,u=unit||"₹";
+  var net=steps.reduce(function(a,s){return a+s[1];},0);
+  var all=steps.concat([["Contribution",net,"net"]]);
+  var cum=steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0);
+  var scale=(base-top)/Math.max(cum,1);var n=all.length,slot=(W-pad*2)/n,bw=slot-14,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  all.forEach(function(s,i){var x=pad+i*slot+7,hiVal,loVal,col;
+    if(s[2]==="net"){hiVal=Math.max(s[1],0);loVal=Math.min(s[1],0);col=(s[1]<0?neg:pos);run=s[1];}
+    else if(s[1]<0){hiVal=run;loVal=run+s[1];run=loVal;col=neg;}
+    else{hiVal=run+s[1];loVal=run;run=run+s[1];col=br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s[2]==="net"&&s[1]<0){yTop=base;h=Math.max(Math.abs(s[1])*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col});svg.appendChild(r);
+    bind(r,"<b>"+s[0]+"</b><br><span class='v'>"+(s[1]<0?"−":"")+u+Math.abs(s[1])+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-5,"text-anchor":"middle","font-size":9.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s[1]<0?"−":"")+u+Math.abs(s[1]);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+14,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s[0].length>15?s[0].slice(0,14)+"…":s[0];svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);
+}
+function kpiRow(id,items){var box=document.getElementById(id);if(!box)return;
+  box.innerHTML=items.map(function(k){return '<div class="kpi" style="--ac:'+(k[3]||"var(--brand)")+'"><div class="lab">'+esc(k[0])+'</div><div class="val">'+esc(k[1])+'</div><div class="sub">'+esc(k[2])+'</div></div>';}).join("");}
+function tableHTML(cols,rows){var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>0?' class="num"':'')+'>'+esc(c)+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>0?' class="num"':'')+'>'+esc(c)+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function segHTML(cols,rows){var map={Healthy:"green",Core:"green",Balanced:"green",Watch:"amber",Grow:"amber",Fix:"red",Over:"amber"};
+  var h="<thead><tr>"+cols.map(function(c,i){return '<th'+(i>0?' class="num"':'')+'>'+esc(c)+'</th>';}).join("")+"</tr></thead><tbody>";
+  h+=rows.map(function(r){return "<tr>"+r.map(function(c,i){
+    if(i===r.length-1){return '<td class="num"><span class="tag '+(map[c]||"amber")+'">'+esc(c)+'</span></td>';}
+    return '<td'+(i>0?' class="num"':'')+'>'+esc(c)+'</td>';}).join("")+"</tr>";}).join("")+"</tbody>";return h;}
+function themeHTML(themes){var maxp=Math.max.apply(null,themes.map(function(t){return t.pct;}));
+  var h="<thead><tr><th>Theme</th><th class='num'>Mentions</th><th class='num'>Share</th><th class='num'>Avg ★</th></tr></thead><tbody>";
+  h+=themes.map(function(t){var w=Math.round(60*t.pct/maxp);
+    var ac=t.avg_rating<2.5?cvar("--neg"):t.avg_rating<3.5?cvar("--warn"):cvar("--ink");
+    return "<tr><td>"+esc(t.theme)+"</td><td class='num'>"+t.mentions+"</td>"+
+      "<td class='num'>"+t.pct+"% <span class='bar-wrap'><span class='bar-fill' style='width:"+w+"px'></span></span></td>"+
+      "<td class='num' style='color:"+ac+";font-weight:700'>"+t.avg_rating+"</td></tr>";}).join("")+"</tbody>";return h;}
+function verbatims(id,list){var box=document.getElementById(id);if(!box)return;
+  box.innerHTML=list.map(function(v){var hi=v.rating>=4;var m=v.thumbs_up>0?(v.thumbs_up+" found this helpful"):"";
+    return '<div class="vb"><span class="r '+(hi?"hi":"lo")+'">'+v.rating+'★</span><span class="tx">“'+esc(v.text)+'”</span>'+(m?'<div class="m">'+m+'</div>':'')+'</div>';}).join("");}
+function sqlHTML(s){return esc(s).replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|USING|ON|AS|WITH|CASE|WHEN|THEN|ELSE|END|UNION ALL|OVER|FIRST_VALUE|AVG|COUNT|ROUND|MIN|MAX|DESC|ASC)\b/g,'<span class="kw">$1</span>');}
+
+function render(){
+  var brand=cvar("--brand"),warn=cvar("--warn"),pos=cvar("--pos");
+  document.getElementById("logo").textContent=CFG.mark;
+  document.getElementById("title").innerHTML=CFG.name+' <span class="r">'+CFG.sub+'</span>';
+  document.getElementById("badge").textContent=CFG.badge;
+  document.getElementById("syn-note").textContent=CFG.syn_note;
+  document.getElementById("foot").textContent=CFG.foot;
+  document.documentElement.style.setProperty("--brand",CFG.accent);
+  document.getElementById("over-insight").innerHTML=CFG.over_insight;
+  kpiRow("kpi-over",CFG.kpis);
+  // overview charts
+  document.getElementById("ca-t").textContent=CFG.chartA.t;document.getElementById("ca-s").textContent=CFG.chartA.s;
+  document.getElementById("cb-t").textContent=CFG.chartB.t;document.getElementById("cb-s").textContent=CFG.chartB.s;
+  barsV("c-a",CFG.chartA.data.map(function(d){return [d[0],d[1]];}),CFG.accent);
+  lineH("c-b",CFG.chartB.data.map(function(d){return [d[0],d[1]];}),warn,CFG.chartB.sla);
+  // funnel & ops
+  document.getElementById("fn-insight").innerHTML=CFG.funnel.insight;
+  funnelH("c-funnel",CFG.funnel.steps,CFG.accent);
+  document.getElementById("seg-t").textContent=CFG.funnel.seg.t;document.getElementById("seg-s").textContent=CFG.funnel.seg.s;
+  document.getElementById("t-seg").innerHTML=segHTML(CFG.funnel.seg.cols,CFG.funnel.seg.rows);
+  // cohorts
+  var coh=CFG.cohorts.rows,d30=coh.filter(function(r){return r[5]!=null;}).map(function(r){return r[5];});
+  var d30a=(d30.reduce(function(a,b){return a+b;},0)/d30.length).toFixed(1);
+  var avg=function(ix){var v=coh.filter(function(r){return r[ix]!=null;}).map(function(r){return r[ix];});return (v.reduce(function(a,b){return a+b;},0)/v.length).toFixed(1);};
+  kpiRow("kpi-coh",[["Cohorts",coh.length,"by acq. month","var(--brand)"],["Avg D1",avg(2)+"%","first repeat","var(--brand)"],
+    ["Avg D7",avg(3)+"%","weekly","var(--brand)"],["Avg D14",avg(4)+"%","forming","var(--brand)"],
+    ["Avg D30",d30a+"%","LTV signal","var(--pos)"],["Benchmark D30",CFG.cohorts.bench+"%","reference","var(--muted)"]]);
+  document.getElementById("coh-insight").innerHTML=CFG.cohorts.insight;
+  document.getElementById("coh-s").textContent="Cumulative repeat by acquisition month · benchmark D30 "+CFG.cohorts.bench+"%";
+  cohortGrid("c-cohort",coh);
+  // unit economics
+  var rev=CFG.ue.steps.filter(function(s){return s[1]>0;}).reduce(function(a,s){return a+s[1];},0);
+  var cost=-CFG.ue.steps.filter(function(s){return s[1]<0;}).reduce(function(a,s){return a+s[1];},0);
+  var net=rev-cost;
+  kpiRow("kpi-ue",[["Revenue / unit","₹"+rev,"gross","var(--pos)"],["Cost / unit","₹"+cost,"all-in","var(--neg)"],
+    ["Contribution",(net<0?"−₹"+Math.abs(net):"₹"+net),"per unit",(net<0?"var(--neg)":"var(--warn)")],
+    ["Margin",(100*net/rev).toFixed(0)+"%","of revenue",(net<0?"var(--neg)":"var(--warn)")],
+    ["Steps",CFG.ue.steps.length,"in the bridge","var(--muted)"],["Model","illustrative","not real P&L","var(--muted)"]]);
+  document.getElementById("ue-insight").innerHTML=CFG.ue.insight;
+  waterfall("c-ue",CFG.ue.steps);
+  // voice of customer (REAL)
+  var rv=CFG.reviews;
+  document.getElementById("rev-note").textContent="REAL Google Play reviews · "+rv.n+" in sample ("+rv.range[0]+" to "+rv.range[1]+") · package "+rv.pkg+" · user names not stored · self-selected sample.";
+  kpiRow("kpi-rev",rv.kpis);
+  document.getElementById("rev-insight").innerHTML=CFG.rev_insight;
+  document.getElementById("rev-dist-s").textContent="Share of "+rv.n+" reviews by star · avg "+rv.avg+"★";
+  distBars("c-rating",rv.dist);
+  document.getElementById("t-theme").innerHTML=themeHTML(rv.themes);
+  verbatims("vb-neg",rv.neg);verbatims("vb-pos",rv.pos);
+  // product ideas
+  document.getElementById("ideas-intro").innerHTML=CFG.ideas_intro;
+  document.getElementById("ideas-list").innerHTML=CFG.ideas.map(function(d,i){
+    return '<div class="card" style="border-left:3px solid var(--brand)">'+
+      '<div class="ct" style="font-size:1rem"><span class="mono" style="color:var(--brand)">'+(i+1)+'. </span>'+esc(d.t)+'</div>'+
+      '<div style="margin:9px 0 0;font-size:.85rem;line-height:1.5"><span class="mono" style="color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em">From the reviews</span><br>'+d.why+'</div>'+
+      '<div style="margin:8px 0 0;font-size:.85rem;line-height:1.5"><span class="mono" style="color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em">Expected impact</span><br>'+d.impact+'</div>'+
+      '<div style="margin:11px 0 2px;display:flex;gap:8px"><span class="tag green">Impact: '+esc(d.imp)+'</span><span class="tag amber">Effort: '+esc(d.eff)+'</span></div></div>';
+  }).join("");
+  // sql
+  var sel=document.getElementById("sql-pick");sel.innerHTML=CFG.sql.map(function(q,i){return '<option value="'+i+'">'+esc(q.name)+'</option>';}).join("");
+  function showSQL(){var q=CFG.sql[+sel.value];document.getElementById("sql-code").innerHTML=sqlHTML(q.sql);document.getElementById("sql-out").innerHTML="";}
+  sel.onchange=showSQL;showSQL();
+  document.getElementById("sql-run").onclick=function(){var q=CFG.sql[+sel.value];document.getElementById("sql-out").innerHTML=tableHTML(q.cols,q.rows);};
+}
+
+var sections=[].slice.call(document.querySelectorAll("section[data-tab]"));
+var tabsNav=document.getElementById("tabs");
+sections.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.getAttribute("data-tab");b.setAttribute("aria-selected",i===0?"true":"false");
+  b.onclick=function(){sections.forEach(function(x){x.hidden=true;});s.hidden=false;[].forEach.call(tabsNav.children,function(c){c.setAttribute("aria-selected","false");});b.setAttribute("aria-selected","true");};
+  tabsNav.appendChild(b);});
+
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("dk_khatabook_theme");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.onclick=function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("dk_khatabook_theme",nd?"dark":"light");}catch(e){}setLabel();render();};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();render();}});
+setLabel();render();
+</script>

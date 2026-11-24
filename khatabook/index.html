@@ -1,0 +1,319 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Khatabook Teardown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Dark-first scroll-story teardown; brand accent on near-black. */
+:root{
+  --bg:#0f0f0c; --panel:#191915; --panel-2:#222018; --border:#302e24;
+  --ink:#f6f4ee; --second:#bdb9ab; --muted:#857f6e;
+  --brand:#c62828; --brand-ink:#ffffff; --grid:#262419;
+  --pos:#36c98d; --neg:#fb7185;
+  --c-sub:#c62828; --c-a:#bdb6a2; --c-b:#7c766a;
+  --font-d:"Bricolage Grotesque",system-ui,sans-serif;
+  --font-b:"DM Sans",system-ui,sans-serif; --font-m:"DM Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f7f6f2; --panel:#ffffff; --panel-2:#faf8f3; --border:#e8e4da;
+  --ink:#16140f; --second:#534f46; --muted:#8a8475; --grid:#eef0ea;
+  --brand:#8e1f1f; --c-sub:#8e1f1f; --c-a:#9a948a; --c-b:#c7c1b4;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f7f6f2; --panel:#ffffff; --panel-2:#faf8f3; --border:#e8e4da;
+  --ink:#16140f; --second:#534f46; --muted:#8a8475; --grid:#eef0ea;
+  --brand:#8e1f1f; --c-sub:#8e1f1f; --c-a:#9a948a; --c-b:#c7c1b4;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:60}
+.wrap{max-width:1060px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-d);text-wrap:balance;margin:0}
+.mono{font-family:var(--font-m);font-variant-numeric:tabular-nums}
+a{color:inherit}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-weight:800;font-size:1rem}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.05rem}
+.brand .r{color:var(--brand)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-size:.8rem;color:var(--second);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.tgl{flex:none;background:var(--panel);border:1px solid var(--border);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:.78rem;cursor:pointer;font-family:var(--font-b)}
+section{padding-block:30px;scroll-margin-top:70px}
+.eyebrow{font-family:var(--font-m);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+.sec-h{font-size:clamp(1.3rem,3.4vw,1.9rem);font-weight:800;margin:.25rem 0 .2rem}
+.sec-sub{color:var(--second);max-width:68ch;margin:0 0 16px}
+.hero{padding-top:34px}
+.hero-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hero-mark{width:74px;height:74px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:2.1rem;box-shadow:0 8px 30px rgba(0,0,0,.28)}
+.hero h1{font-size:clamp(2rem,6vw,3.3rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.hero h1 .r{color:var(--brand)}
+.hero .tag{color:var(--second);font-size:1.02rem;margin:.5rem 0 0;max-width:62ch}
+.disc{display:inline-block;margin-top:12px;font-size:.75rem;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 11px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:20px}
+@media(max-width:860px){.chips{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 14px;position:relative;overflow:hidden}
+.chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--brand)}
+.chip b{display:block;font-family:var(--font-m);font-size:1.28rem;font-weight:500;letter-spacing:-.01em}
+.chip span{font-size:.72rem;color:var(--muted);display:block;margin-top:2px;line-height:1.3}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px}
+.card h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+.card p{color:var(--second);margin:.2rem 0 0;font-size:.92rem}
+.insight{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:12px;padding:14px 16px;margin:16px 0}
+.insight .k{font-family:var(--font-m);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.insight p{margin:.25rem 0 0;color:var(--ink);font-size:.98rem}
+.illus{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);border:1px dashed var(--border);border-radius:6px;padding:2px 8px;margin-left:8px;font-family:var(--font-m);vertical-align:middle}
+.chart{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px 16px 10px}
+.chart .ct{font-weight:700;font-size:1rem;font-family:var(--font-d)}
+.chart .cs{color:var(--muted);font-size:.8rem;margin:1px 0 10px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.tt{position:fixed;z-index:80;pointer-events:none;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:.78rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s}
+.tt .v{font-family:var(--font-m)}
+.tree{display:flex;flex-direction:column;gap:12px;align-items:center}
+.tree .node{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;text-align:center}
+.tree .node b{font-family:var(--font-m)}
+.tree .ops{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tree .ops .node{border-top:3px solid var(--brand)}
+.tree .x{color:var(--muted);align-self:center;font-family:var(--font-m)}
+.idea{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--brand);border-radius:14px;padding:16px}
+.idea h3{font-size:1rem;font-weight:700}
+.idea .lab{font-family:var(--font-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-top:9px}
+.idea p{color:var(--second);font-size:.88rem;margin:.1rem 0 0}
+.idea .pills{display:flex;gap:8px;margin-top:11px}
+.pill{display:inline-block;font-size:.66rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px}
+.pill.imp{background:color-mix(in srgb,var(--pos) 20%,transparent);color:var(--ink)}
+.pill.eff{background:color-mix(in srgb,var(--brand) 20%,transparent);color:var(--ink)}
+table.exp{width:100%;border-collapse:collapse;font-size:.88rem}
+table.exp th,table.exp td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+table.exp th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+table.exp td b{color:var(--ink)}
+.tpill{display:inline-block;font-size:.68rem;font-family:var(--font-m);padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--brand) 20%,transparent);color:var(--ink)}
+.phase{border-left:2px solid var(--border);padding-left:16px;margin-left:6px}
+.phase li{margin-bottom:10px}
+.phase li b{font-family:var(--font-d)}
+details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:10px}
+summary{cursor:pointer;font-weight:600}
+footer{border-top:1px solid var(--border);margin-top:20px;padding:20px 0 40px;color:var(--muted);font-size:.82rem}
+.src-note{color:var(--muted);font-size:.8rem}
+ul.clean{margin:.3rem 0 0;padding-left:18px}
+ul.clean li{margin-bottom:5px;color:var(--second)}
+ul.clean li b{color:var(--ink)}
+</style>
+<div class="topbar"><div class="wrap">
+  <span class="brand"><span class="logo">K</span><span>Khatabook <span class="r">Teardown</span></span></span>
+  <nav class="nav"><a href="#product">Product</a><a href="#economics">Economics</a><a href="#growth">Growth</a><a href="#market">Market</a><a href="#voice">Voice</a><a href="#voice-deep">Deep dive</a><a href="#ideas">Ideas</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a><a href="#moat">Moat &amp; risk</a></nav>
+  <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
+</div></div>
+<div class="wrap">
+  <section class="hero" id="top">
+    <div class="hero-top"><div class="hero-mark">K</div><div>
+      <h1>Khatabook <span class="r">·</span> Product Teardown</h1>
+      <p class="tag">Digitised the paper <b>khata</b> for 50M+ small merchants by being free and dead-simple — now pivoting to <b>profitability</b> via subscription, payments and lending. An independent product-analyst teardown.</p></div></div>
+    <span class="disc">Independent analysis · not affiliated with Khatabook · company facts real &amp; sourced · as of 2026</span>
+    <a href="case-study.pdf" download style="display:inline-block;margin-top:12px;margin-left:8px;font-family:var(--font-m);font-size:.78rem;font-weight:600;color:var(--brand-ink);background:var(--brand);border-radius:999px;padding:6px 15px;text-decoration:none">↓ Download the 1-page case study (PDF)</a>
+    <div class="chips"><div class="chip"><b>50M+</b><span>Downloads · 13 languages</span></div><div class="chip"><b>~10M</b><span>MAU · self-reported</span></div><div class="chip"><b>₹103 Cr</b><span>FY24 revenue</span></div><div class="chip"><b>~$187M</b><span>Raised · peak ~$600M val (2021)</span></div><div class="chip"><b>3.97★</b><span>Play sample · 600 reviews</span></div><div class="chip"><b>₹1,000 Cr</b><span>Lending-AUM goal</span></div></div>
+    <div class="insight" style="margin-top:22px"><div class="k">The one-line thesis</div><p>Khatabook won by making the merchant <b>khata</b> digital, free and simple — 50M+ downloads. The hard turn now is <b>monetising a free utility</b> without breaking it: a Pro subscription paywalls once-free basics, ads fill the app, and a lending arm chases margin. The reviews are blunt — the ledger is still loved, but <b>the monetisation layer, especially lending, is eroding the trust that made it sticky</b>. That tension is the analyst’s whole job here.</p></div>
+  </section>
+
+  <section id="product"><div class="eyebrow">01 · The product</div>
+    <h2 class="sec-h">A paper ledger, in your pocket</h2><p class="sec-sub">Record <b>credit/debit</b> per customer, send payment reminders by SMS/WhatsApp, and collect via UPI/QR — the daily bookkeeping a kirana or small business used to do on paper.</p>
+    <div class="grid3"><div class="card"><h3>Who</h3><p>Small merchants — kirana, retail, distributors — across Tier-2/3 India, in 13 languages.</p></div><div class="card"><h3>How it earns</h3><p>A Pro subscription, a payments take (UPI/QR), and a growing <b>lending</b> business (interest + partner commission).</p></div><div class="card"><h3>Why it wins</h3><p>Daily habit plus switching cost — a merchant’s whole receivables ledger and customer list live inside it.</p></div></div></section>
+
+  <section id="economics"><div class="eyebrow">02 · Business &amp; unit economics</div>
+    <h2 class="sec-h">Monetising a free habit</h2><p class="sec-sub">The ledger was free to win scale; profitability now rides three streams — subscription, payments and lending — each of which touches the trust that made the ledger sticky.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Illustrative revenue mix<span class="illus">illustrative</span></div><div class="cs">Shape from subscription + payments + lending; not Khatabook’s P&amp;L</div><div id="c-waterfall"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><h3>Lending is highest-margin, highest-trust-risk</h3><p>A bad loan experience — spam calls, data-sharing, a hit to a credit score — costs the ledger relationship too.</p></div><div class="card"><h3>The paywall taxes loyalty</h3><p>Putting once-free basics (entry limits, export) behind Pro angers the long-tenure merchants who are the base.</p></div></div></div>
+    <div class="insight"><div class="k">Analyst read</div><p>The north star is <b>retained active merchants</b>, not paid conversions. Monetise <i>around</i> the free ledger — payments, optional Pro value, carefully-run lending — not <i>through</i> breaking it.</p></div></section>
+
+  <section id="growth"><div class="eyebrow">03 · Growth</div>
+    <h2 class="sec-h">From land-grab to profitability</h2><p class="sec-sub">After a 2020–21 scale sprint (50M+ downloads, ~$600M valuation), the SME-bookkeeping category cooled. The new story is revenue: FY24 ₹103 Cr with narrowing losses, and a lending push targeting ₹1,000 Cr AUM.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Funding raised ($M)</div><div class="cs">Reported · cumulative ~$187M</div><div id="c-rev"></div></div>
+      <div class="chart"><div class="ct">Where the complaints concentrate<span class="illus">illustrative</span></div><div class="cs">Indicative · by review severity</div><div id="c-mix"></div></div></div></section>
+
+  <section id="market"><div class="eyebrow">04 · Market</div>
+    <h2 class="sec-h">A crowded, cooled category</h2><p class="sec-sub">Digital-khata peers (OkCredit, Vyapar and others) fought the same war; the survivors are the ones that <b>monetise without churning the base</b>.</p>
+    <div class="grid2"><div class="chart"><div class="ct">Play Store rating (recent sample)</div><div class="cs">600-review sample · count in tooltip</div><div id="c-ratings"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px"><div class="card"><h3>Loved ledger, resented monetisation</h3><p>At <b class='mono'>3.97★</b> with <b>22% one-star</b>, the split is stark: the ledger draws praise; lending (1.93★), the subscription paywall (2.92★) and ads (1.71★) draw the anger.</p></div>
+        <div class="insight" style="margin:0"><div class="k">So what</div><p>The moat is the <b>daily habit and the receivables data</b> locked inside the app. Khatabook’s job is to monetise that without giving merchants a reason to export their khata and leave.</p></div></div></div></section>
+
+  <section id="voice">
+    <div class="eyebrow">Voice of customer · real data</div>
+    <h2 class="sec-h">What users actually say</h2>
+    <p class="sec-sub">A dated sample of <b>600 public Google Play reviews</b> (Khatabook, 2026-10-09 to 2026-11-19). This is <b>real data</b> — the only user-level evidence in this teardown. Reviews are self-selected; user names are not stored. Themes are keyword-tagged, and the average rating per theme shows where the pain is.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin:6px 0 4px"><div class="chip"><b>600</b><span>reviews analysed</span></div><div class="chip"><b>3.97★</b><span>avg rating · this sample</span></div><div class="chip"><b>21.2%</b><span>1-star share</span></div><div class="chip"><b>App / tech</b><span>top complaint theme</span></div></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>Complaint &amp; praise themes</h3><p class="src-note" style="margin:2px 0 6px">Keyword-tagged · red average = the pain</p><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>App / tech</span><span class="src-note" style="white-space:nowrap">185 · 30.8% · <b style="color:var(--second)">3.78★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Service quality</span><span class="src-note" style="white-space:nowrap">37 · 6.2% · <b style="color:var(--neg)">2.11★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Wait / ETA / delay</span><span class="src-note" style="white-space:nowrap">29 · 4.8% · <b style="color:var(--neg)">2.03★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Support</span><span class="src-note" style="white-space:nowrap">24 · 4.0% · <b style="color:var(--second)">3.71★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Payments &amp; refunds</span><span class="src-note" style="white-space:nowrap">18 · 3.0% · <b style="color:var(--second)">3.06★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Pricing &amp; fares</span><span class="src-note" style="white-space:nowrap">13 · 2.2% · <b style="color:var(--second)">2.62★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Driver / partner</span><span class="src-note" style="white-space:nowrap">4 · 0.7% · <b style="color:var(--second)">2.5★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Booking / availability</span><span class="src-note" style="white-space:nowrap">2 · 0.3% · <b style="color:var(--neg)">1.0★</b></span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Cancellations</span><span class="src-note" style="white-space:nowrap">1 · 0.2% · <b style="color:var(--neg)">1.0★</b></span></div></div>
+      <div class="card"><h3>In their words</h3><p class="src-note" style="margin:2px 0 10px">Representative reviews · verbatim</p><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“The app does not open without internet. and When opening app its showing to update (in app) but on google play there is no update available for the app.”</span><div class="src-note" style="margin-top:3px">2★ · 23 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Go to Cash Book Make any back date entery a black pop up appers over in out button and I'm waiting to add another entry it takes 3 seconds to disappear. It's taken more times if you enter more cash book entry at once.”</span><div class="src-note" style="margin-top:3px">1★ · 10 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Cons : -1 Not yet received fingerprint app lock --2 update are coming but still waiting for fingerprint app lock ---3 even after many review not able to provide fingerprint lock in app ----4 need khatabook plus for fingerprint app lock 🤣😂”</span><div class="src-note" style="margin-top:3px">1★ · 6 found helpful</div></div><div style="border-left:3px solid var(--pos);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Rating raised to 5 star.. App too good user interface, data backup so comfortable. Just one drawback- Can't use desktop version parallely and moreover desktop version unable to buy.. Found no option to purchase.”</span><div class="src-note" style="margin-top:3px">5★ · 736 found helpful</div></div></div>
+    </div>
+    <div class="insight" style="margin-top:16px"><div class="k">The read</div><p>The ledger is still valued, but the monetisation layer is the pain: <b>lending</b> (46 reviews, avg 1.93★ — “fake loan app, spam calls, shares my data, ruins my credit score”), the <b>subscription paywall</b> on once-free features (2.92★ — “only 3 entries/day free, no export without paying”) and <b>ads</b> (1.71★). The core khata is loved; the way it’s being monetised is not.</p></div>
+    <div class="card" style="margin-top:16px"><h3>Beyond the Play Store · external signal</h3>
+      <p class="src-note" style="margin:2px 0 10px">Beyond the 600 Play reviews this is cited press (Reddit blocks automated access).</p>
+      <ul class="clean"><li><b>Scale then cool-down</b> — 50M+ downloads and a ~$600M valuation in 2021; the SME-bookkeeping category has since cooled and consolidated.</li><li><b>Profitability pivot</b> — FY24 revenue ~₹103 Cr with narrowing losses; a lending arm targeting ₹1,000 Cr AUM is the margin bet.</li></ul>
+      <p class="src-note" style="margin-top:10px">Sources: <a href="https://inc42.com/company/khatabook/funding/" target="_blank" rel="noopener">Inc42 — Khatabook funding</a></p></div>
+  </section>
+
+  <section id="voice-deep">
+    <div class="eyebrow">Voice of customer · one level deeper</div>
+    <h2 class="sec-h">The monetisation layer is eating the ledger's trust</h2>
+    <p class="sec-sub">The keyword buckets above use a generic consumer-app taxonomy, so Khatabook's real pain hides inside &ldquo;App / tech&rdquo; and &ldquo;Service quality&rdquo;. I re-clustered the same <b>600 real reviews</b> around the three things Khatabook is actually monetising — <b>lending, the Pro paywall, and ads</b>. The average is 3.97★, but <b>22% are 1-star</b>, and that one-star pile has a clear source. Severity = average rating + the count of 1&ndash;2★ reviews. Real data; the fix framing is a product-analyst's view, clearly labelled.</p>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>Re-clustered by what's being monetised</h3><p class="src-note" style="margin:2px 0 8px">Overlapping tags on the 600-review sample · red = the real pain</p>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span><b>Lending / loans</b></span><span class="src-note" style="white-space:nowrap">46 · 7.7% · <b style="color:var(--neg)">1.93★</b> · 34×≤2★</span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Ads (in a daily utility)</span><span class="src-note" style="white-space:nowrap">31 · 5.2% · <b style="color:var(--neg)">1.71★</b> · 24×≤2★</span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Subscription paywall (Pro)</span><span class="src-note" style="white-space:nowrap">24 · 4.0% · <b style="color:var(--neg)">2.92★</b> · 12×≤2★</span></div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;font-size:.9rem"><span>App performance (heavy / slow)</span><span class="src-note" style="white-space:nowrap">23 · 3.8% · <b style="color:var(--neg)">2.13★</b> · 16×≤2★</span></div>
+        <p class="src-note" style="margin-top:12px">The ledger itself draws 395 five-star reviews. The anger is concentrated in the <b>three monetisation moves</b> — and lending, the newest and highest-margin, is also the angriest and the most brand-damaging.</p>
+      </div>
+      <div class="card"><h3>In their words · loyalty turning to resentment</h3><p class="src-note" style="margin:2px 0 10px">Real 1★ Play reviews</p>
+        <div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;worst app, loan mt lena kabhi &mdash; es aap se credit score kharab kr deta h.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · lending</div></div>
+        <div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;Spam calls all the time. They share your data with third parties.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · lending</div></div>
+        <div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;Good bye your filthy greed&hellip; removing khatabook after 5 years of use&hellip; good luck with your greedy subscription model.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · paywall, 5-year user</div></div>
+        <div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 0 12px"><span style="font-size:.88rem">&ldquo;Useless after new updates &mdash; only 3 entries per day, and no option to export entries without a paid subscription.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · paywall</div></div>
+      </div>
+    </div>
+
+    <div class="insight" style="margin-top:16px"><div class="k">The read</div><p>Khatabook won 50M+ merchants by being a <b>free, simple ledger</b>. Chasing profitability, it now monetises three ways at once &mdash; a <b>Pro paywall</b> on once-free basics, <b>ads</b>, and a <b>lending</b> arm &mdash; and all three generate its angriest reviews. Lending is the sharpest: it's the highest-margin bet (the ₹1,000 Cr-AUM story), but the complaints &mdash; <b>spam calls, data shared with third parties, a hit to the credit score, no loan statement or closing</b> &mdash; damage the <i>ledger</i> brand too, because it's the same app holding the merchant's whole khata. And the export/entry paywall doesn't tax new users; it taxes the <b>5-year loyalists</b> who are the base. The core utility is loved; the way it's being monetised is quietly spending the trust that made it sticky.</p></div>
+
+    <div class="card" style="margin-top:16px"><h3>How I'd measure it &mdash; monetisation-driven churn as a first-class metric</h3>
+      <p class="src-note" style="margin:2px 0 10px">The instrumentation I'd stand up in week one</p>
+      <ul class="clean">
+        <li><b>Split cohort retention by monetisation event</b> &mdash; did the merchant hit the paywall, see heavy ads, or take a loan? Track each group's D30 vs a clean cohort; the gaps are the real cost of each lever.</li>
+        <li><b>Loan-complaint rate and data-consent opt-outs</b> as first-class metrics &mdash; lending revenue that costs the ledger relationship is negative-sum.</li>
+        <li><b>Loyal-merchant churn</b> (tenure &gt; 1 year) after a paywall change &mdash; the base is the moat, so churning it to convert a few is a bad trade.</li>
+        <li><b>Guardrail:</b> the Play Store rating and the &ldquo;scam / fake loan&rdquo; share of reviews &mdash; brand damage here raises the cost of every future install.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="ideas">
+    <div class="eyebrow">Feature ideas · from the reviews</div>
+    <h2 class="sec-h">What I’d ship to make the app better</h2>
+    <p class="sec-sub">The ledger is loved; the monetisation layer is the churn driver. Protect the trust that made the khata sticky, then monetise around it. Each is pulled from a real complaint theme above, with a product-analyst’s rough impact/effort call — opinion, clearly labelled.</p>
+    <div class="grid2"><div class="idea"><h3><span class="mono" style="color:var(--brand)">1. </span>Separate the loan business from the ledger brand</h3><span class="lab">From the reviews</span><p>Lending is the angriest theme (46 reviews, 1.93★) — “spam calls, shares my data, ruins credit score”.</p><span class="lab">Expected impact</span><p>Protects the core ledger trust from loan-collections anger.</p><div class="pills"><span class="pill imp">Impact: High</span><span class="pill eff">Effort: Med</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">2. </span>Rethink the export / entry-limit paywall for loyal users</h3><span class="lab">From the reviews</span><p>“Only 3 entries/day free, no export without paying” — 5-year users leaving over the ₹199 model.</p><span class="lab">Expected impact</span><p>Retains the loyal base that compounds word-of-mouth.</p><div class="pills"><span class="pill imp">Impact: High</span><span class="pill eff">Effort: Low</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">3. </span>Loan statement, closing &amp; responsive support</h3><span class="lab">From the reviews</span><p>“Not providing loan statement or closing option, no customer care.”</p><span class="lab">Expected impact</span><p>Compliance and trust on the money product.</p><div class="pills"><span class="pill imp">Impact: High</span><span class="pill eff">Effort: Med</span></div></div><div class="idea"><h3><span class="mono" style="color:var(--brand)">4. </span>Cap and clarify ads</h3><span class="lab">From the reviews</span><p>Ads are the lowest-rated theme (1.71★) — injected into a daily utility.</p><span class="lab">Expected impact</span><p>Less rage; a cleaner reason to buy Pro.</p><div class="pills"><span class="pill imp">Impact: Med</span><span class="pill eff">Effort: Low</span></div></div></div>
+  </section>
+
+  <section id="analyst"><div class="eyebrow">05 · The product-analyst lens</div>
+    <h2 class="sec-h">How I’d run analytics here</h2>
+    <p class="sec-sub">The company facts above are real. The rest is how I’d <b>instrument and grow</b> the product. Funnel and cohort figures are <b>illustrative frameworks</b>, clearly marked.</p>
+    <div class="card"><h3>North-star metric tree</h3><p>One number the org can move, decomposed into the levers a team owns.</p>
+      <div class="tree" style="margin-top:14px"><div class="node" style="border-top:3px solid var(--brand)"><b>Retained active merchants</b><br><span class="src-note">north star</span></div>
+        <div class="x">=</div><div class="ops"><div class="node"><b>New merchants</b><br><span class="src-note">acquisition × languages</span></div><div class="x">×</div><div class="node"><b>Daily ledger use</b><br><span class="src-note">habit × reliability</span></div><div class="x">×</div><div class="node"><b>Monetisation</b><br><span class="src-note">subscription + payments + lending</span></div></div></div>
+      <p style="margin-top:12px">The quiet killer sits in the third leg — a monetisation move (a paywall, a loan-collections call, an ad) that <b>breaks the habit in the second leg</b>. Measure each monetisation lever by its effect on retention, not just its revenue.</p></div>
+    <div class="grid2" style="margin-top:16px"><div class="chart"><div class="ct">Install → paid funnel<span class="illus">illustrative</span></div><div class="cs">Install → first entry → daily active → Pro</div><div id="c-funnel"></div></div>
+      <div class="chart"><div class="ct">Cohort retention (monthly)<span class="illus">illustrative</span></div><div class="cs">% of a cohort still active, by month since first use</div><div id="c-cohort"></div></div></div>
+    <div class="insight"><div class="k">What good looks like</div><p>The leaks that matter are <b>daily-active → Pro</b> and, hidden beneath it, <b>loyal-merchant churn</b> after a paywall or a loan complaint. Instrument monetisation-driven churn as a first-class metric — cohort retention split by whether a merchant hit the paywall or took a loan.</p></div></section>
+
+  <section id="experiments"><div class="eyebrow">06 · Experiment backlog</div>
+    <h2 class="sec-h">The first A/B tests I’d ship</h2>
+    <p class="sec-sub">Each tied to a lever in the tree, with a primary metric and a guardrail so we don’t win one number by breaking another.</p>
+    <div class="card" style="padding:4px 4px"><table class="exp"><thead><tr><th>Hypothesis</th><th>Lever</th><th>Primary metric</th><th>Guardrail</th></tr></thead><tbody><tr><td><b>Paywall redesign</b> — soften the entry-limit/export paywall for long-tenure users</td><td><span class="tpill">retention</span></td><td>Loyal-cohort D30</td><td>Pro revenue</td></tr><tr><td><b>Lending guardrails</b> — consent-first, no data-sharing, clear statements & closing</td><td><span class="tpill">trust</span></td><td>Loan-complaint rate</td><td>Lending volume</td></tr><tr><td><b>Ad-load test</b> — cap ads inside the ledger view</td><td><span class="tpill">retention</span></td><td>Daily active merchants</td><td>Ad revenue</td></tr><tr><td><b>Lite build</b> — a lighter app for low-end phones</td><td><span class="tpill">growth</span></td><td>Install→D1 on budget devices</td><td>App size</td></tr></tbody></table></div>
+    <h3 style="font-family:var(--font-d);margin:22px 0 10px;font-size:1.1rem">First 30 · 60 · 90 days as your analyst</h3>
+    <ul class="phase clean"><li><b>Days 0–30 —</b> a monetisation-vs-retention dashboard: cohort retention split by paywall-hit and loan-taken, plus a loan-complaint tracker.</li><li><b>Days 30–60 —</b> run the paywall-redesign and lending-guardrail tests; measure loyal-cohort retention lift.</li><li><b>Days 60–90 —</b> a per-merchant contribution model across subscription, payments and lending, so revenue is tuned without churning the base.</li></ul></section>
+
+  <section id="moat"><div class="eyebrow">07 · Moat &amp; risk</div>
+    <h2 class="sec-h">What protects it, what threatens it</h2>
+    <div class="grid2"><div class="card"><h3>The moat</h3><ul class="clean"><li><b>Daily habit</b> — the receivables ledger lives in the app.</li><li><b>Switching cost</b> — a merchant’s whole khata and customer data.</li><li><b>Distribution</b> — 50M+ downloads, 13 languages.</li></ul></div>
+      <div class="card"><h3>The risks</h3><ul class="clean"><li><b>Monetisation backlash</b> — paywall + lending + ads churn the loyal base.</li><li><b>Lending brand damage</b> — spam, data-sharing, credit-score complaints.</li><li><b>Cooled category</b> — SME-bookkeeping growth has slowed.</li></ul></div></div>
+    <p class="src-note" style="margin-top:8px"><b>Note:</b> Funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks, not reported Khatabook figures. Company facts are real and sourced.</p>
+    <details><summary>Sources &amp; method</summary><p class="src-note" style="margin-top:8px">Inc42 / Tracxn / YourStory — Series C $100M at ~$600M valuation (2021), total ~$187M raised; FY24 operating revenue ~₹103 Cr with narrowing losses; 50M+ downloads, ~10M MAU (self-reported), 13 languages; monetisation via Khatabook Pro subscription, UPI/QR payments and a lending arm (₹1,000 Cr AUM target) · Google Play public reviews (600-review sample, package com.vaibhavkalpe.android.khatabook, Nov 2026). Figures as of 2026.</p></details></section>
+
+  <footer>Independent product-analyst teardown by Diya Mittal (ex-Pocket FM, Scout). Company facts are real and sourced; funnel, cohort and unit-economics charts are clearly-labelled illustrative frameworks. Khatabook and its marks belong to their owners.</footer>
+</div>
+
+<div class="tt" id="tt"></div>
+<script>
+"use strict";
+var CFG={"wf": [{"l": "Blended rev / merchant", "v": 60, "t": "tot"}, {"l": "− Content/ops", "v": -18, "t": "neg"}, {"l": "− Lending risk/collections", "v": -20, "t": "neg"}, {"l": "− Support", "v": -14, "t": "neg"}, {"l": "Contribution", "v": 8, "t": "end"}], "rev": [{"l": "Seed/A (2019)", "v": 25}, {"l": "Series B (2020)", "v": 60}, {"l": "Series C (2021)", "v": 100}], "rev_growth": "Sequoia/Tiger/B Capital", "rev_unit": "$M", "mix": [{"l": "Lending", "v": 40, "c": "--c-sub"}, {"l": "Subscription paywall", "v": 28, "c": "--c-a"}, {"l": "Ads", "v": 20, "c": "--c-b"}, {"l": "App performance", "v": 12, "c": "--muted"}], "rating": [{"l": "Khatabook (Play sample)", "v": 3.97, "n": "600 reviews", "c": "--c-sub"}], "funnel": [{"l": "Installed", "v": 100}, {"l": "First entry", "v": 78}, {"l": "Daily active", "v": 46}, {"l": "Pro trial", "v": 18}, {"l": "Paid Pro", "v": 11}], "cohort": [100, 46, 36, 33, 31, 34]};
+var SVGNS="http://www.w3.org/2000/svg";
+function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tt=document.getElementById("tt");
+function bind(node,html){node.addEventListener("mousemove",function(e){tt.innerHTML=html;tt.style.opacity="1";tt.style.left=(e.clientX+12)+"px";tt.style.top=(e.clientY+12)+"px";});node.addEventListener("mouseleave",function(){tt.style.opacity="0";});}
+function rupee(n){return "₹"+n.toLocaleString("en-IN");}
+
+function waterfall(id,steps){var box=document.getElementById(id);if(!box)return;var W=440,H=240,pad=26,base=H-42,top=18;
+  var max=Math.max.apply(null,steps.map(function(s){return Math.abs(s.v);})),scale=(base-top)/max,n=steps.length,slot=(W-pad*2)/n,bw=slot-16,run=0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),g=cvar("--grid"),ink=cvar("--second"),br=cvar("--brand"),neg=cvar("--neg"),pos=cvar("--pos");
+  svg.appendChild(el("line",{x1:pad,y1:base,x2:W-pad,y2:base,stroke:g,"stroke-width":1}));
+  steps.forEach(function(s,i){var x=pad+i*slot+8,hiVal,loVal,col;
+    if(s.t==="neg"){hiVal=run;loVal=run+s.v;run=loVal;col=neg;}
+    else{hiVal=Math.max(s.v,0);loVal=Math.min(s.v,0);run=s.v;col=(s.t==="end")?(s.v<0?neg:pos):br;}
+    var yTop=base-Math.max(hiVal,0)*scale,h=Math.max((Math.max(hiVal,loVal)-Math.min(hiVal,loVal))*scale,2);
+    if(s.t==="end"&&s.v<0){yTop=base;h=Math.max(Math.abs(s.v)*scale,2);}
+    var r=el("rect",{x:x,y:yTop,width:bw,height:h,rx:4,fill:col,opacity:(s.t==="neg")?0.9:(s.t==="sub"?0.55:1)});svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+(s.v<0?"−":"")+rupee(Math.abs(s.v))+"</span>");
+    var tx=el("text",{x:x+bw/2,y:yTop-6,"text-anchor":"middle","font-size":10,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(s.v<0?"−":"")+rupee(Math.abs(s.v));svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:base+15,"text-anchor":"middle","font-size":8,fill:ink});lb.textContent=s.l.length>14?s.l.slice(0,13)+"…":s.l;svg.appendChild(lb);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function barsN(id,data,growth,unit){var box=document.getElementById(id);if(!box)return;var W=440,H=220,L=20,R=14,T=24,B=34,u=unit||"₹";
+  var max=Math.max.apply(null,data.map(function(d){return d.v;}))*1.25,iw=W-L-R,ih=H-T-B,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  var n=data.length,bw=Math.min(56,(iw/n)-18),gap=(iw-bw*n)/(n+1);
+  data.forEach(function(d,i){var x=L+gap+i*(bw+gap),h=ih*d.v/max,y=T+ih-h;var r=el("rect",{x:x,y:y,width:bw,height:h,rx:5,fill:br,opacity:0.5+0.5*i/(n-1)});svg.appendChild(r);
+    bind(r,"<b>"+d.l+"</b><br><span class='v'>"+(unit==="$M"?"$"+d.v.toLocaleString()+"M":unit==="%"?d.v+"%":u+d.v.toLocaleString("en-IN")+(unit==="k"?"k":" Cr"))+"</span>");
+    var tx=el("text",{x:x+bw/2,y:y-7,"text-anchor":"middle","font-size":10.5,fill:cvar("--ink"),"font-family":cvar("--font-m")});tx.textContent=(unit==="k"?d.v+"k":unit==="$M"?"$"+d.v+"M":unit==="%"?d.v+"%":"₹"+d.v);svg.appendChild(tx);
+    var lb=el("text",{x:x+bw/2,y:H-12,"text-anchor":"middle","font-size":10,fill:mut});lb.textContent=d.l;svg.appendChild(lb);});
+  if(growth){var ar=el("text",{x:W-R,y:T-8,"text-anchor":"end","font-size":11,fill:cvar("--pos"),"font-family":cvar("--font-m")});ar.textContent=growth;svg.appendChild(ar);}
+  box.innerHTML="";box.appendChild(svg);}
+
+function donut(id,data){var box=document.getElementById(id);if(!box)return;var W=440,H=230,cx=150,cy=H/2,rO=82,rI=50;
+  var total=data.reduce(function(a,d){return a+d.v;},0),ang=-Math.PI/2,svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  data.forEach(function(d){var cc=cvar(d.c),a2=ang+d.v/total*Math.PI*2,large=(a2-ang)>Math.PI?1:0;
+    var x1=cx+rO*Math.cos(ang),y1=cy+rO*Math.sin(ang),x2=cx+rO*Math.cos(a2),y2=cy+rO*Math.sin(a2);
+    var xi1=cx+rI*Math.cos(a2),yi1=cy+rI*Math.sin(a2),xi2=cx+rI*Math.cos(ang),yi2=cy+rI*Math.sin(ang);
+    var p=el("path",{d:"M"+x1+","+y1+" A"+rO+","+rO+" 0 "+large+" 1 "+x2+","+y2+" L"+xi1+","+yi1+" A"+rI+","+rI+" 0 "+large+" 0 "+xi2+","+yi2+" Z",fill:cc,stroke:cvar("--panel"),"stroke-width":2});
+    svg.appendChild(p);bind(p,"<b>"+d.l+"</b><br><span class='v'>"+d.v+"%</span>");ang=a2;});
+  data.forEach(function(d,i){var ly=cy-24+i*26;svg.appendChild(el("rect",{x:270,y:ly,width:13,height:13,rx:3,fill:cvar(d.c)}));
+    var t=el("text",{x:290,y:ly+11,"font-size":12,fill:cvar("--ink")});t.textContent=d.l+"  ·  "+d.v+"%";t.setAttribute("font-family",cvar("--font-b"));svg.appendChild(t);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function hbar(id,data){var box=document.getElementById(id);if(!box)return;var W=440,rh=46,H=data.length*rh+6,lo=3.2,hi=5.0;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H}),mut=cvar("--muted");
+  data.forEach(function(d,i){var y=i*rh+8,w=(W-190)*(d.v-lo)/(hi-lo);var r=el("rect",{x:160,y:y,width:Math.max(w,3),height:26,rx:6,fill:cvar(d.c||"--c-sub")});svg.appendChild(r);
+    bind(r,"<b>"+d.l+"</b><br><span class='v'>"+d.v.toFixed(2)+"★ · "+d.n+"</span>");
+    var lb=el("text",{x:152,y:y+17,"text-anchor":"end","font-size":11.5,fill:cvar("--ink")});lb.textContent=d.l;svg.appendChild(lb);
+    var vl=el("text",{x:160+Math.max(w,3)+8,y:y+17,"font-size":11,fill:mut,"font-family":cvar("--font-m")});vl.textContent=d.v.toFixed(2)+"★";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function funnel(id,steps){var box=document.getElementById(id);if(!box)return;var W=440,H=steps.length*38+10,max=steps[0].v,br=cvar("--brand"),mut=cvar("--muted"),svg=el("svg",{viewBox:"0 0 "+W+" "+H});
+  steps.forEach(function(s,i){var y=i*38+6,w=(W-200)*s.v/max;var r=el("rect",{x:200,y:y,width:Math.max(w,3),height:26,rx:5,fill:br,opacity:1-i*0.13});svg.appendChild(r);
+    bind(r,"<b>"+s.l+"</b><br><span class='v'>"+s.v+"% of top</span>");
+    var lb=el("text",{x:192,y:y+17,"text-anchor":"end","font-size":10.5,fill:cvar("--ink")});lb.textContent=s.l;svg.appendChild(lb);
+    var vl=el("text",{x:200+Math.max(w,3)+6,y:y+17,"font-size":10.5,fill:mut,"font-family":cvar("--font-m")});vl.textContent=s.v+"%";svg.appendChild(vl);});
+  box.innerHTML="";box.appendChild(svg);}
+
+function cohort(id,base){var box=document.getElementById(id);if(!box)return;var cohorts=["Jun","Jul","Aug","Sep","Oct"],months=base,W=440,cell=34,x0=46,y0=22,gapc=6;
+  var H=y0+cohorts.length*(cell+gapc)+16,svg=el("svg",{viewBox:"0 0 "+W+" "+H}),br=cvar("--brand"),mut=cvar("--muted");
+  for(var m=0;m<months.length;m++){var ht=el("text",{x:x0+m*(cell+gapc)+cell/2,y:y0-6,"text-anchor":"middle","font-size":9,fill:mut,"font-family":cvar("--font-m")});ht.textContent="M"+m;svg.appendChild(ht);}
+  cohorts.forEach(function(ch,r){var rt=el("text",{x:x0-8,y:y0+r*(cell+gapc)+cell/2+4,"text-anchor":"end","font-size":9.5,fill:mut});rt.textContent=ch;svg.appendChild(rt);
+    for(var m=0;m<months.length;m++){var v=Math.max(0,months[m]-r*2+(r?Math.round(Math.sin(r+m)*2):0)),op=0.14+0.86*(v/100),x=x0+m*(cell+gapc),y=y0+r*(cell+gapc);
+      var rc=el("rect",{x:x,y:y,width:cell,height:cell,rx:5,fill:br,opacity:op});svg.appendChild(rc);bind(rc,"<b>"+ch+" · M"+m+"</b><br><span class='v'>"+v+"% retained</span>");
+      var vt=el("text",{x:x+cell/2,y:y+cell/2+3.5,"text-anchor":"middle","font-size":9,fill:(op>0.55?cvar("--brand-ink"):cvar("--ink")),"font-family":cvar("--font-m")});vt.textContent=v;svg.appendChild(vt);}});
+  box.innerHTML="";box.appendChild(svg);}
+
+function renderAll(){
+  waterfall("c-waterfall",CFG.wf);
+  barsN("c-rev",CFG.rev,CFG.rev_growth,CFG.rev_unit);
+  donut("c-mix",CFG.mix);
+  hbar("c-ratings",CFG.rating);
+  funnel("c-funnel",CFG.funnel);
+  cohort("c-cohort",CFG.cohort);
+}
+var root=document.documentElement,tglb=document.getElementById("tgl");
+function curDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;}
+function setLabel(){tglb.textContent=curDark()?"Light":"Dark";}
+try{var sv=localStorage.getItem("td_khatabook");if(sv)root.setAttribute("data-theme",sv);}catch(e){}
+tglb.addEventListener("click",function(){var nd=!curDark();root.setAttribute("data-theme",nd?"dark":"light");try{localStorage.setItem("td_khatabook",nd?"dark":"light");}catch(e){}setLabel();renderAll();});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(!root.getAttribute("data-theme")){setLabel();renderAll();}});
+setLabel();renderAll();
+</script>
