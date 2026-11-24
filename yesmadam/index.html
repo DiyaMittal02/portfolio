@@ -116,9 +116,9 @@ ul.clean li b{color:var(--ink)}
   <span class="brand"><img src="img/icon.png" alt="YesMadam"><span>YesMadam <span class="r">Teardown</span></span></span>
   <nav class="nav">
     <a href="#product">Product</a><a href="#economics">Economics</a><a href="#growth">Growth</a>
-    <a href="#market">Market</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a>
+    <a href="#market">Market</a><a href="#journey">Journey</a><a href="#analyst">Analyst lens</a><a href="#experiments">Experiments</a>
     <a href="#reads">More reads</a><a href="#moat">Moat &amp; risk</a>
-  <a href="#voice">Voice</a></nav>
+  <a href="#voice">Voice</a><a href="#voice-deep">Deep dive</a></nav>
   <button class="tgl" id="tgl" aria-label="Toggle theme">Light</button>
 </div></div>
 
@@ -248,6 +248,24 @@ ul.clean li b{color:var(--ink)}
   </section>
 
   
+  <section id="journey">
+    <div class="eyebrow">The journey</div>
+    <h2 class="sec-h">How it got here</h2>
+    <p class="sec-sub">Founding, funding and the turns that shaped the company. Hover any milestone. Dates and amounts are from public press; where a figure is estimated it is labelled.</p>
+    <style>
+#journey .jq-rail{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 12px}
+#journey .jq-item{min-width:165px;flex:1 1 165px;border:1px solid var(--border);border-radius:10px;padding:11px 12px;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+#journey .jq-item:hover{border-color:var(--brand);transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.07)}
+#journey .jq-yr{font-family:var(--font-m);font-weight:700;color:var(--brand);font-size:.9rem;letter-spacing:.02em}
+#journey .jq-t{font-weight:600;font-size:.88rem;margin:3px 0 2px}
+#journey .jq-d{font-size:.79rem;color:var(--second);line-height:1.38}
+#journey .jq-val{display:inline-block;margin-top:7px;font-family:var(--font-m);font-size:.71rem;background:var(--brand);color:var(--brand-ink);padding:2px 8px;border-radius:999px}
+#journey .jq-spark{margin:4px 0 14px;padding:12px;border:1px solid var(--border);border-radius:10px}
+</style>
+    
+    <div class="jq-rail"><div class="jq-item"><div class="jq-yr">2016</div><div class="jq-t">Founded</div><div class="jq-d">At-home salon & spa for women.</div></div><div class="jq-item"><div class="jq-yr">2017</div><div class="jq-t">PMF, hard winter</div><div class="jq-d">Reached fit as rival salon-at-home startups shut down.</div></div><div class="jq-item"><div class="jq-yr">Feb 2024</div><div class="jq-t">Shark Tank India</div><div class="jq-d">₹1.5 Cr deal (Vineeta, Aman, Peyush, Ritesh).</div><span class="jq-val">~₹300 Cr implied</span></div><div class="jq-item"><div class="jq-yr">Sep 2024</div><div class="jq-t">₹50 Cr maiden round</div><div class="jq-d">Led by Info Edge.</div></div><div class="jq-item"><div class="jq-yr">Dec 2024</div><div class="jq-t">‘Fired for stress’ stunt</div><div class="jq-d">Viral PR stunt drew heavy backlash.</div></div><div class="jq-item"><div class="jq-yr">Today</div><div class="jq-t">3.56★ Play sample</div><div class="jq-d">Supply reliability is the growth unlock.</div></div></div>
+  </section>
+
   <section id="voice">
     <div class="eyebrow">Voice of customer · real data</div>
     <h2 class="sec-h">What users actually say</h2>
@@ -258,6 +276,21 @@ ul.clean li b{color:var(--ink)}
       <div class="card"><h3>In their words</h3><p class="src-note" style="margin:2px 0 10px">Representative reviews · verbatim</p><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Worst. Call 100s of times and then at the time of service comes late or cancels the appointment. I've booked twice and both times had a bad experience. I would rather go to parlour or use Urban company.”</span><div class="src-note" style="margin-top:3px">1★ · 4 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Disappointed. Very poor customer support system. They don't value customers and their problems. Despite of several follow up , they don't solve your problem.”</span><div class="src-note" style="margin-top:3px">2★ · 1 found helpful</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“Very poor service. Booked my slot and yet the professional didn't come..wasted my time..”</span><div class="src-note" style="margin-top:3px">1★ · 1 found helpful</div></div><div style="border-left:3px solid var(--pos);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">“ruby provides excellent salon services.”</span><div class="src-note" style="margin-top:3px">5★ · 18 found helpful</div></div></div>
     </div>
     <div class="insight" style="margin-top:16px"><div class="k">The read</div><p>At <b>3.56★ this is the lowest-rated app here</b>, and the cause is <b>reliability, not price</b>. Service quality is mentioned in 62% of reviews; <b>no-shows, refunds and cancellations</b> (avg ~1.2–1.7★) dominate the complaints — arrival SLA and professional vetting are the growth unlock.</p></div>
+  </section>
+
+  <section id="voice-deep">
+    <div class="eyebrow">Voice of customer · one level deeper</div>
+    <h2 class="sec-h">The professional didn’t show — and that’s the product</h2>
+    <p class="sec-sub">YesMadam’s recent sample is <b>3.56★ with 32% one-star</b>, and the cause is <b>supply reliability, not price</b>. Two linked failures: the professional doesn’t arrive (or cancels), and when they do, quality disappoints. Severity = average rating + count of 1–2★. Real data.</p>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>Where the one-stars concentrate</h3><p class="src-note" style="margin:2px 0 8px">Re-clustered from the 600-review sample · red = the real pain</p><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Booking / slot / no-show</span><span class="src-note" style="white-space:nowrap;color:var(--neg)">104 · 1.69★ · 85×≤2★</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Professional quality (fake products, untrained)</span><span class="src-note" style="white-space:nowrap;color:var(--neg)">125 · 2.85★ · 64×≤2★</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem"><span>Cancellation (by them)</span><span class="src-note" style="white-space:nowrap;color:var(--neg)">24 · 1.17★ · 23×≤2★</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 0;font-size:.9rem"><span>Refund</span><span class="src-note" style="white-space:nowrap;color:var(--neg)">16 · 1.19★ · 16×≤2★</span></div></div>
+      <div class="card"><h3>In their words · trust at the doorstep</h3><p class="src-note" style="margin:2px 0 10px">Real 1★ Play reviews</p><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;Booked my slot and yet the professional didn’t come — wasted my time.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · no-show</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;They ask for the service-start OTP without even visiting.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · gaming the completion flow</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 12px"><span style="font-size:.88rem">&ldquo;Fake products for hair, can’t do basic services; customer service didn’t help.&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · quality + no recovery</div></div><div style="border-left:3px solid var(--neg);padding:3px 0 3px 12px;margin:0 0 0 12px"><span style="font-size:.88rem">&ldquo;Why offer a massage/spa booking if you can’t provide the service?&rdquo;</span><div class="src-note" style="margin-top:3px">1★ · broken promise</div></div></div>
+    </div>
+    <div class="insight" style="margin-top:16px"><div class="k">The read</div><p>For an at-home service, <b>on-time arrival and a vetted professional ARE the product</b> — price isn’t the issue. Two failures compound: the professional <b>doesn’t show or cancels</b> (booking 1.69★, cancellation 1.17★), and when they do, quality disappoints — fake products, untrained staff, and the alarming <b>“asks for the start-OTP without visiting”</b>, which means someone is gaming the completion metric. That last one is both a fraud signal and a trust bomb. The unlock is supply: vet professionals, guarantee arrival, and make the start-OTP impossible to trigger remotely.</p></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>How I’d measure it</h3><ul class="clean"><li><b>No-show rate</b> and <b>on-time arrival %</b> — the core reliability metrics.</li><li><b>‘Start-OTP without arrival’ fraud signal</b> (OTP requested with no geolocation match).</li><li><b>Professional-quality CSAT</b> and repeat-book rate; refund TAT.</li><li>Guardrail: cancellation-by-partner rate, which quietly destroys trust.</li></ul></div>
+      <div class="card"><h3>Quick wins I’d ship</h3><ul class="clean"><li><b>Geofenced start-OTP</b> — can’t start a job unless the professional is physically on-site.</li><li>A <b>vetting + rating gate</b> so low-quality professionals don’t get bookings.</li><li><b>Auto-refund + priority rebook</b> the moment a no-show is detected.</li></ul></div>
+    </div>
   </section>
 
   <section id="analyst">
